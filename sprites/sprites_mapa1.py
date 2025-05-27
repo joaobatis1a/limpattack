@@ -5,6 +5,12 @@ from sprites.sprites_base import *
 from npcs import npcs_data
 import random
 
+# este arquivo define o mapa 1 e os sprites especificos desse mapa
+# tilemap contem a representacao do mapa usando caracteres
+# create_tiled_map instancia os sprites de acordo com o tilemap
+# classes como House, Cerca, BigTree, Arbs, Espan, Poco, Sacos, Wind, Toco e NPC3 representam objetos e npcs do mapa 1
+# comentarios em minusculo e sem acento para facilitar entendimento
+
 tilemap = [
     'MTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT',
     'M.............................u.....,,Np',
@@ -38,6 +44,7 @@ tilemap = [
     'MttttttttttttttttttttttttttttttttttttttM',
 ]
 
+# cria o mapa com base no tilemap definido acima
 def create_tiled_map(game, mapa_atual_index, mapas_visitados, fases, enemies, itens_cura):
     if not hasattr(game, 'mapa1_state'):
         game.mapa1_state = {
@@ -46,33 +53,42 @@ def create_tiled_map(game, mapa_atual_index, mapas_visitados, fases, enemies, it
             'npc3_pos': None,
             'sabonete_coletado': False
         }
+    # percorre cada linha e coluna do tilemap
     for i, row in enumerate(tilemap):
         for j, column in enumerate(row):
+            # cria o sprite de chao
             Ground(game, j, i)
+            # verifica se o tile atual e uma parede ou um portal fechado
             if column == ",":
                 Ground2(game, j, i)
             if column == "N":
                 Ground2(game, j, i)
+                # posiciona o jogador no mapa, dependendo se o mapa foi visitado ou nao
                 if not mapas_visitados[mapa_atual_index]:
                     game.player = Player(game, 5, 10)
                 else:
                     game.player = Player(game, j, i)
                     Ground2(game, j, i)
+            # cria inimigos aleatorios nas posicoes marcadas com "E" no tilemap
             if column == "E" and fases[mapa_atual_index]:
                 enemy_name = random.choice(list(enemies.keys()))
                 game.battle_enemy = Enemy(game, j, i, enemy_name)
+            # cria diferentes tipos de arvores, dependendo do caractere no tilemap
             if column == "t":
                 Tree1(game, j, i)
             if column == "T":
                 Tree2(game, j, i)
             if column == "M":
                 Tree3(game, j, i)
+            # cria portais fechados e abertos, dependendo das condicoes do jogo
             if column == "p":
                 ClosedPortal(game, j, i)
             if column == "p" and len(game.enemy) == 0:
                 Portal(game, j, i)
+            # cria as casas no mapa
             if column == "H":
                 House(game, j, i)
+            # cria as cercas superiores
             if column == "C":
                 CercaTop1(game, j, i)
             if column == "h":
@@ -82,12 +98,14 @@ def create_tiled_map(game, mapa_atual_index, mapas_visitados, fases, enemies, it
                 Ground2(game, j, i)
             if column == "F":
                 CercaTop3(game, j, i)
+            # cria as cercas do meio
             if column == "c":
                 CercaTopMid1(game, j, i)
             if column == "Y":
                 CercaTopMid2(game, j, i)
             if column == "f":
                 CercaTopMid3(game, j, i)
+            # cria as cercas inferiores
             if column == "j":
                 CercaMid1(game, j, i)
             if column == "i":
@@ -98,12 +116,14 @@ def create_tiled_map(game, mapa_atual_index, mapas_visitados, fases, enemies, it
                 CercaBotMid2(game, j, i)
             if column == "I":
                 CercaBotMid3(game, j, i)
+            # cria as cercas na parte inferior do mapa
             if column == "L":
                 CercaBot1(game, j, i)
             if column == "l":
                 CercaBot2(game, j, i)
             if column == "K":
                 CercaBot3(game, j, i)
+            # cria objetos como arvores grandes, arbustos, poços, sacos e elementos de vento
             if column == "o":
                 BigTree(game, j, i)
             if column == "a":
@@ -122,6 +142,7 @@ def create_tiled_map(game, mapa_atual_index, mapas_visitados, fases, enemies, it
                 Wind(game, j, i)
             if column == "u":
                 Toco(game, j, i)
+            # cria itens de cura em posicoes especificas do mapa
             if column == "U":
                 pos = (j, i)
                 if not hasattr(game, 'itens_cura_coletados'):
@@ -129,6 +150,7 @@ def create_tiled_map(game, mapa_atual_index, mapas_visitados, fases, enemies, it
                 if pos not in game.itens_cura_coletados:
                     item_cura = random.choices(itens_cura, weights=[60, 30, 8, 2])[0]
                     ItemCuraSprite(game, j, i, item_cura)
+            # cria os NPCs do mapa
             if column == "1":
                 NPC(game, j, i, symbol="A")
             if column == "2":
@@ -136,22 +158,26 @@ def create_tiled_map(game, mapa_atual_index, mapas_visitados, fases, enemies, it
             if column == "3":
                 Ground2(game, j, i)
                 npc3_x, npc3_y = j, i
+                # posiciona o NPC3 dependendo do estado salvo no jogo
                 if game.mapa1_state['npc3_moved'] and game.mapa1_state['npc3_pos']:
                     npc3_x, npc3_y = game.mapa1_state['npc3_pos']
                 npc3 = NPC3(game, npc3_x, npc3_y, symbol="C")
                 npc3.estado = game.mapa1_state['npc3_estado']
                 npc3.moved = game.mapa1_state['npc3_moved']
+                # remove o NPC3 da sua posicao anterior, se necessario
                 if npc3.moved:
                     try:
                         npc3.remove(game.blocks)
                     except Exception:
                         pass
                 game.npc3_ref = npc3
+            # cria o sabonete apenas uma vez, se ainda nao foi coletado
             if column == "B":
                 if not game.mapa1_state['sabonete_coletado'] and 'sabonete' not in getattr(game, 'inventario_chave', []):
                     Sabonete(game, j, i)
     mapas_visitados[mapa_atual_index] = True
 
+# classe para criar as casas no mapa
 class House(pygame.sprite.Sprite):
     def __init__(self, game, x, y):
         self.game = game
@@ -168,6 +194,7 @@ class House(pygame.sprite.Sprite):
         self.rect.x = self.x
         self.rect.y = self.y
 
+# classes para criar as cercas superiores do mapa
 class CercaTop1(pygame.sprite.Sprite):
     def __init__(self, game, x, y):
         self.game = game
@@ -216,6 +243,7 @@ class CercaTop3(pygame.sprite.Sprite):
         self.rect.x = self.x
         self.rect.y = self.y
 
+# classes para criar as cercas do meio do mapa
 class CercaTopMid1(pygame.sprite.Sprite):
     def __init__(self, game, x, y):
         self.game = game
@@ -264,6 +292,7 @@ class CercaTopMid3(pygame.sprite.Sprite):
         self.rect.x = self.x
         self.rect.y = self.y
 
+# classes para criar as cercas inferiores do mapa
 class CercaMid1(pygame.sprite.Sprite):
     def __init__(self, game, x, y):
         self.game = game
@@ -296,6 +325,7 @@ class CercaMid2(pygame.sprite.Sprite):
         self.rect.x = self.x
         self.rect.y = self.y
 
+# classes para criar as cercas na parte inferior do mapa
 class CercaBotMid1(pygame.sprite.Sprite):
     def __init__(self, game, x, y):
         self.game = game
@@ -392,6 +422,7 @@ class CercaBot3(pygame.sprite.Sprite):
         self.rect.x = self.x
         self.rect.y = self.y
 
+# classe para criar arvores grandes no mapa
 class BigTree(pygame.sprite.Sprite):
     def __init__(self, game, x, y):
         self.game = game
@@ -408,6 +439,7 @@ class BigTree(pygame.sprite.Sprite):
         self.rect.x = self.x
         self.rect.y = self.y
 
+# classe para criar arbustos no mapa
 class Arbs(pygame.sprite.Sprite):
     def __init__(self, game, x, y):
         self.game = game
@@ -424,6 +456,7 @@ class Arbs(pygame.sprite.Sprite):
         self.rect.x = self.x
         self.rect.y = self.y
 
+# classe para criar espinhos no mapa
 class Espan(pygame.sprite.Sprite):
     def __init__(self, game, x, y):
         self.game = game
@@ -440,6 +473,7 @@ class Espan(pygame.sprite.Sprite):
         self.rect.x = self.x
         self.rect.y = self.y
 
+# classe para criar poços no mapa
 class Poco(pygame.sprite.Sprite):
     def __init__(self, game, x, y):
         self.game = game
@@ -456,6 +490,7 @@ class Poco(pygame.sprite.Sprite):
         self.rect.x = self.x
         self.rect.y = self.y
 
+# classe para criar poços duplos no mapa
 class Poco2(pygame.sprite.Sprite):
     def __init__(self, game, x, y):
         self.game = game
@@ -472,6 +507,7 @@ class Poco2(pygame.sprite.Sprite):
         self.rect.x = self.x
         self.rect.y = self.y
 
+# classe para criar sacos no mapa
 class Sacos(pygame.sprite.Sprite):
     def __init__(self, game, x, y):
         self.game = game
@@ -488,6 +524,7 @@ class Sacos(pygame.sprite.Sprite):
         self.rect.x = self.x
         self.rect.y = self.y
 
+# classe para criar vento no mapa
 class Wind(pygame.sprite.Sprite):
     def __init__(self, game, x, y):
         self.game = game
@@ -504,6 +541,7 @@ class Wind(pygame.sprite.Sprite):
         self.rect.x = self.x
         self.rect.y = self.y
 
+# classe para criar tocos no mapa
 class Toco(pygame.sprite.Sprite):
     def __init__(self, game, x, y):
         self.game = game
@@ -520,6 +558,7 @@ class Toco(pygame.sprite.Sprite):
         self.rect.x = self.x
         self.rect.y = self.y
 
+# classe para criar o NPC3 no mapa
 class NPC3(pygame.sprite.Sprite):
     def __init__(self, game, x, y, symbol="3"):
         self.game = game

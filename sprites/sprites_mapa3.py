@@ -5,6 +5,12 @@ from sprites.sprites_base import *
 from npcs import npcs_data
 import random
 
+# este arquivo define o mapa 3 e os sprites especificos desse mapa
+# tilemap contem a representacao do mapa usando caracteres
+# create_tiled_map instancia os sprites de acordo com o tilemap
+# classes como Tenda e Toco representam objetos do mapa 3
+# comentarios em minusculo e sem acento para facilitar entendimento
+
 tilemap = [
     'TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTM',
     'pN.Z......u.................E..........M',
@@ -35,41 +41,44 @@ tilemap = [
     'M......................................M',
     'M......................................M',
     'M......................................M',
+    'M......................................M',
     'M......................................p',
     'MttttttttttttttttttttttttttttttttttttttM',
 ]
 
+# funcao responsavel por criar o mapa baseado no tilemap
 def create_tiled_map(game, mapa_atual_index, mapas_visitados, fases, enemies, itens_cura):
     for i, row in enumerate(tilemap):
         for j, column in enumerate(row):
-            Ground(game, j, i)
+            Ground(game, j, i)  # cria o chao em todas as posicoes
             if column == ",":
-                Ground2(game, j, i)
+                Ground2(game, j, i)  # cria um tipo diferente de chao
             if column == "N":
-                game.player = Player(game, j, i)
+                game.player = Player(game, j, i)  # posiciona o jogador
                 Ground2(game, j, i)
             if column == "E" and fases[mapa_atual_index]:
                 enemy_name = random.choice(list(enemies.keys()))
-                game.battle_enemy = Enemy(game, j, i, enemy_name)
+                game.battle_enemy = Enemy(game, j, i, enemy_name)  # posiciona inimigos
             if column == "t":
-                Tree1(game, j, i)
+                Tree1(game, j, i)  # posiciona tipo 1 de arvore
             if column == "T":
-                Tree2(game, j, i)
+                Tree2(game, j, i)  # posiciona tipo 2 de arvore
             if column == "M":
-                Tree3(game, j, i)
+                Tree3(game, j, i)  # posiciona tipo 3 de arvore
             if column == "p":
-                ClosedPortal(game, j, i)
+                ClosedPortal(game, j, i)  # posiciona portal fechado
             if column == "p" and len(game.enemy) == 0:
-                Portal(game, j, i)
+                Portal(game, j, i)  # posiciona portal aberto se nao houver inimigos
             if column == "U":
                 item_cura = random.choices(itens_cura, weights=[60, 30, 8, 2])[0]
-                ItemCuraSprite(game, j, i, item_cura)
+                ItemCuraSprite(game, j, i, item_cura)  # posiciona itens de cura
             if column == "u":
-                Toco(game, j, i)
+                Toco(game, j, i)  # posiciona tocos
             if column == "Z":
-                Tenda(game, j, i)
-    mapas_visitados[mapa_atual_index] = True
+                Tenda(game, j, i)  # posiciona tendas
+    mapas_visitados[mapa_atual_index] = True  # marca o mapa atual como visitado
 
+# classe que representa a tenda no mapa
 class Tenda(pygame.sprite.Sprite):
     def __init__(self, game, x, y):
         self.game = game
@@ -81,11 +90,13 @@ class Tenda(pygame.sprite.Sprite):
         self.width = TILESIZE
         self.height = TILESIZE
         bg_colors = [CHARACTER_BG, ENEYMY_BG, TERRAIN_BG]
+        # pega o sprite da tenda na spritesheet
         self.image = self.game.terrain_spritesheet.get_sprite(2, 802, 160, 160, bg_colors)
         self.rect = self.image.get_rect()
         self.rect.x = self.x
         self.rect.y = self.y
 
+# classe que representa o toco no mapa
 class Toco(pygame.sprite.Sprite):
     def __init__(self, game, x, y):
         self.game = game
@@ -97,6 +108,7 @@ class Toco(pygame.sprite.Sprite):
         self.width = TILESIZE
         self.height = TILESIZE
         bg_colors = [CHARACTER_BG, ENEYMY_BG, TERRAIN_BG]
+        # pega o sprite do toco na spritesheet
         self.image = self.game.terrain_spritesheet.get_sprite(130, 386, self.width, self.height, bg_colors)
         self.rect = self.image.get_rect()
         self.rect.x = self.x

@@ -1,8 +1,14 @@
+# este arquivo define o comportamento dos npcs do jogo
+# cada npc tem um simbolo unico usado no mapa
+# cada npc possui nome, status e dialogos
+# dialogos podem ser diferentes dependendo do estado do npc
+# comentarios em minusculo e sem acento para facilitar entendimento
+
 npcs_data = {
     "A": {
-        "nome": "Carlos",
-        "status": {"importante": True},
-        "dialogos": [
+        "nome": "Carlos",  # nome do npc
+        "status": {"importante": True},  # status do npc, se e importante ou nao
+        "dialogos": [  # dialogos do npc
             "Caramba, isso tá demorando pra crescer...",
             "Os tomates do Will vão crescer mais rápido que isso!",
         ]
@@ -18,16 +24,16 @@ npcs_data = {
     "C": {
         "nome": "Piu",
         "status": {"importante": True},
-        "dialogos_bloqueando": [
+        "dialogos_bloqueando": [  # dialogos que aparecem quando algo esta bloqueando o npc
             "Aaaaai! Meus Olhos! Sujos de lamaaaa!",
             "Não consigo enxergar a passagem, alguém me ajuda!",
             "Ei, você! Procure um sabonete para mim! Preciso enxergar!"
         ],
-        "dialogos_entrega": [
+        "dialogos_entrega": [  # dialogos de agradecimento ao receber ajuda
             "Oh, como você é gentil! Obrigado por me ajudar!",
             "Perdão por atrapalhar sua jornada, por favor, siga em frente!"
         ],
-        "dialogos_livre": [
+        "dialogos_livre": [  # dialogos quando o npc esta livre
             "Olhinhos, olhinhos... Enxergo, enxergo... Piu!"
         ]
     },
@@ -45,24 +51,29 @@ npcs_data = {
         "nome": "Kaiki",
         "status": {"importante": False, "presente_entregue": False},
         "dialogos": [
-            "THE GUARDIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAN",
+            "THE GUARDIAAAAAAAAAAAAAAAAAAAAAN!",
             "TOME ESTE PRESENTE E SE CUIDE!",
             "AAAAAAAND OOOOOOOOOONE",
         ]
     },
     "F": {
-        "nome": "Guardião",
+        "nome": "Bob",
         "status": {"importante": True, "tocha_entregue": False},
         "dialogos_bloqueando": [
-            "Você não pode passar sem uma tocha!",
-            "Procure uma tocha nas tendas e traga para mim."
+            "Acabei de chegar da floresta, tá muito escuro lá dentro!",
+            "Estive com Kauã agora há pouco, ele quer sua ajuda...",
+            "Procure uma tocha na aldeia e volte aqui, por favor!",
         ],
         "dialogos_entrega": [
-            "Ótimo, você trouxe a tocha! Agora pode passar.",
-            "Vou liberar a passagem para você."
+            "Ótimo, você trouxe a tocha! Kauã precisa atravessar a floresta.",
+            "A loja dele fica do outro lado da aldeia, mas...",
+            "O caminho está cheio de bactérias! A loja dele foi invadida!",
+            "Confio que você consegue combater os maus-hábitos.",
+            "Boa sorte, Nala!",
         ],
         "dialogos_livre": [
-            "Boa sorte no labirinto escuro!"
+            "Tome cuidado com as bactérias, Nala.",
+            "Sempre use o ataque certo contra elas!",
         ]
     }   
 }

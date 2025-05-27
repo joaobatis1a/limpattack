@@ -1,45 +1,62 @@
+# este arquivo define as classes de batalha e os dados dos inimigos
+# EnemyBattle representa um inimigo em batalha
+# Item e ItemCura representam itens que podem ser usados
+# selecionar_ataques_eficazes_e_aleatorios escolhe ataques para o inimigo
+# enemies contem os dados de todos os inimigos do jogo
+# comentarios em minusculo e sem acento para facilitar entendimento
+
 from config import *
 import random
 
+# classe que representa um inimigo em batalha
 class EnemyBattle:
     def __init__(self, nome, hp, ataques):
-        self.nome = nome
-        self.hp = hp
-        self.ataques = ataques
+        self.nome = nome  # nome do inimigo
+        self.hp = hp  # pontos de vida do inimigo
+        self.ataques = ataques  # ataques que o inimigo pode realizar
 
+    # metodo para escolher um ataque aleatorio do inimigo
     def ataque_aleatorio(self):
         from random import random
         for nome, dados in self.ataques.items():
+            # verifica se o ataque deve ser realizado baseado na probabilidade
             if random() <= dados["probabilidade"]:
-                return nome, dados["dano"]
-        return "Ataque Fraco", 3
+                return nome, dados["dano"]  # retorna o nome e dano do ataque
+        return "Ataque Fraco", 3  # ataque default caso nenhum ataque seja escolhido
 
+# classe que representa um item que pode ser usado em batalha
 class Item:
     def __init__(self, nome, dano_base, eficacias):
-        self.nome = nome
-        self.dano_base = dano_base
-        self.eficacias = eficacias
+        self.nome = nome  # nome do item
+        self.dano_base = dano_base  # dano base do item
+        self.eficacias = eficacias  # eficacias do item contra inimigos
 
+    # metodo que calcula o dano que o item pode causar em um inimigo
     def calcular_dano(self, inimigo_nome):
-        return self.dano_base * self.eficacias.get(inimigo_nome, 0.2)
+        return self.dano_base * self.eficacias.get(inimigo_nome, 0.2)  # dano base multiplicado pela eficacia contra o inimigo
 
+# classe que representa um item de cura
 class ItemCura:
     def __init__(self, nome, cura):
-        self.nome = nome
-        self.cura = cura
+        self.nome = nome  # nome do item de cura
+        self.cura = cura  # quantidade de cura que o item fornece
 
+# funcao que seleciona ataques eficazes e aleatorios para um inimigo
 def selecionar_ataques_eficazes_e_aleatorios(enemy_name):
-    todos_itens = list(itens.values())
+    todos_itens = list(itens.values())  # pega todos os itens disponiveis
+    # ordena os itens baseados na eficacia contra o inimigo
     eficazes = sorted(
         todos_itens,
         key=lambda item: item.eficacias.get(enemy_name, 0),
         reverse=True
     )
-    melhores = eficazes[:2]
-    restantes = [item for item in todos_itens if item not in melhores]
+    melhores = eficazes[:2]  # pega os 2 itens mais eficazes
+    restantes = [item for item in todos_itens if item not in melhores]  # pega os itens restantes que nao sao os melhores
+    # seleciona 2 itens aleatorios entre os restantes
     aleatorios = random.sample(restantes, 2) if len(restantes) >= 2 else restantes
-    return melhores + aleatorios
+    return melhores + aleatorios  # retorna a combinacao dos melhores e aleatorios
 
+# dicionario que contem os dados de todos os inimigos do jogo
 enemies = {
     "Cárie": EnemyBattle("Cárie", 100, {
         "Dente Sujo": {"dano": 5, "probabilidade": 0.4},
@@ -94,6 +111,7 @@ enemies = {
 #     })
 # }
 
+# dicionario que mapeia os itens e suas respectivas propriedades
 itens = {
     "Escova de Dente": Item("Escova de Dente", 12, {
         "Cárie": 4, "Mão Podre": 0.5, "Caspa no Cabelo": 0.2, "Acne": 0.2,
@@ -145,6 +163,7 @@ itens = {
     })
 }
 
+# lista de itens de cura disponiveis no jogo
 itens_cura = [
     ItemCura("Curativo", 15),
     ItemCura("Pomada", 30),
@@ -152,6 +171,7 @@ itens_cura = [
     ItemCura("Chá Natural", 100)
 ]
 
+# dicionario que mapeia os inimigos para suas respectivas spritesheets
 enemy_spritesheets = {
     "Cárie": "img/carie_spritesheet.png",
     "Mão Podre": "img/mao_podre_spritesheet.png",
@@ -162,6 +182,7 @@ enemy_spritesheets = {
     "Gordura na Pele": "img/gordura_spritesheet.png"
 }
 
+# dicionario que mapeia os inimigos para suas respectivas animações
 enemy_animations = {
      "Cárie": [(0, 0), (64, 0), (128, 0), (192, 0), (256, 0), (320, 0),
               (0, 64), (64, 64), (128, 64), (192, 64), (256, 64), (320, 64),

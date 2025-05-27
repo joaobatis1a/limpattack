@@ -1,5 +1,26 @@
+# este arquivo contem a classe principal do jogo e a logica de troca de mapas
+# importa bibliotecas principais, modulos de sprites, dados de batalha e npcs
+# mapas contem os dados de cada mapa do jogo, cada um com seu tilemap e funcao de criacao
+# classe Game gerencia o estado geral do jogo, eventos, atualizacoes, transicoes de mapas e batalhas
+# variaveis de instancia controlam sprites, inventario, dialogos, estado de batalha, progresso e flags de controle
+# handle_battle gerencia toda a logica da tela de batalha, incluindo imagens, musica e resultado
+# new reinicia o mapa atual, recriando todos os sprites e a camera
+# verificar_portal checa se o jogador pode trocar de mapa, considerando inimigos restantes e colisao com portais
+# events processa eventos do pygame, incluindo dialogos com npcs e saida do jogo
+# update atualiza todos os sprites, gerencia dialogos, portais, inimigos e camera
+# trocar_mapa troca o mapa atual para o proximo ou anterior, reiniciando o estado
+# trocar_para_tenda troca o mapa para o interior de uma tenda, importando dinamicamente o modulo correto
+# draw desenha todos os sprites, hud, dialogos e efeitos visuais na tela
+# main e o loop principal do jogo, chamando eventos, update e draw
+# game_over exibe a tela de game over e permite reiniciar o jogo
+# draw_hud_itens_cura desenha o inventario de itens de cura e chaves no hud
+# draw_npc_dialog desenha a caixa de dialogo dos npcs na tela
+# checar_inimigos retorna a quantidade de inimigos restantes e o total no mapa
+# ao final, o jogo e inicializado e o loop principal e executado ate o usuario sair
+
 import pygame
 from pygame import mixer
+import importlib
 from config import *
 from sprites import *
 from sprites.sprites_base import *
@@ -27,6 +48,7 @@ mapas = [
     {"tilemap": tilemap6, "create": create_tiled_map6}
 ]
 
+# esta e a classe principal do jogo, que gerencia o estado geral, eventos, atualizacoes e transicoes
 class Game:
     def __init__(self):
         pygame.init()
@@ -65,8 +87,11 @@ class Game:
         self.fases = [True] * len(mapas)
         self.mapas_visitados = [False] * len(mapas)
         self.sabonete_spawned = False
+        self.tocha_spawned = False
         self.spawn_tocha_apos_dialogo = False
+        self.npcs_tendas_movidos = False
 
+    # esta funcao gerencia a tela de batalha, incluindo a musica, imagens e logica de vitoria/derrota
     def handle_battle(self):
         enemy_battle_images = {
             "Cárie": "img/carie_luta.png",
@@ -136,12 +161,14 @@ class Game:
         self.in_battle = False
         self.battle_started = False
 
+    # esta funcao inicia um novo jogo ou reinicia o mapa atual
     def new(self):
         self.playing = True
         self.all_sprites = pygame.sprite.LayeredUpdates()
         self.blocks = pygame.sprite.LayeredUpdates()
         self.enemy = pygame.sprite.LayeredUpdates()
         self.portals = pygame.sprite.LayeredUpdates()
+        self.npcs_tendas_movidos = False
         mapas[self.mapa_atual_index]["create"](
             self, self.mapa_atual_index, self.mapas_visitados, self.fases, enemies, itens_cura
         )
@@ -149,6 +176,7 @@ class Game:
         map_height = len(mapas[self.mapa_atual_index]["tilemap"]) * TILESIZE
         self.camera = Camera(map_width, map_height)
 
+    # verifica se o jogador colidiu com um portal ou se ainda ha inimigos no mapa
     def verificar_portal(self):
         if len(self.enemy) > 0:
             if not self.inimigos_aviso_exibido:
@@ -170,6 +198,7 @@ class Game:
         self.trocando_mapa = False
         return False
 
+    # gerencia os eventos do jogo, incluindo entrada do jogador e interacoes com NPCs
     def events(self):
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -188,6 +217,7 @@ class Game:
                             self.npc_dialog_char_index = 0
                             self.npc_dialog_last_update = pygame.time.get_ticks()
 
+    # atualiza o estado dos sprites e verifica interacoes como colisao com NPCs e inimigos
     def update(self):
         self.all_sprites.update()
         if not self.npc_dialog_active and self.player is not None:
@@ -221,10 +251,12 @@ class Game:
             print("jogador colidiu com um portal.")
         if self.player is not None:
             self.camera.update(self.player)
-        if hasattr(self, "spawn_tocha_apos_dialogo") and self.spawn_tocha_apos_dialogo and not self.npc_dialog_active:
-            TochaSprite(self, 38, 4)  # ajuste as coordenadas
+        if hasattr(self, "spawn_tocha_apos_dialogo") and self.spawn_tocha_apos_dialogo and not self.npc_dialog_active and not self.tocha_spawned:
+            TochaSprite(self, 38, 4)
             self.spawn_tocha_apos_dialogo = False
+            self.tocha_spawned = True
 
+    # troca o mapa atual pelo proximo ou anterior na lista de mapas
     def trocar_mapa(self, direcao="proximo"):
         if direcao == "proximo":
             if self.mapa_atual_index < len(mapas) - 1:
@@ -242,6 +274,20 @@ class Game:
         print(f"mudando para o mapa {self.mapa_atual_index + 1}")
         self.new()
 
+    # troca o mapa para o interior de uma tenda
+    def trocar_para_tenda(self, tenda_num):
+        import importlib
+        modulo = importlib.import_module(f'sprites.tendas.mapa_tenda{tenda_num}')
+        self.mapa_atual = getattr(modulo, 'tilemap', None)
+        self.mapa_atual_index = None
+        self.playing = True
+        self.all_sprites = pygame.sprite.LayeredUpdates()
+        self.blocks = pygame.sprite.LayeredUpdates()
+        self.enemy = pygame.sprite.LayeredUpdates()
+        self.portals = pygame.sprite.LayeredUpdates()
+        modulo.create_tiled_map(self, 0, [False], [True], {}, [])
+
+    # desenha os sprites na tela, incluindo o fundo, personagens e elementos do mapa
     def draw(self):
         self.screen.fill(BLACK)
         for sprite in self.all_sprites:
@@ -283,6 +329,7 @@ class Game:
         self.clock.tick(FPS)
         pygame.display.update()
 
+    # loop principal do jogo, gerencia a ordem de eventos, atualizacoes e desenho na tela
     def main(self):
         while self.playing:
             self.events()
@@ -293,6 +340,7 @@ class Game:
                 self.game_over_flag = True
             break
 
+    # gerencia a tela de game over, incluindo opcoes de reinicio
     def game_over(self):
         font = pygame.font.SysFont("Arial", 80)
         small_font = pygame.font.SysFont("Arial", 40)
@@ -341,6 +389,7 @@ class Game:
     def intro_screen(self):
         pass
 
+    # desenha os itens de cura no HUD do jogador
     def draw_hud_itens_cura(self):
         inventario_dict = {}
         for item in self.inventario_cura:
@@ -372,6 +421,7 @@ class Game:
             font2 = pygame.font.SysFont("arial", 16)
             self.screen.blit(font2.render("Sabonete", True, (255,255,255)), (hud_x + 40, hud_y + 60))
 
+    # desenha o dialogo dos NPCs na tela
     def draw_npc_dialog(self):
         dialog_box_rect = pygame.Rect(40, WIN_HEIGHT - 120, WIN_WIDTH - 80, 80)
         pygame.draw.rect(self.screen, (255, 255, 255), dialog_box_rect, border_radius=10)
@@ -406,6 +456,7 @@ class Game:
         self.screen.blit(btn_text, (btn_rect.x + 18, btn_rect.y + 5))
         self.npc_dialog_btn_rect = btn_rect
 
+    # checa e retorna a quantidade de inimigos restantes e o total de inimigos no mapa atual
     def checar_inimigos(self):
         """Retorna (restantes, total) de inimigos no mapa atual."""
         total = 0
@@ -417,6 +468,7 @@ class Game:
             restantes += 1
         return restantes, total
 
+# inicializa o jogo
 g = Game()
 g.new()
 g.intro_screen()

@@ -12,6 +12,12 @@ font = pygame.font.SysFont("arial", 20)
 dialog_font = pygame.font.SysFont("arial", 16)
 small_button_font = pygame.font.SysFont("arial", 14)
 
+# este arquivo implementa a tela e a logica de batalha do jogo
+# battle_screen gerencia toda a interface e fluxo de uma batalha
+# funcoes internas desenham barras de hp, botoes e caixas de dialogo
+# mostrar_vitoria exibe a tela de vitoria apos a batalha
+# comentarios em minusculo e sem acento para facilitar entendimento
+
 def battle_screen(player_hp, player_max_hp, enemy, enemy_img, player_img, bg_img, itens_selecionados, main_game_over_func, inventario_cura):
     screen = pygame.display.set_mode((WIDTH, HEIGHT))
     pygame.display.set_caption("LimpAttack")
@@ -32,10 +38,12 @@ def battle_screen(player_hp, player_max_hp, enemy, enemy_img, player_img, bg_img
     phase_delay = 2500
     modo_cura = False
 
+    # desenha o texto na tela
     def draw_text(text, x, y, font=font, color=BLACK):
         rendered = font.render(text, True, color)
         screen.blit(rendered, (x, y))
 
+    # desenha a barra de hp do jogador e do inimigo
     def draw_hp_bar(name, x, y, hp, max_hp):
         bar_width = 150
         bar_height = 10
@@ -47,6 +55,7 @@ def battle_screen(player_hp, player_max_hp, enemy, enemy_img, player_img, bg_img
         pygame.draw.rect(screen, GREEN, (x, y, bar_width * hp_ratio, bar_height))
         draw_text(f"HP: {int(hp)}/{int(max_hp)}", x, y + 14, font)
 
+    # desenha a caixa de dialogo onde aparecem as mensagens
     def draw_dialog_box(message):
         box_width = 220
         box_height = 90
@@ -57,6 +66,7 @@ def battle_screen(player_hp, player_max_hp, enemy, enemy_img, player_img, bg_img
         for i, line in enumerate(message.split('\n')):
             draw_text(line, box_x + 8, box_y + 8 + i * 18, dialog_font)
 
+    # desenha os botoes de ataque na tela
     def draw_attack_buttons(moves, mouse_pos):
         container_x = 10
         container_y = 380
@@ -83,6 +93,7 @@ def battle_screen(player_hp, player_max_hp, enemy, enemy_img, player_img, bg_img
             pygame.draw.rect(screen, BLACK, button_rect, 2)
             draw_text(move.nome, button_rect.x + 8, button_rect.y + 6)
 
+    # desenha os botoes de cura na tela
     def draw_cura_buttons(itens_cura, mouse_pos):
         inventario_dict = {}
         for item in itens_cura:
@@ -136,6 +147,7 @@ def battle_screen(player_hp, player_max_hp, enemy, enemy_img, player_img, bg_img
             except Exception as e:
                 pygame.draw.rect(screen, (255, 0, 0), (button_rect.x + 4, button_rect.y + 4, 22, 22), border_radius=4)
 
+    # desenha o botao que alterna entre modo de cura e ataque
     def draw_toggle_cura_button(mouse_pos, modo_cura):
         btn_x = 410
         btn_y = 335
@@ -151,6 +163,7 @@ def battle_screen(player_hp, player_max_hp, enemy, enemy_img, player_img, bg_img
         texto = "Modo Cura" if not modo_cura else "Modo Ataque"
         draw_text(f"{texto}", btn_x + 10, btn_y + 5)
 
+    # lida com o clique nos botoes de ataque
     def handle_button_click(mouse_pos, moves):
         nonlocal selected_move
         container_x = 10
@@ -172,6 +185,7 @@ def battle_screen(player_hp, player_max_hp, enemy, enemy_img, player_img, bg_img
                 return True
         return False
 
+    # lida com o clique nos botoes de cura
     def handle_cura_button_click(mouse_pos, itens_cura):
         inventario_dict = {}
         for item in itens_cura:
@@ -199,6 +213,7 @@ def battle_screen(player_hp, player_max_hp, enemy, enemy_img, player_img, bg_img
                 return data["item"].nome
         return None
 
+    # efeito de fade in para a tela de batalha
     def fade_in():
         alpha = 255
         fade_surface = pygame.Surface((WIDTH, HEIGHT))
@@ -213,6 +228,7 @@ def battle_screen(player_hp, player_max_hp, enemy, enemy_img, player_img, bg_img
             pygame.display.flip()
             pygame.time.delay(10)
 
+    # efeito de fade out para a tela de batalha
     def fade_out():
         alpha = 0
         fade_surface = pygame.Surface((WIDTH, HEIGHT))
@@ -227,6 +243,7 @@ def battle_screen(player_hp, player_max_hp, enemy, enemy_img, player_img, bg_img
             pygame.display.flip()
             pygame.time.delay(10)
 
+    # mostra a introducao da batalha com o inimigo
     def show_battle_intro(enemy_name, bg_img, player_img, enemy_img):
         intro_texts = [f"Um inimigo apareceu: {enemy_name}!", "Vamos Combater, Nala!"]
         for text in intro_texts:
@@ -234,6 +251,7 @@ def battle_screen(player_hp, player_max_hp, enemy, enemy_img, player_img, bg_img
             pygame.time.delay(600)
         transition_to_battle(bg_img, player_img, enemy_img)
 
+    # transicao para a tela de batalha
     def transition_to_battle(bg_img, player_img, enemy_img):
         for alpha in range(0, 256, 16):
             screen.fill(BLACK)
@@ -253,6 +271,7 @@ def battle_screen(player_hp, player_max_hp, enemy, enemy_img, player_img, bg_img
             pygame.display.flip()
             pygame.time.delay(20)
 
+    # efeito de fade para o texto da introducao
     def fade_text(text):
         font_intro = pygame.font.SysFont("arial", 32)
         fade_surface = pygame.Surface((WIDTH, HEIGHT))
@@ -273,12 +292,14 @@ def battle_screen(player_hp, player_max_hp, enemy, enemy_img, player_img, bg_img
             pygame.display.flip()
             pygame.time.delay(10)
 
+    # desenha o texto centralizado na tela
     def draw_text_centered(text, font, color):
         screen.fill(BLACK)
         rendered = font.render(text, True, color)
         rect = rendered.get_rect(center=(WIDTH // 2, HEIGHT // 2))
         screen.blit(rendered, rect)
 
+    # calcula e executa o ataque do jogador
     def ataque_do_jogador(item_usado, inimigo):
         if random.random() < 0.15:
             return "desviou", 0
@@ -291,6 +312,7 @@ def battle_screen(player_hp, player_max_hp, enemy, enemy_img, player_img, bg_img
             setattr(inimigo, "damage_flash", 4)
         return "acertou", dano
 
+    # calcula e executa o ataque do inimigo
     def ataque_do_inimigo(inimigo):
         nonlocal player_hp, player_damage_flash
         atk_nome, atk_dano = inimigo.ataque_aleatorio()
@@ -421,6 +443,7 @@ def battle_screen(player_hp, player_max_hp, enemy, enemy_img, player_img, bg_img
                 message = "O que Nala fará?"
                 battle_phase = 0
 
+# esta funcao exibe a tela de vitoria
 def mostrar_vitoria(screen, mensagem, tempo_ms=2500):
     mixer.music.stop()
     mixer.music.load("sounds/limpattack_tune_vitoria.mp3")
