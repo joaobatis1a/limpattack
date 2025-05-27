@@ -9,8 +9,8 @@
 # todos os comentarios estao em minusculo e sem acento para facilitar entendimento da equipe
 
 # define as dimensoes da janela do jogo
-WIN_WIDTH = 1280/2 # largura da janela
-WIN_HEIGHT = 960/2 # altura da janela
+WIN_WIDTH = 1280/2 # largura da janela = 640
+WIN_HEIGHT = 960/2 # altura da janela = 480
 # define o tamanho de cada tile do mapa
 TILESIZE = 32
 # define o numero de frames por segundo
