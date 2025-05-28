@@ -57,8 +57,9 @@ def create_tiled_map(game, mapa_atual_index, mapas_visitados, fases, enemies, it
                 game.player = Player(game, j, i)  # posiciona o jogador
                 Ground2(game, j, i)
             if column == "E" and fases[mapa_atual_index]:
-                enemy_name = random.choice(list(enemies.keys()))
-                game.battle_enemy = Enemy(game, j, i, enemy_name)  # posiciona inimigos
+                enemy_names = [k for k in enemies.keys() if k != "Rei Mundiça"]
+                enemy_name = random.choice(enemy_names)
+                game.battle_enemy = Enemy(game, j, i, enemy_name)
             if column == "t":
                 Tree1(game, j, i)  # posiciona tipo 1 de arvore
             if column == "T":

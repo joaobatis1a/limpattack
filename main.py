@@ -128,7 +128,8 @@ class Game:
             "Acne": "img/acne_luta.png",
             "Bactéria de Resfriado": "img/resfriado_luta.png",
             "Bactéria do Pé": "img/pe_luta.png",
-            "Gordura na Pele": "img/gordura_luta.png"
+            "Gordura na Pele": "img/gordura_luta.png",
+            "Rei Mundiça": "img/rei_luta.png"
         }
         mixer.music.stop()
         mixer.music.load("sounds/limpattack_ost_luta.mp3")
@@ -148,7 +149,10 @@ class Game:
         player_img = pygame.image.load("img/nala_luta.png").convert()
         player_img.set_colorkey((184, 200, 168))
         player_img = pygame.transform.scale(player_img, (120, 120))
-        bg_img = pygame.transform.scale(pygame.image.load("img/luta_bg.png"), (640, 480))
+        if enemy_name == "Rei Mundiça":
+            bg_img = pygame.transform.scale(pygame.image.load("img/boss_bg.png"), (640, 480))
+        else:
+            bg_img = pygame.transform.scale(pygame.image.load("img/luta_bg.png"), (640, 480))
         itens_selecionados = selecionar_ataques_eficazes_e_aleatorios(enemy_name)
         resultado = battle_screen(
             player_hp=self.fox_hp,

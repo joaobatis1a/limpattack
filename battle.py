@@ -2,6 +2,7 @@ import pygame
 from pygame import mixer
 import random
 from config import *
+from battleData import *
 
 pygame.init()
 
@@ -37,6 +38,10 @@ def battle_screen(player_hp, player_max_hp, enemy, enemy_img, player_img, bg_img
     phase_timer = 0
     phase_delay = 2500
     modo_cura = False
+    boss_estado = None
+    itens_selecionados = selecionar_ataques_eficazes_e_aleatorios(enemy.nome)
+    ultimo_estado_boss = None
+    boss_primeiro_ataque = False
 
     # desenha o texto na tela
     def draw_text(text, x, y, font=font, color=BLACK):
@@ -301,9 +306,16 @@ def battle_screen(player_hp, player_max_hp, enemy, enemy_img, player_img, bg_img
 
     # calcula e executa o ataque do jogador
     def ataque_do_jogador(item_usado, inimigo):
-        if random.random() < 0.15:
-            return "desviou", 0
-        dano = int(item_usado.calcular_dano(inimigo.nome))
+        # Chance de desvio especial para o Rei Mundiça
+        if inimigo.nome == "Rei Mundiça":
+            if random.random() < 0.20:
+                return "desviou", 0
+        else:
+            if random.random() < 0.15:
+                return "desviou", 0
+        # Se for o Rei Mundiça e estiver personificado, use o estado para calcular eficácia
+        nome_para_eficacia = boss_estado if (inimigo.nome == "Rei Mundiça" and boss_estado) else inimigo.nome
+        dano = int(item_usado.calcular_dano(nome_para_eficacia))
         inimigo.hp -= dano
         inimigo.hp = max(inimigo.hp, 0)
         if hasattr(inimigo, "damage_flash"):
@@ -314,8 +326,14 @@ def battle_screen(player_hp, player_max_hp, enemy, enemy_img, player_img, bg_img
 
     # calcula e executa o ataque do inimigo
     def ataque_do_inimigo(inimigo):
-        nonlocal player_hp, player_damage_flash
+        nonlocal player_hp, player_damage_flash, boss_estado
         atk_nome, atk_dano = inimigo.ataque_aleatorio()
+        boss_estado = None
+        if inimigo.nome == "Rei Mundiça":
+            for nome, enemy in enemies.items():
+                if nome != "Rei Mundiça" and atk_nome in enemy.ataques:
+                    boss_estado = nome
+                    break
         player_hp -= atk_dano
         player_hp = max(player_hp, 0)
         player_damage_flash = 4
@@ -355,6 +373,15 @@ def battle_screen(player_hp, player_max_hp, enemy, enemy_img, player_img, bg_img
         if modo_cura:
             draw_cura_buttons(inventario_cura, mouse_pos)
         else:
+            if enemy.nome == "Rei Mundiça" and boss_estado:
+                # Só atualiza se o estado mudou
+                if boss_estado != ultimo_estado_boss:
+                    itens_selecionados = selecionar_ataques_eficazes_e_aleatorios(boss_estado)
+                    ultimo_estado_boss = boss_estado
+            else:
+                if ultimo_estado_boss != enemy.nome:
+                    itens_selecionados = selecionar_ataques_eficazes_e_aleatorios(enemy.nome)
+                    ultimo_estado_boss = enemy.nome
             draw_attack_buttons(itens_selecionados, mouse_pos)
         draw_toggle_cura_button(mouse_pos, modo_cura)
 
@@ -412,7 +439,10 @@ def battle_screen(player_hp, player_max_hp, enemy, enemy_img, player_img, bg_img
         if battle_phase == 2 and now - phase_timer > phase_delay:
             if enemy.hp > 0:
                 atk_nome, atk_dano = ataque_do_inimigo(enemy)
-                message = f"{enemy.nome} usou...\n{atk_nome}!\nCausou {atk_dano} de dano."
+                if enemy.nome == "Rei Mundiça" and boss_estado:
+                    message = f"Rei Mundiça se personificou de...\n{boss_estado}!\nUsou {atk_nome} e...\nCausou {atk_dano} de dano!"
+                else:
+                    message = f"{enemy.nome} usou...\n{atk_nome}!\nCausou {atk_dano} de dano."
             else:
                 victory_messages = [
                     "Higiene é tudo!",
@@ -442,6 +472,18 @@ def battle_screen(player_hp, player_max_hp, enemy, enemy_img, player_img, bg_img
             else:
                 message = "O que Nala fará?"
                 battle_phase = 0
+
+        if enemy.nome == "Rei Mundiça" and not boss_primeiro_ataque:
+            atk_nome, atk_dano = ataque_do_inimigo(enemy)
+            if boss_estado:
+                message = f"Rei Mundiça se personificou de...\n{boss_estado}!\nUsou {atk_nome} e...\nCausou {atk_dano} de dano!"
+            else:
+                message = f"Rei Mundiça atacou!\nUsou {atk_nome} e...\nCausou {atk_dano} de dano!"
+            boss_primeiro_ataque = True
+            battle_phase = 3
+            phase_timer = pygame.time.get_ticks()
+            continue  # Pula para o próximo frame, mostrando a mensagem
+
 
 # esta funcao exibe a tela de vitoria
 def mostrar_vitoria(screen, mensagem, tempo_ms=2500):

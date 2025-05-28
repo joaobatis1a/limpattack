@@ -13,7 +13,7 @@ import random
 
 tilemap = [ #40x30
     'MTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT',
-    'M.............................u.....,,Np',
+    'M............Z................u.....,,Np',
     'M.H..........o......H.........u.....,..t',
     'M.......H.................H...u...,,,..M',
     'M.................................,....M',
@@ -24,7 +24,7 @@ tilemap = [ #40x30
     'M....,...W.............,...W......,....M',
     'M....,.....,...........,.....,....,....M',
     'M....,.....,...........,.....,....,....M',
-    'M.Z..,.....,...........,.....,....,....M',
+    'M....,.....,...........,.....,....,....M',
     'M....,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,....M',
     'M....,.....,.....,.....,.....,.........M',
     'M....,.....,.....,.....,.....,.........M',
@@ -70,7 +70,7 @@ def create_tiled_map(game, mapa_atual_index, mapas_visitados, fases, enemies, it
                         self.width = TILESIZE
                         self.height = TILESIZE
                         self.image = pygame.Surface((self.width, self.height), pygame.SRCALPHA)
-                        self.image.fill((255, 255, 0, 128))
+                        self.image.fill((255, 255, 0, 50))
                         self.rect = self.image.get_rect()
                         self.rect.x = self.x
                         self.rect.y = self.y
@@ -93,7 +93,8 @@ def create_tiled_map(game, mapa_atual_index, mapas_visitados, fases, enemies, it
                     Ground2(game, j, i)
             # cria inimigos aleatorios nas posicoes marcadas com "E" no tilemap
             if column == "E" and fases[mapa_atual_index]:
-                enemy_name = random.choice(list(enemies.keys()))
+                enemy_names = [k for k in enemies.keys() if k != "Rei Mundiça"]
+                enemy_name = random.choice(enemy_names)
                 game.battle_enemy = Enemy(game, j, i, enemy_name)
             # cria diferentes tipos de arvores, dependendo do caractere no tilemap
             if column == "t":

@@ -17,12 +17,19 @@ class EnemyBattle:
 
     # metodo para escolher um ataque aleatorio do inimigo
     def ataque_aleatorio(self):
-        from random import random
+        # comportamento padrão (probabilidade)
         for nome, dados in self.ataques.items():
             # verifica se o ataque deve ser realizado baseado na probabilidade
-            if random() <= dados["probabilidade"]:
+            if random.random() <= dados["probabilidade"]:
                 return nome, dados["dano"]  # retorna o nome e dano do ataque
-        return "Ataque Fraco", 3  # ataque default caso nenhum ataque seja escolhido
+        nome = random.choice(list(self.ataques.keys()))
+        return nome, self.ataques[nome]["dano"]  # ataque default caso nenhum ataque seja escolhido
+
+class ReiMundicaBattle(EnemyBattle):
+    def ataque_aleatorio(self):
+        nomes_ataques = list(self.ataques.keys())
+        nome = random.choice(nomes_ataques)
+        return nome, self.ataques[nome]["dano"]
 
 # classe que representa um item que pode ser usado em batalha
 class Item:
@@ -43,18 +50,18 @@ class ItemCura:
 
 # funcao que seleciona ataques eficazes e aleatorios para um inimigo
 def selecionar_ataques_eficazes_e_aleatorios(enemy_name):
-    todos_itens = list(itens.values())  # pega todos os itens disponiveis
-    # ordena os itens baseados na eficacia contra o inimigo
+    todos_itens = list(itens.values())
     eficazes = sorted(
         todos_itens,
         key=lambda item: item.eficacias.get(enemy_name, 0),
         reverse=True
     )
-    melhores = eficazes[:2]  # pega os 2 itens mais eficazes
-    restantes = [item for item in todos_itens if item not in melhores]  # pega os itens restantes que nao sao os melhores
-    # seleciona 2 itens aleatorios entre os restantes
+    melhores = eficazes[:2]
+    restantes = [item for item in todos_itens if item not in melhores]
     aleatorios = random.sample(restantes, 2) if len(restantes) >= 2 else restantes
-    return melhores + aleatorios  # retorna a combinacao dos melhores e aleatorios
+    opcoes = melhores + aleatorios
+    random.shuffle(opcoes)
+    return opcoes
 
 # dicionario que contem os dados de todos os inimigos do jogo
 enemies = {
@@ -100,12 +107,6 @@ enemies = {
         "Obstrução dos Poros": {"dano": 12, "probabilidade": 0.2},
         "Acne com Sebo": {"dano": 18, "probabilidade": 0.1}
     }),
-    "Rei Mundiça": EnemyBattle("Rei Mundiça", 200, {
-        "Ataque Poderoso": {"dano": 20, "probabilidade": 0.4},
-        "Grito de Guerra": {"dano": 30, "probabilidade": 0.3},
-        "Destruição Total": {"dano": 50, "probabilidade": 0.2},
-        "Fúria do Rei": {"dano": 70, "probabilidade": 0.1}
-    })
 }
 # dicionario que mapeia os itens e suas respectivas propriedades
 itens = {
@@ -153,10 +154,10 @@ itens = {
         "Bactéria do Pé": 4, "Gordura na Pele": 1.5, "Cárie": 0.2, "Caspa no Cabelo": 0.2,
         "Mão Podre": 0.5, "Acne": 0.5, "Bactéria de Resfriado": 0.2
     }),
-    "Nulo": Item("Nulo", 0, {
-        "Cárie": 0, "Mão Podre": 0, "Caspa no Cabelo": 0, "Acne": 0,
-        "Bactéria de Resfriado": 0, "Bactéria do Pé": 0, "Gordura na Pele": 0
-    })
+    # "Nulo": Item("Nulo", 0, {
+    #     "Cárie": 0, "Mão Podre": 0, "Caspa no Cabelo": 0, "Acne": 0,
+    #     "Bactéria de Resfriado": 0, "Bactéria do Pé": 0, "Gordura na Pele": 0
+    # })
 }
 
 # lista de itens de cura disponiveis no jogo
@@ -221,3 +222,12 @@ enemy_animations = {
               (0, 192),],
 "Rei Mundiça": [(0, 0)]
 }
+
+def ataques_de_todos_os_inimigos():
+    ataques = {}
+    for nome, inimigo in enemies.items():
+        if nome != "Rei Mundiça":
+            ataques.update(inimigo.ataques)
+    return ataques
+
+enemies["Rei Mundiça"] = ReiMundicaBattle("Rei Mundiça", 200, ataques_de_todos_os_inimigos())
