@@ -48,6 +48,32 @@ mapas = [
     {"tilemap": tilemap6, "create": create_tiled_map6}
 ]
 
+MAPA_SPAWNS = {
+    0: {  # mapa 1
+        "right": (38, 1),
+    },
+    1: {  # mapa 2
+        "left": (1, 1),    # entrada vinda do mapa 1
+        "right": (38, 1),  # entrada vinda do mapa 3
+    },
+    2: {  # mapa 3
+        "left": (1, 1),    # entrada vinda do mapa 2
+        "right": (38, 38),  # entrada vinda do mapa 4
+    },
+    3: {  # mapa 4
+        "left": (1, 1),    # entrada vinda do mapa 3
+        "right": (38, 1),  # entrada vinda do mapa 5
+    },
+    4: {  # mapa 5
+        "left": (1, 1),
+        "right": (38, 1),
+    },
+    5: {  # mapa 6
+        "left": (1, 1),
+        "right": (38, 1),
+    },
+}
+
 # esta e a classe principal do jogo, que gerencia o estado geral, eventos, atualizacoes e transicoes
 class Game:
     def __init__(self):
@@ -88,10 +114,12 @@ class Game:
         self.mapas_visitados = [False] * len(mapas)
         self.sabonete_spawned = False
         self.tocha_spawned = False
+        self.npcs_moveram = False
         self.spawn_tocha_apos_dialogo = False
-        self.npcs_tendas_movidos = False
+        self.npc_moved = False
+        self.sombra_ativa_mapa3 = True
 
-    # esta funcao gerencia a tela de batalha, incluindo a musica, imagens e logica de vitoria/derrota
+    # essa funcao gerencia a tela de batalha, incluindo a musica, imagens e logica de vitoria/derrota
     def handle_battle(self):
         enemy_battle_images = {
             "Cárie": "img/carie_luta.png",
@@ -168,13 +196,14 @@ class Game:
         self.blocks = pygame.sprite.LayeredUpdates()
         self.enemy = pygame.sprite.LayeredUpdates()
         self.portals = pygame.sprite.LayeredUpdates()
-        self.npcs_tendas_movidos = False
         mapas[self.mapa_atual_index]["create"](
             self, self.mapa_atual_index, self.mapas_visitados, self.fases, enemies, itens_cura
         )
         map_width = len(mapas[self.mapa_atual_index]["tilemap"][0]) * TILESIZE
         map_height = len(mapas[self.mapa_atual_index]["tilemap"]) * TILESIZE
         self.camera = Camera(map_width, map_height)
+        # Salva o total inicial de inimigos
+        self.inimigos_total = len(self.enemy)
 
     # verifica se o jogador colidiu com um portal ou se ainda ha inimigos no mapa
     def verificar_portal(self):
@@ -255,28 +284,59 @@ class Game:
             TochaSprite(self, 38, 4)
             self.spawn_tocha_apos_dialogo = False
             self.tocha_spawned = True
+        if self.mapa_atual_index == 2:
+            if len(self.enemy) == 0:
+                self.sombra_ativa_mapa3 = False
+            else:
+                self.sombra_ativa_mapa3 = True
 
     # troca o mapa atual pelo proximo ou anterior na lista de mapas
     def trocar_mapa(self, direcao="proximo"):
+        anterior = self.mapa_atual_index
         if direcao == "proximo":
             if self.mapa_atual_index < len(mapas) - 1:
                 self.mapa_atual_index += 1
             else:
                 print("ja esta no ultimo mapa. nao e possivel avancar.")
                 return
+            entrada = "left"  # vindo da esquerda ao avançar
         elif direcao == "anterior":
             if self.mapa_atual_index > 0:
                 self.mapa_atual_index -= 1
             else:
                 print("ja esta no primeiro mapa. nao e possivel voltar.")
                 return
+            entrada = "right"  # vindo da direita ao voltar
+        else:
+            entrada = "left"
         self.mapa_atual = mapas[self.mapa_atual_index]["tilemap"]
         print(f"mudando para o mapa {self.mapa_atual_index + 1}")
         self.new()
+        # Após criar o novo mapa, posicione a Nala no ponto correto
+        spawn = MAPA_SPAWNS.get(self.mapa_atual_index, {}).get(entrada)
+        if spawn and hasattr(self, "player") and self.player:
+            self.player.rect.x = spawn[0] * TILESIZE
+            self.player.rect.y = spawn[1] * TILESIZE
 
     # troca o mapa para o interior de uma tenda
     def trocar_para_tenda(self, tenda_num):
         import importlib
+        if self.mapa_atual_index is None:
+            self.mapa_atual_index = 1
+            self.mapa_atual = mapas[self.mapa_atual_index]["tilemap"]
+            self.new()
+            if hasattr(self, "tenda_entrada_num") and hasattr(self, "tenda_entrada_pos"):
+                for sprite in self.all_sprites:
+                    if hasattr(sprite, "tenda_num") and sprite.tenda_num == self.tenda_entrada_num:
+                        self.player.rect.x = sprite.rect.x
+                        self.player.rect.y = sprite.rect.y + 2*TILESIZE
+                        break
+            return
+        self.tenda_entrada_num = tenda_num
+        for sprite in self.all_sprites:
+            if hasattr(sprite, "tenda_num") and sprite.tenda_num == tenda_num:
+                self.tenda_entrada_pos = (sprite.rect.x, sprite.rect.y)
+                break
         modulo = importlib.import_module(f'sprites.tendas.mapa_tenda{tenda_num}')
         self.mapa_atual = getattr(modulo, 'tilemap', None)
         self.mapa_atual_index = None
@@ -296,7 +356,7 @@ class Game:
         if self.npc_dialog_active:
             self.draw_npc_dialog()
 
-        if self.mapa_atual_index == 2:
+        if self.mapa_atual_index == 2 and getattr(self, "sombra_ativa_mapa3", True):
             darkness = pygame.Surface((int(WIN_WIDTH), int(WIN_HEIGHT)), pygame.SRCALPHA)
             darkness.fill((0, 0, 0, 255))
             nala_screen_x, nala_screen_y = self.camera.get_screen_pos(self.player.rect)
@@ -315,8 +375,9 @@ class Game:
 
         self.draw_hud_itens_cura()
 
-        restantes, total = self.checar_inimigos()
-        if total > 0 and restantes > 0:
+        restantes = len(self.enemy)
+        total = getattr(self, "inimigos_total", restantes)
+        if total > 0:
             font = pygame.font.SysFont("arial", 22, bold=True)
             texto = f"Inimigos: {restantes}/{total}"
             text_surface = font.render(texto, True, (255, 255, 255))
@@ -411,7 +472,7 @@ class Game:
             sprite = HudItemCuraSprite(hud_x + i*48, hud_y, img_path, data["quantidade"])
             sprite.draw(self.screen, font)
         if hasattr(self, 'inventario_chave') and 'tocha' in self.inventario_chave:
-            tocha_sprite = HudItemCuraSprite(hud_x, hud_y + 54, "img/sabonete.png", 1)
+            tocha_sprite = HudItemCuraSprite(hud_x, hud_y + 54, "img/tocha.png", 1)
             tocha_sprite.draw(self.screen, font)
             font2 = pygame.font.SysFont("arial", 16)
             self.screen.blit(font2.render("Tocha", True, (255,255,255)), (hud_x + 40, hud_y + 60))

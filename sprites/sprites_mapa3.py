@@ -13,33 +13,33 @@ import random
 
 tilemap = [
     'TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTM',
-    'pN.Z......u.................E..........M',
+    'pN.Z......u............................M',
     't.........u.uuuuuu.uuu.uuuuuuuu.uuuuuu.M',
-    'M.........u.uuuuUu.u.u.uuuuuuuu.uuuuuu.M',
-    'M.........u..E...u.u.u.u..E.....uuuuuu.M',
-    'M.........uuuuuuuu.u.u.uuuuuuuuuu......M',
-    'M..................uuu.uuuuuuuuuu.uuuuuM',
+    'M.........u.uuuuUu.uuu.uuuuuuuu.uuuuuu.M',
+    'M.........u......u.uuu.u........uuuuuu.M',
+    'M.........uuuuuuuu.uuu.uuuuuuuuuu......M',
+    'M........E.....E...uuu.uuuuuuuuuu.uuuuuM',
     'Muuuuuuuuuuuuuuuuuuu...u...............M',
-    'Muuuuuuuuuuuuuuuuuuuuuuu...............M',
+    'Muuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuu.uuuuuM',
     'M......................................M',
     'M......................................M',
     'M......................................M',
+    'M.uuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuM',
+    'M.u...uU...............................M',
+    'M.u.u.uuuuuuu.uuuuuuuuu................M',
+    'M...u.........uuuuuuuuuu...............M',
+    'Muuuuuuuuuuuuuuuuuuuuuuuu..............M',
+    'Muuuuuuuuuuuuuuuuuuuuuuuuu.............M',
+    'Muuuuuuuuuuuuuuuuuuuuuuuuuu............M',
+    'Muuuuuuuuuuuuuuuuuuuuuuuuuuu...........M',
+    'Muuuuuuuuuuuuuuuuuuuuuuuuuuuu..........M',
+    'Muuuuuuuuuuuuuuuuuuuuuuuuuuuuu.........M',
+    'Muuuuuuuuuuuuuuuuuuuuuuuuuuuuuu........M',
+    'Muuuuuuuuuuuuuuuuuuuuuuuuuuuuuuu.......M',
+    'Muuuuuuuuuuuuuuuuuuuuuuuuuuuuuuu.......M',
     'M......................................M',
     'M......................................M',
-    'M......................................M',
-    'M......................................M',
-    'M......................................M',
-    'M......................................M',
-    'M......................................M',
-    'M......................................M',
-    'M......................................M',
-    'M......................................M',
-    'M......................................M',
-    'M......................................M',
-    'M......................................M',
-    'M......................................M',
-    'M......................................M',
-    'M......................................M',
+    'M...uuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuM',
     'M......................................M',
     'M......................................M',
     'M......................................p',
@@ -70,8 +70,12 @@ def create_tiled_map(game, mapa_atual_index, mapas_visitados, fases, enemies, it
             if column == "p" and len(game.enemy) == 0:
                 Portal(game, j, i)  # posiciona portal aberto se nao houver inimigos
             if column == "U":
-                item_cura = random.choices(itens_cura, weights=[60, 30, 8, 2])[0]
-                ItemCuraSprite(game, j, i, item_cura)  # posiciona itens de cura
+                pos = (j, i)
+                if not hasattr(game, 'itens_cura_coletados'):
+                    game.itens_cura_coletados = set()
+                if pos not in game.itens_cura_coletados:
+                    item_cura = random.choices(itens_cura, weights=[60, 30, 8, 2])[0]
+                    ItemCuraSprite(game, j, i, item_cura)
             if column == "u":
                 Toco(game, j, i)  # posiciona tocos
             if column == "Z":

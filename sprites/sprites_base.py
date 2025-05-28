@@ -102,6 +102,7 @@ class Player(pygame.sprite.Sprite):
                 if 'tocha' not in self.game.inventario_chave:
                     self.game.inventario_chave.append('tocha')
                     item.kill()
+                    self.game.tocha_spawned = True  # <-- Adicione esta linha aqui!
         # verifica colisao com portais para troca de cena
         for portal in self.game.all_sprites:
             if portal.__class__.__name__ == 'PortalTenda' and self.rect.colliderect(portal.rect):
@@ -150,7 +151,9 @@ class Player(pygame.sprite.Sprite):
                 npc_hit = None
                 # verifica colisao com npcs
                 for npc in self.game.all_sprites:
-                    if npc.__class__.__name__ in ['NPC', 'NPC2', 'NPC3', 'NPC4', 'NPC5', 'NPC6'] and next_rect.colliderect(npc.rect):
+                    if npc.__class__.__name__ in ['NPC', 'NPC2', 'NPC3',
+                                                  'NPC4', 'NPC5', 'NPC6',
+                                                  'NPCTenda1', 'NPCTenda2', 'NPCTenda3', 'NPCTenda4', 'NPCTenda5'] and next_rect.colliderect(npc.rect):
                         npc_hit = npc
                         break
                 portal_hit = None
@@ -228,6 +231,7 @@ class Player(pygame.sprite.Sprite):
                         if not npc_info["status"].get("tocha_entregue", False):
                             if "tocha" in self.game.inventario_chave:
                                 npc_info["status"]["tocha_entregue"] = True
+                                self.game.npcs_moveram = True
                                 self.game.npc_dialog_active = True
                                 self.game.npc_dialog_texts = npc_info["dialogos_entrega"]
                                 self.game.npc_dialog_index = 0
@@ -235,13 +239,10 @@ class Player(pygame.sprite.Sprite):
                                 self.game.npc_dialog_char_index = 0
                                 self.game.npc_dialog_last_update = pygame.time.get_ticks()
                                 self.game.npc_dialog_npc_symbol = 'F'
-                                # movimenta o npc da classe 'F' para fora do caminho
-                                npc_hit.rect.x -= 2 * TILESIZE
-                                for npc in self.game.all_sprites:
-                                    if hasattr(npc, "symbol") and npc.symbol in ["G", "H", "I", "J", "K"]:
-                                        npc.rect.x -= TILESIZE
-                                # remove a tocha do inventario do jogador
                                 self.game.inventario_chave.remove("tocha")
+                                for npc in self.game.all_sprites:
+                                    if hasattr(npc, "symbol") and npc.symbol == "F":
+                                        npc.rect.x -= 2 * TILESIZE
                                 self.moving = False
                                 return
                             else:
@@ -252,11 +253,11 @@ class Player(pygame.sprite.Sprite):
                                 self.game.npc_dialog_char_index = 0
                                 self.game.npc_dialog_last_update = pygame.time.get_ticks()
                                 self.game.npc_dialog_npc_symbol = 'F'
-                                # movimenta npcs para fora do caminho
-                                for npc in self.game.all_sprites:
-                                    if hasattr(npc, "symbol") and npc.symbol in ["G", "H", "I", "J", "K"]:
-                                        npc.rect.x -= TILESIZE
-                                self.game.spawn_tocha_apos_dialogo = True
+                                if not getattr(self.game, "tocha_spawned", False) and not getattr(self.game, "npcs_moveram", False):
+                                    for npc in self.game.all_sprites:
+                                        if hasattr(npc, "symbol") and npc.symbol in ["G", "H", "I", "J", "K"]:
+                                            npc.rect.x -= TILESIZE
+                                    self.game.npcs_moveram = True
                                 self.moving = False
                                 return
                         else:
@@ -269,6 +270,20 @@ class Player(pygame.sprite.Sprite):
                             self.game.npc_dialog_npc_symbol = 'F'
                             self.moving = False
                             return
+                    if npc_symbol in ["G", "H", "I", "J", "K"]:
+                        if not getattr(self.game, "npcs_moveram", False):
+                            dialogos = npcs_data[npc_symbol].get("dialogo_bloqueando", ["..."])
+                        else:
+                            dialogos = npcs_data[npc_symbol].get("dialogo_livre", ["..."])
+                        self.game.npc_dialog_active = True
+                        self.game.npc_dialog_texts = dialogos
+                        self.game.npc_dialog_index = 0
+                        self.game.npc_dialog_current = ""
+                        self.game.npc_dialog_char_index = 0
+                        self.game.npc_dialog_last_update = pygame.time.get_ticks()
+                        self.game.npc_dialog_npc_symbol = npc_symbol
+                        self.moving = False
+                        return
                     # dialogos genericos para npcs
                     npc_info = npcs_data.get(npc_symbol)
                     if npc_info:
@@ -705,7 +720,7 @@ class TochaSprite(pygame.sprite.Sprite):
         self.width = TILESIZE
         self.height = TILESIZE
         # carrega a imagem da tocha
-        img = pygame.image.load("img/sabonete.png").convert()
+        img = pygame.image.load("img/tocha.png").convert()
         img.set_colorkey((184, 200, 168))
         self.image = pygame.transform.scale(img, (32, 32))
         self.rect = self.image.get_rect()

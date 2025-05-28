@@ -99,18 +99,14 @@ enemies = {
         "Acúmulo de Sebo": {"dano": 8, "probabilidade": 0.3},
         "Obstrução dos Poros": {"dano": 12, "probabilidade": 0.2},
         "Acne com Sebo": {"dano": 18, "probabilidade": 0.1}
+    }),
+    "Rei Mundiça": EnemyBattle("Rei Mundiça", 200, {
+        "Ataque Poderoso": {"dano": 20, "probabilidade": 0.4},
+        "Grito de Guerra": {"dano": 30, "probabilidade": 0.3},
+        "Destruição Total": {"dano": 50, "probabilidade": 0.2},
+        "Fúria do Rei": {"dano": 70, "probabilidade": 0.1}
     })
 }
-
-# boss = {
-#     "Rei Mundiça": EnemyBattle("Rei Mundiça", 200, {
-#         "Ataque Poderoso": {"dano": 20, "probabilidade": 0.4},
-#         "Grito de Guerra": {"dano": 30, "probabilidade": 0.3},
-#         "Destruição Total": {"dano": 50, "probabilidade": 0.2},
-#         "Fúria do Rei": {"dano": 70, "probabilidade": 0.1}
-#     })
-# }
-
 # dicionario que mapeia os itens e suas respectivas propriedades
 itens = {
     "Escova de Dente": Item("Escova de Dente", 12, {
@@ -179,7 +175,8 @@ enemy_spritesheets = {
     "Acne": "img/acne_spritesheet.png",
     "Bactéria de Resfriado": "img/resfriado_spritesheet.png",
     "Bactéria do Pé": "img/pe_spritesheet.png",
-    "Gordura na Pele": "img/gordura_spritesheet.png"
+    "Gordura na Pele": "img/gordura_spritesheet.png",
+    "Rei Mundiça": "img/rei_luta.png"
 }
 
 # dicionario que mapeia os inimigos para suas respectivas animações
@@ -221,5 +218,6 @@ enemy_animations = {
 "Gordura na Pele": [(0, 0), (64, 0), (128, 0), (192, 0),
               (0, 64), (64, 64), (128, 64), (192, 64),
               (0, 128), (64, 128), (128, 128), (192, 128),
-              (0, 192),]
+              (0, 192),],
+"Rei Mundiça": [(0, 0)]
 }

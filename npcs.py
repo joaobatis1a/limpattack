@@ -75,5 +75,56 @@ npcs_data = {
             "Tome cuidado com as bactérias, Nala.",
             "Sempre use o ataque certo contra elas!",
         ]
-    }   
+    },
+    "G": {
+        "nome": "Tigre Branco",
+        "status": {},
+        "dialogo_bloqueando": [
+            "Desculpe, não posso deixar você passar ainda.",
+            "Fale com o Bob primeiro!"
+        ],
+        "dialogo_livre": [
+            "Agora você pode entrar na tenda. Boa sorte!"
+        ]
+    },
+    "H": {
+        "nome": "NPC H",
+        "status": {},
+        "dialogo_bloqueando": [
+            "Estamos em reunião, volte depois de falar com o Bob."
+        ],
+        "dialogo_livre": [
+            "A passagem está livre, pode entrar!"
+        ]
+    },
+    "I": {
+        "nome": "NPC I",
+        "status": {},
+        "dialogo_bloqueando": [
+            "Aguardando instruções do Bob..."
+        ],
+        "dialogo_livre": [
+            "Pode passar, a tenda está aberta!"
+        ]
+    },
+    "J": {
+        "nome": "NPC J",
+        "status": {},
+        "dialogo_bloqueando": [
+            "Só liberamos a entrada após o Bob autorizar."
+        ],
+        "dialogo_livre": [
+            "Bem-vindo à tenda!"
+        ]
+    },
+    "K": {
+        "nome": "NPC K",
+        "status": {},
+        "dialogo_bloqueando": [
+            "Fale com o Bob para liberar a passagem."
+        ],
+        "dialogo_livre": [
+            "Aproveite sua visita à tenda!"
+        ]
+    }
 }

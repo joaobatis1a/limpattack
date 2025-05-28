@@ -11,7 +11,7 @@ import random
 # classes como House, Cerca, BigTree, Arbs, Espan, Poco, Sacos, Wind, Toco e NPC3 representam objetos e npcs do mapa 1
 # comentarios em minusculo e sem acento para facilitar entendimento
 
-tilemap = [
+tilemap = [ #40x30
     'MTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT',
     'M.............................u.....,,Np',
     'M.H..........o......H.........u.....,..t',
@@ -24,7 +24,7 @@ tilemap = [
     'M....,...W.............,...W......,....M',
     'M....,.....,...........,.....,....,....M',
     'M....,.....,...........,.....,....,....M',
-    'M....,.....,...........,.....,....,....M',
+    'M.Z..,.....,...........,.....,....,....M',
     'M....,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,....M',
     'M....,.....,.....,.....,.....,.........M',
     'M....,.....,.....,.....,.....,.........M',
@@ -58,7 +58,29 @@ def create_tiled_map(game, mapa_atual_index, mapas_visitados, fases, enemies, it
         for j, column in enumerate(row):
             # cria o sprite de chao
             Ground(game, j, i)
-            # verifica se o tile atual e uma parede ou um portal fechado
+            if column == "Z":
+                class PortalMapa6(pygame.sprite.Sprite):
+                    def __init__(self, game, x, y):
+                        self.game = game
+                        self._layer = BLOCK_LAYER
+                        self.groups = self.game.all_sprites, self.game.portals
+                        pygame.sprite.Sprite.__init__(self, self.groups)
+                        self.x = x * TILESIZE
+                        self.y = y * TILESIZE
+                        self.width = TILESIZE
+                        self.height = TILESIZE
+                        self.image = pygame.Surface((self.width, self.height), pygame.SRCALPHA)
+                        self.image.fill((255, 255, 0, 128))
+                        self.rect = self.image.get_rect()
+                        self.rect.x = self.x
+                        self.rect.y = self.y
+                    def update(self):
+                        if self.game.player.rect.colliderect(self.rect):
+                            self.game.mapa_atual_index = 5  # mapa 6
+                            self.game.new()
+                            self.game.player.rect.x = 1 * TILESIZE
+                            self.game.player.rect.y = 1 * TILESIZE
+                PortalMapa6(game, j, i)
             if column == ",":
                 Ground2(game, j, i)
             if column == "N":

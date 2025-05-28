@@ -16,8 +16,8 @@ tilemap = [
     'pN,...Z.....Z.....Z....Z......Z.....,3,p',
     't.,.................................,uut',
     'M.,.................................,..M',
-    'M.,.................................,..M',
     'M.,.....{.....}.....[....]......)...,..M',
+    'M.,.................................,..M',
     'M.,,,,,,4,,,,,5,,,,,6,,,,7,,,,,,8,,,,..M',
     'M.,....,,...,,.......,,.....,,.....,,..M',
     'M.,....,,...,,.......,,.....,,.....,,..M',
@@ -87,9 +87,13 @@ def create_tiled_map(game, mapa_atual_index, mapas_visitados, fases, enemies, it
             if column == "u":
                 Toco(game, j, i)
             if column == "U":
-                item_cura = random.choices(itens_cura, weights=[60, 30, 8, 2])[0]
-                ItemCuraSprite(game, j, i, item_cura)
-                Ground2(game, j, i)
+                pos = (j, i)
+                if not hasattr(game, 'itens_cura_coletados'):
+                    game.itens_cura_coletados = set()
+                if pos not in game.itens_cura_coletados:
+                    item_cura = random.choices(itens_cura, weights=[60, 30, 8, 2])[0]
+                    ItemCuraSprite(game, j, i, item_cura)
+                Ground2(game, j, i) 
             if column == "1":
                 NPC4(game, j, i, symbol="D")
             if column == "2":
@@ -98,23 +102,33 @@ def create_tiled_map(game, mapa_atual_index, mapas_visitados, fases, enemies, it
                 npc6 = NPC6(game, j, i, symbol="F")
                 Ground2(game, j, i)
                 game.npc6_ref = npc6
+                if npcs_data["F"]["status"].get("tocha_entregue", False):
+                    npc6.rect.x -= 2 * TILESIZE
             if column == "4":
-                NPCTenda1(game, j, i, symbol="G")
+                npc = NPCTenda1(game, j, i, symbol="G")
                 Ground2(game, j, i)
+                if getattr(game, "npcs_moveram", False):
+                    npc.rect.x -= TILESIZE
             if column == "5":
-                NPCTenda2(game, j, i, symbol="H")
+                npc = NPCTenda2(game, j, i, symbol="H")
                 Ground2(game, j, i)
+                if getattr(game, "npcs_moveram", False):
+                    npc.rect.x -= TILESIZE
             if column == "6":
-                NPCTenda3(game, j, i, symbol="I")
+                npc = NPCTenda3(game, j, i, symbol="I")
                 Ground2(game, j, i)
+                if getattr(game, "npcs_moveram", False):
+                    npc.rect.x -= TILESIZE
             if column == "7":
-                NPCTenda4(game, j, i, symbol="J")
+                npc = NPCTenda4(game, j, i, symbol="J")
                 Ground2(game, j, i)
+                if getattr(game, "npcs_moveram", False):
+                    npc.rect.x -= TILESIZE
             if column == "8":
-                NPCTenda5(game, j, i, symbol="K")
+                npc = NPCTenda5(game, j, i, symbol="K")
                 Ground2(game, j, i)
-            if column == "!":
-                TochaSprite(game, j, i)
+                if getattr(game, "npcs_moveram", False):
+                    npc.rect.x -= TILESIZE
             if column == "{":
                 PortalTenda(game, j, i, tenda_num=1)
             if column == "}":
@@ -349,9 +363,9 @@ class NPCTenda1(pygame.sprite.Sprite):
         self.y = y * TILESIZE
         self.width = TILESIZE
         self.height = TILESIZE
-        self.spritesheet = Spritesheet("img/kaiki.png")
-        self.image = self.spritesheet.get_sprite(1, 1, self.width, self.height, [])
-        self.image.set_colorkey((184, 200, 168))
+        self.spritesheet = Spritesheet("img/tigrebranco.png")
+        sprite = self.spritesheet.get_sprite(0, 0, 64, 64, [(160, 192, 144)])  # ajuste a cor do fundo conforme necessário
+        self.image = pygame.transform.scale(sprite, (32, 32))
         self.rect = self.image.get_rect()
         self.rect.x = self.x
         self.rect.y = self.y
@@ -443,10 +457,9 @@ class PortalTenda(pygame.sprite.Sprite):
         self.x = x * TILESIZE
         self.y = y * TILESIZE
         self.width = TILESIZE
-        self.height = TILESIZE * 1.1
-        bg_colors = [CHARACTER_BG, ENEYMY_BG, TERRAIN_BG]
-        self.image = pygame.Surface((TILESIZE, TILESIZE * 2))
-        self.image.fill((255, 200, 0))
+        self.height = TILESIZE
+        self.image = pygame.Surface((TILESIZE, TILESIZE * 2), pygame.SRCALPHA)
+        self.image.fill((0, 0, 0, 0))
         self.rect = self.image.get_rect()
         self.rect.x = self.x
         self.rect.y = self.y
