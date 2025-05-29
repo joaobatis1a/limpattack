@@ -43,6 +43,8 @@ def battle_screen(player_hp, player_max_hp, enemy, enemy_img, player_img, bg_img
     ultimo_estado_boss = None
     boss_primeiro_ataque = False
 
+    
+
     # desenha o texto na tela
     def draw_text(text, x, y, font=font, color=BLACK):
         rendered = font.render(text, True, color)
@@ -304,8 +306,10 @@ def battle_screen(player_hp, player_max_hp, enemy, enemy_img, player_img, bg_img
         rect = rendered.get_rect(center=(WIDTH // 2, HEIGHT // 2))
         screen.blit(rendered, rect)
 
-    # calcula e executa o ataque do jogador
+
+
     def ataque_do_jogador(item_usado, inimigo):
+        nonlocal boss_estado
         # Chance de desvio especial para o Rei Mundiça
         if inimigo.nome == "Rei Mundiça":
             if random.random() < 0.20:
@@ -313,16 +317,30 @@ def battle_screen(player_hp, player_max_hp, enemy, enemy_img, player_img, bg_img
         else:
             if random.random() < 0.15:
                 return "desviou", 0
-        # Se for o Rei Mundiça e estiver personificado, use o estado para calcular eficácia
+
+        # Calcule o dano ANTES de usar
         nome_para_eficacia = boss_estado if (inimigo.nome == "Rei Mundiça" and boss_estado) else inimigo.nome
         dano = int(item_usado.calcular_dano(nome_para_eficacia))
-        inimigo.hp -= dano
-        inimigo.hp = max(inimigo.hp, 0)
+
+        # Aplica dano e chama regeneração se necessário
+        if inimigo.nome == "Rei Mundiça":
+            x_rei, y_rei = 420, 60
+            inimigo.tomar_dano(dano, screen, x_rei, y_rei, font, draw_hp_bar)
+        else:
+            inimigo.hp -= dano
+            inimigo.hp = max(inimigo.hp, 0)
+
+        # Atualiza hp para todos os inimigos (inclusive Rei Mundiça)
+        if hasattr(inimigo, "vida"):
+            inimigo.hp = inimigo.vida
+            inimigo.max_hp = inimigo.vida_max
+
         if hasattr(inimigo, "damage_flash"):
             inimigo.damage_flash = 4
         else:
             setattr(inimigo, "damage_flash", 4)
         return "acertou", dano
+
 
     # calcula e executa o ataque do inimigo
     def ataque_do_inimigo(inimigo):
@@ -368,7 +386,7 @@ def battle_screen(player_hp, player_max_hp, enemy, enemy_img, player_img, bg_img
 
         draw_hp_bar("Nala", 60, 180, player_hp, player_max_hp)
         draw_hp_bar(enemy.nome, 420, 60, enemy.hp, enemy.max_hp)
-
+        
         draw_dialog_box(message)
         if modo_cura:
             draw_cura_buttons(inventario_cura, mouse_pos)

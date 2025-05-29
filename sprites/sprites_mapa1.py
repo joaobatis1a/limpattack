@@ -13,7 +13,7 @@ import random
 
 tilemap = [ #40x30
     'MTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT',
-    'M............Z................u.....,,Np',
+    'M.............................u.....,,Np',
     'M.H..........o......H.........u.....,..t',
     'M.......H.................H...u...,,,..M',
     'M.................................,....M',
@@ -58,29 +58,6 @@ def create_tiled_map(game, mapa_atual_index, mapas_visitados, fases, enemies, it
         for j, column in enumerate(row):
             # cria o sprite de chao
             Ground(game, j, i)
-            if column == "Z":
-                class PortalMapa6(pygame.sprite.Sprite):
-                    def __init__(self, game, x, y):
-                        self.game = game
-                        self._layer = BLOCK_LAYER
-                        self.groups = self.game.all_sprites, self.game.portals
-                        pygame.sprite.Sprite.__init__(self, self.groups)
-                        self.x = x * TILESIZE
-                        self.y = y * TILESIZE
-                        self.width = TILESIZE
-                        self.height = TILESIZE
-                        self.image = pygame.Surface((self.width, self.height), pygame.SRCALPHA)
-                        self.image.fill((255, 255, 0, 50))
-                        self.rect = self.image.get_rect()
-                        self.rect.x = self.x
-                        self.rect.y = self.y
-                    def update(self):
-                        if self.game.player.rect.colliderect(self.rect):
-                            self.game.mapa_atual_index = 5  # mapa 6
-                            self.game.new()
-                            self.game.player.rect.x = 1 * TILESIZE
-                            self.game.player.rect.y = 1 * TILESIZE
-                PortalMapa6(game, j, i)
             if column == ",":
                 Ground2(game, j, i)
             if column == "N":

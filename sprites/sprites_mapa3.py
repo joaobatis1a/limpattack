@@ -17,8 +17,8 @@ tilemap = [
     't.........u.uuuuuu.uuu.uuuuuuuu.uuuuuu.M',
     'M.........u.uuuuUu.uuu.uuuuuuuu.uuuuuu.M',
     'M.........u......u.uuu.u........uuuuuu.M',
-    'M.........uuuuuuuu.uuu.uuuuuuuuuu......M',
-    'M........E.....E...uuu.uuuuuuuuuu.uuuuuM',
+    'M.......k.uuuuuuuu.uuu.uuuuuuuuuu......M',
+    'M..................uuu.uuuuuuuuuu.uuuuuM',
     'Muuuuuuuuuuuuuuuuuuu...u...............M',
     'Muuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuu.uuuuuM',
     'M......................................M',
@@ -41,9 +41,9 @@ tilemap = [
     'M......................................M',
     'M...uuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuM',
     'M......................................M',
-    'M......................................M',
+    'M......................................T',
     'M......................................p',
-    'MttttttttttttttttttttttttttttttttttttttM',
+    'Mttttttttttttttttttttttttttttttttttttttt',
 ]
 
 # funcao responsavel por criar o mapa baseado no tilemap
@@ -81,6 +81,8 @@ def create_tiled_map(game, mapa_atual_index, mapas_visitados, fases, enemies, it
                 Toco(game, j, i)  # posiciona tocos
             if column == "Z":
                 Tenda(game, j, i)  # posiciona tendas
+            if column == "k":
+                Placa(game, j, i, symbol="L")
     mapas_visitados[mapa_atual_index] = True  # marca o mapa atual como visitado
 
 # classe que representa a tenda no mapa
@@ -112,9 +114,27 @@ class Toco(pygame.sprite.Sprite):
         self.y = y * TILESIZE
         self.width = TILESIZE
         self.height = TILESIZE
-        bg_colors = [CHARACTER_BG, ENEYMY_BG, TERRAIN_BG]
+        bg_colors = [TERRAIN_BG]
         # pega o sprite do toco na spritesheet
-        self.image = self.game.terrain_spritesheet.get_sprite(130, 386, self.width, self.height, bg_colors)
+        self.image = self.game.terrain_spritesheet.get_sprite(582, 4722, self.width, self.height, bg_colors)
+        self.rect = self.image.get_rect()
+        self.rect.x = self.x
+        self.rect.y = self.y
+
+class Placa(pygame.sprite.Sprite):
+    def __init__(self, game, x, y, symbol="L"):
+        self.game = game
+        self.symbol = symbol
+        self._layer = BLOCK_LAYER
+        self.groups = self.game.all_sprites
+        pygame.sprite.Sprite.__init__(self, self.groups)
+        self.x = x * TILESIZE
+        self.y = y * TILESIZE
+        self.width = TILESIZE
+        self.height = TILESIZE
+        self.spritesheet = Spritesheet("img/placa.png")
+        self.image = self.spritesheet.get_sprite(0, 0, self.width, self.height, [])
+        self.image.set_colorkey((0, 184, 0))
         self.rect = self.image.get_rect()
         self.rect.x = self.x
         self.rect.y = self.y

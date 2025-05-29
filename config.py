@@ -17,6 +17,7 @@ TILESIZE = 32
 FPS = 30
 
 # define as camadas de renderizacao dos sprites
+UP_LAYER = 4
 PLAYER_LAYER = 3 # camada do jogador
 BLOCK_LAYER = 2  # camada de blocos/obstaculos
 GROUND_LAYER = 1 # camada do chao

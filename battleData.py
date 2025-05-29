@@ -7,6 +7,7 @@
 
 from config import *
 import random
+import time
 
 # classe que representa um inimigo em batalha
 class EnemyBattle:
@@ -26,10 +27,52 @@ class EnemyBattle:
         return nome, self.ataques[nome]["dano"]  # ataque default caso nenhum ataque seja escolhido
 
 class ReiMundicaBattle(EnemyBattle):
+    def __init__(self, nome, vida, ataques):
+        super().__init__(nome, vida, ataques)
+        self.vida_max = vida
+        self.vida = vida
+        self.regenerou = False
+
     def ataque_aleatorio(self):
         nomes_ataques = list(self.ataques.keys())
         nome = random.choice(nomes_ataques)
         return nome, self.ataques[nome]["dano"]
+
+    def tomar_dano(self, dano, screen=None, x=None, y=None, font=None, draw_hp_bar=None):
+        self.vida -= dano
+        # Garante que nunca fique negativo
+        if self.vida < 0:
+            self.vida = 0
+        self.hp = self.vida  # Sincroniza com hp usado no resto do código
+        if self.vida <= 0 and not self.regenerou:
+            self.vida = 0
+            self.hp = 0
+            self.regenerou = True
+            if (
+                screen is not None and x is not None and y is not None
+                and font is not None and draw_hp_bar is not None
+            ):
+                self.animar_regeneracao_visual(screen, x, y, font, draw_hp_bar)
+            self.vida = self.vida_max
+            self.hp = self.vida_max
+        # Garante que após a segunda vida, nunca fique negativo
+        if self.regenerou and self.vida < 0:
+            self.vida = 0
+            self.hp = 0
+
+    def animar_regeneracao_visual(self, screen, x, y, font, draw_hp_bar):
+        import pygame
+        fundo = screen.copy()
+        for i in range(0, self.vida_max + 1, 2):
+            self.vida = i
+            self.hp = i
+            screen.blit(fundo, (0, 0))
+            draw_hp_bar(self.nome, x, y, self.vida, self.vida_max)
+            pygame.display.update()
+            pygame.time.delay(60)
+        self.vida = self.vida_max
+        self.hp = self.vida_max
+        print(f"{self.nome} regenerou completamente!")
 
 # classe que representa um item que pode ser usado em batalha
 class Item:
@@ -230,4 +273,4 @@ def ataques_de_todos_os_inimigos():
             ataques.update(inimigo.ataques)
     return ataques
 
-enemies["Rei Mundiça"] = ReiMundicaBattle("Rei Mundiça", 200, ataques_de_todos_os_inimigos())
+enemies["Rei Mundiça"] = ReiMundicaBattle("Rei Mundiça", 150, ataques_de_todos_os_inimigos())

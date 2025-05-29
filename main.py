@@ -62,7 +62,7 @@ MAPA_SPAWNS = {
     },
     3: {  # mapa 4
         "left": (1, 1),    # entrada vinda do mapa 3
-        "right": (38, 1),  # entrada vinda do mapa 5
+        "right": (38, 30),  # entrada vinda do mapa 5
     },
     4: {  # mapa 5
         "left": (1, 1),
@@ -150,7 +150,7 @@ class Game:
         player_img.set_colorkey((184, 200, 168))
         player_img = pygame.transform.scale(player_img, (120, 120))
         if enemy_name == "Rei Mundiça":
-            bg_img = pygame.transform.scale(pygame.image.load("img/boss_bg.png"), (640, 480))
+            bg_img = pygame.transform.scale(pygame.image.load("img/boss.luta.png"), (640, 480))
         else:
             bg_img = pygame.transform.scale(pygame.image.load("img/luta_bg.png"), (640, 480))
         itens_selecionados = selecionar_ataques_eficazes_e_aleatorios(enemy_name)
@@ -356,10 +356,8 @@ class Game:
         self.screen.fill(BLACK)
         for sprite in self.all_sprites:
             self.screen.blit(sprite.image, self.camera.apply(sprite))
-        
-        if self.npc_dialog_active:
-            self.draw_npc_dialog()
 
+        # Desenha a sombra primeiro
         if self.mapa_atual_index == 2 and getattr(self, "sombra_ativa_mapa3", True):
             darkness = pygame.Surface((int(WIN_WIDTH), int(WIN_HEIGHT)), pygame.SRCALPHA)
             darkness.fill((0, 0, 0, 255))
@@ -376,6 +374,10 @@ class Game:
                 )
             pygame.draw.circle(darkness, (0, 0, 0, 0), (int(nala_screen_x), int(nala_screen_y)), min_radius)
             self.screen.blit(darkness, (0, 0))
+
+        # Agora desenha o diálogo por cima da sombra
+        if self.npc_dialog_active:
+            self.draw_npc_dialog()
 
         self.draw_hud_itens_cura()
 

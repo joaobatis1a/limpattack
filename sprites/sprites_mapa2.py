@@ -345,9 +345,9 @@ class NPC6(pygame.sprite.Sprite):
         self.y = y * TILESIZE
         self.width = TILESIZE
         self.height = TILESIZE
-        self.spritesheet = Spritesheet("img/kaiki.png")
-        self.image = self.spritesheet.get_sprite(1, 1, self.width, self.height, [])
-        self.image.set_colorkey((184, 200, 168))
+        self.spritesheet = Spritesheet("img/rino.png")
+        sprite = self.spritesheet.get_sprite(0, 0, 64, 64, [(0, 176, 0)])  # ajuste a cor do fundo conforme necessário
+        self.image = pygame.transform.scale(sprite, (32, 32))
         self.rect = self.image.get_rect()
         self.rect.x = self.x
         self.rect.y = self.y
@@ -383,9 +383,9 @@ class NPCTenda2(pygame.sprite.Sprite):
         self.y = y * TILESIZE
         self.width = TILESIZE
         self.height = TILESIZE
-        self.spritesheet = Spritesheet("img/kaiki.png")
-        self.image = self.spritesheet.get_sprite(1, 1, self.width, self.height, [])
-        self.image.set_colorkey((184, 200, 168))
+        self.spritesheet = Spritesheet("img/tigre.png")
+        sprite = self.spritesheet.get_sprite(0, 0, 64, 64, [(160, 192, 144)])  # ajuste a cor do fundo conforme necessário
+        self.image = pygame.transform.scale(sprite, (32, 32))
         self.rect = self.image.get_rect()
         self.rect.x = self.x
         self.rect.y = self.y
@@ -402,9 +402,9 @@ class NPCTenda3(pygame.sprite.Sprite):
         self.y = y * TILESIZE
         self.width = TILESIZE
         self.height = TILESIZE
-        self.spritesheet = Spritesheet("img/kaiki.png")
-        self.image = self.spritesheet.get_sprite(1, 1, self.width, self.height, [])
-        self.image.set_colorkey((184, 200, 168))
+        self.spritesheet = Spritesheet("img/cavalo.png")
+        sprite = self.spritesheet.get_sprite(0, 0, 64, 64, [(0, 184, 0)])  # ajuste a cor do fundo conforme necessário
+        self.image = pygame.transform.scale(sprite, (32, 32))
         self.rect = self.image.get_rect()
         self.rect.x = self.x
         self.rect.y = self.y
@@ -421,9 +421,9 @@ class NPCTenda4(pygame.sprite.Sprite):
         self.y = y * TILESIZE
         self.width = TILESIZE
         self.height = TILESIZE
-        self.spritesheet = Spritesheet("img/kaiki.png")
-        self.image = self.spritesheet.get_sprite(1, 1, self.width, self.height, [])
-        self.image.set_colorkey((184, 200, 168))
+        self.spritesheet = Spritesheet("img/elefante.png")
+        sprite = self.spritesheet.get_sprite(0, 0, 64, 64, [(0, 176, 0)])  # ajuste a cor do fundo conforme necessário
+        self.image = pygame.transform.scale(sprite, (32, 32))
         self.rect = self.image.get_rect()
         self.rect.x = self.x
         self.rect.y = self.y
@@ -440,9 +440,9 @@ class NPCTenda5(pygame.sprite.Sprite):
         self.y = y * TILESIZE
         self.width = TILESIZE
         self.height = TILESIZE
-        self.spritesheet = Spritesheet("img/kaiki.png")
-        self.image = self.spritesheet.get_sprite(1, 1, self.width, self.height, [])
-        self.image.set_colorkey((184, 200, 168))
+        self.spritesheet = Spritesheet("img/mamute.png")
+        sprite = self.spritesheet.get_sprite(0, 0, 64, 64, [(0, 176, 0)])  # ajuste a cor do fundo conforme necessário
+        self.image = pygame.transform.scale(sprite, (32, 32))
         self.rect = self.image.get_rect()
         self.rect.x = self.x
         self.rect.y = self.y

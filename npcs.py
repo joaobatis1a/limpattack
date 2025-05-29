@@ -77,54 +77,73 @@ npcs_data = {
         ]
     },
     "G": {
-        "nome": "Tigre Branco",
+        "nome": "Thiago",
         "status": {},
         "dialogo_bloqueando": [
-            "Desculpe, não posso deixar você passar ainda.",
-            "Fale com o Bob primeiro!"
+            "Invadir minha tenda? LOUCO!",
+            "Talvez o mano do meu lado deixe, mas EU NÃO!"
         ],
         "dialogo_livre": [
-            "Agora você pode entrar na tenda. Boa sorte!"
+            "Perdão se fui grosseiro, pode entrar se quiser!"
         ]
     },
     "H": {
-        "nome": "NPC H",
+        "nome": "Diego",
         "status": {},
         "dialogo_bloqueando": [
-            "Estamos em reunião, volte depois de falar com o Bob."
+            "Entrar na MINHA TENDA?",
+            "NUNCA! Não importa o que o Thiago diz!",
         ],
         "dialogo_livre": [
-            "A passagem está livre, pode entrar!"
+            "Não me arrependo de nada, mas você pode entrar.",
         ]
     },
     "I": {
-        "nome": "NPC I",
+        "nome": "Pedro",
         "status": {},
         "dialogo_bloqueando": [
-            "Aguardando instruções do Bob..."
+            "eh... não... duh..."
         ],
         "dialogo_livre": [
-            "Pode passar, a tenda está aberta!"
+            "eh... sim... meh..."
         ]
     },
     "J": {
-        "nome": "NPC J",
+        "nome": "Carla T.",
         "status": {},
         "dialogo_bloqueando": [
-            "Só liberamos a entrada após o Bob autorizar."
+            "Ouvi boatos de que Kauã está em perigo.",
+            "Vi no jornal Choquei, deve ser verdade...",
+            "Minha tenda? Não, não, não!"
         ],
         "dialogo_livre": [
-            "Bem-vindo à tenda!"
+            "Ouvi boatos de que Você vai ajudar Kauã.",
+            "Vi no jornal Choquei, deve ser verdade...",
+            "Minha tenda? Pode entrar!",
         ]
     },
     "K": {
-        "nome": "NPC K",
+        "nome": "Manny",
         "status": {},
         "dialogo_bloqueando": [
-            "Fale com o Bob para liberar a passagem."
+            "Perdi meu emprego de ator por causa das bactérias...",
+            "Só saio daqui por uma boa causa!",
         ],
         "dialogo_livre": [
-            "Aproveite sua visita à tenda!"
+            "Oh, você é uma boa pessoa!",
+            "Pode entrar na minha tenda!",
+        ]
+    },
+
+    "L": {
+        "nome": "Placa",
+        "status": {"importante": False},
+        "dialogos": [
+            "Abandonei meu lar por causa das bactérias.",
+            "Elas tomaram conta da minha loja!",
+            "Estou indo recuperar. Quem sabe um dia eu volte.",
+            "Atenciosamente,",
+            "Kauã."
         ]
     }
 }

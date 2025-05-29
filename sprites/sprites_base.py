@@ -102,7 +102,9 @@ class Player(pygame.sprite.Sprite):
                 if 'tocha' not in self.game.inventario_chave:
                     self.game.inventario_chave.append('tocha')
                     item.kill()
-                    self.game.tocha_spawned = True  # <-- Adicione esta linha aqui!
+                    # Marque como coletada para a tenda 4
+                    if hasattr(self.game, "tocha_coletada_tenda4"):
+                        self.game.tocha_coletada_tenda4 = True
         # verifica colisao com portais para troca de cena
         for portal in self.game.all_sprites:
             if portal.__class__.__name__ == 'PortalTenda' and self.rect.colliderect(portal.rect):
@@ -153,7 +155,8 @@ class Player(pygame.sprite.Sprite):
                 for npc in self.game.all_sprites:
                     if npc.__class__.__name__ in ['NPC', 'NPC2', 'NPC3',
                                                   'NPC4', 'NPC5', 'NPC6',
-                                                  'NPCTenda1', 'NPCTenda2', 'NPCTenda3', 'NPCTenda4', 'NPCTenda5'] and next_rect.colliderect(npc.rect):
+                                                  'NPCTenda1', 'NPCTenda2', 'NPCTenda3', 'NPCTenda4', 'NPCTenda5',
+                                                  'Placa'] and next_rect.colliderect(npc.rect):
                         npc_hit = npc
                         break
                 portal_hit = None
@@ -719,10 +722,31 @@ class TochaSprite(pygame.sprite.Sprite):
         self.y = y * TILESIZE
         self.width = TILESIZE
         self.height = TILESIZE
-        # carrega a imagem da tocha
         img = pygame.image.load("img/tocha.png").convert()
         img.set_colorkey((184, 200, 168))
         self.image = pygame.transform.scale(img, (32, 32))
+        self.rect = self.image.get_rect()
+        self.rect.x = self.x
+        self.rect.y = self.y
+
+# classe para sprites de sujeira, que herda de Sprite
+class DirtSprite(pygame.sprite.Sprite):
+    def __init__(self, game, x, y, nivel=1):
+        self.game = game
+        self._layer = GROUND_LAYER
+        self.groups = self.game.all_sprites
+        pygame.sprite.Sprite.__init__(self, self.groups)
+        self.x = x * TILESIZE
+        self.y = y * TILESIZE
+        self.width = TILESIZE
+        self.height = TILESIZE
+        sujeira_coords = {
+            1: (422, 194),
+            2: (422, 226),
+        }
+        coord = sujeira_coords.get(nivel, (422, 194))
+        bg_colors = [CHARACTER_BG, ENEYMY_BG, TERRAIN_BG]
+        self.image = self.game.terrain_spritesheet.get_sprite(coord[0], coord[1], self.width, self.height, bg_colors)
         self.rect = self.image.get_rect()
         self.rect.x = self.x
         self.rect.y = self.y
