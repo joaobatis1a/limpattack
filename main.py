@@ -29,7 +29,6 @@ from sprites.sprites_mapa2 import tilemap as tilemap2, create_tiled_map as creat
 from sprites.sprites_mapa3 import tilemap as tilemap3, create_tiled_map as create_tiled_map3
 from sprites.sprites_mapa4 import tilemap as tilemap4, create_tiled_map as create_tiled_map4
 from sprites.sprites_mapa5 import tilemap as tilemap5, create_tiled_map as create_tiled_map5
-from sprites.sprites_mapa6 import tilemap as tilemap6, create_tiled_map as create_tiled_map6
 from battleData import *
 from battle import *
 from npcs import npcs_data
@@ -45,7 +44,6 @@ mapas = [
     {"tilemap": tilemap3, "create": create_tiled_map3},
     {"tilemap": tilemap4, "create": create_tiled_map4},
     {"tilemap": tilemap5, "create": create_tiled_map5},
-    {"tilemap": tilemap6, "create": create_tiled_map6}
 ]
 
 MAPA_SPAWNS = {
@@ -65,10 +63,6 @@ MAPA_SPAWNS = {
         "right": (38, 30),  # entrada vinda do mapa 5
     },
     4: {  # mapa 5
-        "left": (1, 1),
-        "right": (38, 1),
-    },
-    5: {  # mapa 6
         "left": (1, 1),
         "right": (38, 1),
     },

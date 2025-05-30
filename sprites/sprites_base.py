@@ -156,7 +156,8 @@ class Player(pygame.sprite.Sprite):
                     if npc.__class__.__name__ in ['NPC', 'NPC2', 'NPC3',
                                                   'NPC4', 'NPC5', 'NPC6',
                                                   'NPCTenda1', 'NPCTenda2', 'NPCTenda3', 'NPCTenda4', 'NPCTenda5',
-                                                  'Placa'] and next_rect.colliderect(npc.rect):
+                                                  'Placa',
+                                                  'NPC7'] and next_rect.colliderect(npc.rect):
                         npc_hit = npc
                         break
                 portal_hit = None

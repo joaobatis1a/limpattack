@@ -145,5 +145,18 @@ npcs_data = {
             "Atenciosamente,",
             "Kauã."
         ]
+    },
+    "M": {
+        "nome": "Kauã",
+        "status": {"importante": False},
+        "dialogos": [
+            "Olá, Nala...",
+            "Não consigo mais me mover por causa das bactérias.",
+            "Observe meu casco, está cheio delas!",
+            "Preciso que você prossiga sem mim.",
+            "Avançe na floresta e derrote as bactérias...",
+            "Confio em você!",
+            "Você está indo muito bem...",
+        ]
     }
 }

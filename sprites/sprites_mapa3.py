@@ -18,7 +18,7 @@ tilemap = [
     'M.........u.uuuuUu.uuu.uuuuuuuu.uuuuuu.M',
     'M.........u......u.uuu.u........uuuuuu.M',
     'M.......k.uuuuuuuu.uuu.uuuuuuuuuu......M',
-    'M..................uuu.uuuuuuuuuu.uuuuuM',
+    'M......p...........uuu.uuuuuuuuuu.uuuuuM',
     'Muuuuuuuuuuuuuuuuuuu...u...............M',
     'Muuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuu.uuuuuM',
     'M......................................M',

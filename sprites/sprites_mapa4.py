@@ -13,34 +13,34 @@ import random
 
 tilemap = [
     'TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTM',
-    'pN.....................................M',
-    't......................................M',
+    'pN..............................U......M',
+    't.........1............................M',
+    'M....R..............R..2...............M',
+    'M..........................1...........M',
+    'M1...............................R.....M',
+    'M..U2.....R............................M',
     'M......................................M',
+    'M.....R.........2........R.......2.....M',
+    'M.1....................................M',
     'M......................................M',
+    'M.......1............1.................M',
+    'M..2...................................M',
+    'M................R........1.......2....M',
+    'M.....R................................M',
+    'M............2.........................M',
+    'M...1.......................1..........M',
     'M......................................M',
+    'M...................................R..M',
+    'M.......1........R.....................M',
     'M......................................M',
-    'M......................................M',
-    'M......................................M',
-    'M......................................M',
-    'M......................................M',
-    'M......................................M',
-    'M......................................M',
-    'M......................................M',
-    'M......................................M',
-    'M......................................M',
-    'M......................................M',
-    'M......................................M',
-    'M......................................M',
-    'M......................................M',
-    'M......................................M',
-    'M......................................M',
-    'M......................................M',
+    'M...............................U......M',
+    'M..1..1..1..1..1..1..1..1..1..1..1..1..M',
     'M......................................M',
     'M......................................M',
     'M......................................M',
     'M......................................M',
     'M......................................T',
-    'M......................................p',
+    'M................U.....................p',
     'Mttttttttttttttttttttttttttttttttttttttt',
 ]
 
@@ -75,32 +75,15 @@ def create_tiled_map(game, mapa_atual_index, mapas_visitados, fases, enemies, it
                 item_cura = random.choices(itens_cura, weights=[60, 30, 8, 2])[0]
                 ItemCuraSprite(game, j, i, item_cura)  # posiciona itens de cura
             if column == "1":
-                Tree4(game, j, i)
+                Tronco1(game, j, i)
             if column == "2":
-                Tree5(game, j, i)
+                Tronco2(game, j, i)
+            if column == "R":
+                Pedra(game, j, i)
             
     mapas_visitados[mapa_atual_index] = True  # marca o mapa atual como visitado
 
-# classe para arvores, que herda de Sprite
-class Tree4(pygame.sprite.Sprite):
-    def __init__(self, game, x, y):
-        self.game = game
-        self._layer = UP_LAYER
-        self.groups = self.game.all_sprites
-        pygame.sprite.Sprite.__init__(self, self.groups)
-        self.x = x * TILESIZE
-        self.y = y * TILESIZE
-        self.width = TILESIZE
-        self.height = TILESIZE
-        bg_colors = [CHARACTER_BG, ENEYMY_BG, TERRAIN_BG]
-        # carrega a imagem da arvore a partir da spritesheet
-        self.image = self.game.terrain_spritesheet.get_sprite(1130, 2570, self.width, self.height, bg_colors)
-        self.rect = self.image.get_rect()
-        self.rect.x = self.x
-        self.rect.y = self.y    
-
-# classe para arvores alternativas, que herda de Sprite
-class Tree5(pygame.sprite.Sprite):
+class Tronco1(pygame.sprite.Sprite):
     def __init__(self, game, x, y):
         self.game = game
         self._layer = BLOCK_LAYER
@@ -111,8 +94,57 @@ class Tree5(pygame.sprite.Sprite):
         self.width = TILESIZE
         self.height = TILESIZE
         bg_colors = [CHARACTER_BG, ENEYMY_BG, TERRAIN_BG]
-        # carrega a imagem da arvore alternativa a partir da spritesheet
-        self.image = self.game.terrain_spritesheet.get_sprite(1130, 2602, self.width, self.height, bg_colors)
+        self.image = self.game.terrain_spritesheet.get_sprite(390, 551, (483-390), (577-551), bg_colors)
+        self.rect = self.image.get_rect()
+        self.rect.x = self.x
+        self.rect.y = self.y
+
+class Tronco2(pygame.sprite.Sprite):
+    def __init__(self, game, x, y):
+        self.game = game
+        self._layer = BLOCK_LAYER
+        self.groups = self.game.all_sprites, self.game.blocks
+        pygame.sprite.Sprite.__init__(self, self.groups)
+        self.x = x * TILESIZE
+        self.y = y * TILESIZE
+        self.width = TILESIZE
+        self.height = TILESIZE
+        bg_colors = [CHARACTER_BG, ENEYMY_BG, TERRAIN_BG]
+        self.image = self.game.terrain_spritesheet.get_sprite(485, 548, (515-485), (641-548), bg_colors)
+        self.rect = self.image.get_rect()
+        self.rect.x = self.x
+        self.rect.y = self.y
+        
+class Pedra(pygame.sprite.Sprite):
+    def __init__(self, game, x, y):
+        self.game = game
+        self._layer = BLOCK_LAYER
+        self.groups = self.game.all_sprites, self.game.blocks
+        pygame.sprite.Sprite.__init__(self, self.groups)
+        self.x = x * TILESIZE
+        self.y = y * TILESIZE
+        self.width = TILESIZE
+        self.height = TILESIZE
+        bg_colors = [CHARACTER_BG, ENEYMY_BG, TERRAIN_BG]
+        self.image = self.game.terrain_spritesheet.get_sprite(582, 386, self.width, self.height, bg_colors)
+        self.rect = self.image.get_rect()
+        self.rect.x = self.x
+        self.rect.y = self.y
+
+class NPC7(pygame.sprite.Sprite):
+    def __init__(self, game, x, y, symbol="M"):
+        self.game = game
+        self.symbol = symbol
+        self._layer = BLOCK_LAYER
+        self.groups = self.game.all_sprites
+        pygame.sprite.Sprite.__init__(self, self.groups)
+        self.x = x * TILESIZE
+        self.y = y * TILESIZE
+        self.width = TILESIZE
+        self.height = TILESIZE
+        self.spritesheet = Spritesheet("img/kaua_sujo.png")
+        sprite = self.spritesheet.get_sprite(0, 0, 64, 64, [(0, 176, 0)])
+        self.image = pygame.transform.scale(sprite, (32, 32))
         self.rect = self.image.get_rect()
         self.rect.x = self.x
         self.rect.y = self.y
