@@ -24,7 +24,7 @@ BLOCK_LAYER = 2  # camada de blocos/obstaculos
 GROUND_LAYER = 1 # camada do chao
 
 # define a velocidade do jogador
-PLAYER_SPEED = 20
+PLAYER_SPEED = 10
 
 # define as cores usadas no jogo em formato RGB
 RED = (255,0,0)

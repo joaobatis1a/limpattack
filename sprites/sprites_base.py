@@ -359,7 +359,7 @@ class Player(pygame.sprite.Sprite):
                     self.rect.y = hits[0].rect.bottom
     # metodo para animacao do jogador
     def animation(self):
-        bg_colors = [CHARACTER_BG, ENEYMY_BG, TERRAIN_BG]
+        bg_colors = [CHARACTER_BG, ENEYMY_BG]
         # definicao dos frames de animacao para cada direcao
         down_animations = [self.game.character_spritesheet.get_sprite(1, 1, self.width, self.height, bg_colors),
                           self.game.character_spritesheet.get_sprite(1, 37, self.width, self.height, bg_colors),
@@ -383,32 +383,32 @@ class Player(pygame.sprite.Sprite):
                 self.image = self.game.character_spritesheet.get_sprite(1, 1, self.width, self.height, bg_colors)
             else:
                 self.image = down_animations[math.floor(self.animation_loop)]
-                self.animation_loop += 0.3
-                if self.animation_loop >= 3:
+                self.animation_loop += 0.5
+                if self.animation_loop >= 4:
                     self.animation_loop = 1
         if self.facing == "up":
             if self.y_change == 0:
                 self.image = self.game.character_spritesheet.get_sprite(83, 1, self.width, self.height, bg_colors)
             else:
                 self.image = up_animations[math.floor(self.animation_loop)]
-                self.animation_loop += 0.3
-                if self.animation_loop >= 3:
+                self.animation_loop += 0.5
+                if self.animation_loop >= 4:
                     self.animation_loop = 1
         if self.facing == "left":
             if self.x_change == 0:
                 self.image = self.game.character_spritesheet.get_sprite(34, 3, 47, 32, bg_colors)
             else:
                 self.image = left_animations[math.floor(self.animation_loop)]
-                self.animation_loop += 0.3
-                if self.animation_loop >= 3:
+                self.animation_loop += 0.5
+                if self.animation_loop >= 4:
                     self.animation_loop = 1
         if self.facing == "right":
             if self.x_change == 0:
                 self.image = self.game.character_spritesheet.get_sprite(116, 3, 47, 32, bg_colors)
             else:
                 self.image = right_animations[math.floor(self.animation_loop)]
-                self.animation_loop += 0.3
-                if self.animation_loop >= 3:
+                self.animation_loop += 0.5
+                if self.animation_loop >= 4:
                     self.animation_loop = 1
 
 # classe para inimigos, que herda de Sprite
@@ -433,6 +433,7 @@ class Enemy(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect.x = self.x
         self.rect.y = self.y
+        self.spawn_mapa_index = getattr(game, "mapa_atual_index", None)
     # metodo chamado a cada frame para atualizar o estado do inimigo
     def update(self):
         self.animate()
@@ -447,12 +448,14 @@ class Enemy(pygame.sprite.Sprite):
             self.animation_loop = 0
     # movimentacao aleatoria do inimigo
     def random_movement(self):
+        # Impede o movimento do Rei Mundiça no mapa 5 (índice 4)
+        if self.enemy_name == "Rei Mundiça" and getattr(self.game, "mapa_atual_index", None) == 4:
+            return  # Não se move, mas mantém colisão e batalha
         if random.random() < 0.02:
             dx, dy = random.choice([(0, -TILESIZE), (0, TILESIZE), (-TILESIZE, 0), (TILESIZE, 0)])
             next_rect = self.rect.copy()
             next_rect.x += dx
             next_rect.y += dy
-            # verifica se o movimento eh valido (sem colisao)
             if not any(next_rect.colliderect(block.rect) for block in self.game.blocks) and \
                not any(next_rect.colliderect(enemy.rect) for enemy in self.game.enemy if enemy != self):
                 self.rect.x += dx
@@ -748,6 +751,22 @@ class DirtSprite(pygame.sprite.Sprite):
         coord = sujeira_coords.get(nivel, (422, 194))
         bg_colors = [CHARACTER_BG, ENEYMY_BG, TERRAIN_BG]
         self.image = self.game.terrain_spritesheet.get_sprite(coord[0], coord[1], self.width, self.height, bg_colors)
+        self.rect = self.image.get_rect()
+        self.rect.x = self.x
+        self.rect.y = self.y
+
+class ParedeInv(pygame.sprite.Sprite):
+    def __init__(self, game, x, y):
+        self.game = game
+        self._layer = BLOCK_LAYER
+        self.groups = self.game.all_sprites, self.game.blocks
+        pygame.sprite.Sprite.__init__(self, self.groups)
+        self.x = x * TILESIZE
+        self.y = y * TILESIZE
+        self.width = TILESIZE
+        self.height = TILESIZE
+        self.image = pygame.Surface((TILESIZE, TILESIZE), pygame.SRCALPHA)
+        self.image.fill((0, 0, 0, 0))
         self.rect = self.image.get_rect()
         self.rect.x = self.x
         self.rect.y = self.y

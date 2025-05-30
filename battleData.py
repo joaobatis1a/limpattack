@@ -140,7 +140,7 @@ enemies = {
     }),
     "Bactéria do Pé": EnemyBattle("Bactéria do Pé", 80, {
         "Fungo Pé Sujo": {"dano": 6, "probabilidade": 0.4},
-        "Bicho de Oé": {"dano": 12, "probabilidade": 0.3},
+        "Bicho de Pé": {"dano": 12, "probabilidade": 0.3},
         "Unha Encravada": {"dano": 18, "probabilidade": 0.2},
         "Infecção Grave": {"dano": 30, "probabilidade": 0.1}
     }),

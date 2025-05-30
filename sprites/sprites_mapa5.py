@@ -6,9 +6,27 @@ from npcs import npcs_data
 import random
 
 tilemap = [
-    'TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT',
-    'pN.....................................M',
-    't......................................M',
+    'TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTM',
+    'pN...................,.................M',
+    't,,,,,,,,,,,,,,,,,,,.,,,,,,,,,,,,,,,,,,M',
+    'M..................,.,.................M',
+    'M..................,.,.................M',
+    'M..................,.,.................M',
+    'M..................,.,.................M',
+    'M..................,.,.................M',
+    'M..................,.,.................M',
+    'M..................,.,.................M',
+    'M..................,.,.................M',
+    'M..................,.,.................M',
+    'M..................,.,.................M',
+    'M..................,.,.................M',
+    'M..................,.,.................M',
+    'M..................,.,.................M',
+    'M..................,.,.................M',
+    'M..................,.,.................M',
+    'M..................,.,.................M',
+    'M..................,.,.................M',
+    'M,,,,,,,,,,,,,,,,,,,.,,,,,,,,,,,,,,,,,,M',
     'M......................................M',
     'M......................................M',
     'M......................................M',
@@ -16,33 +34,7 @@ tilemap = [
     'M......................................M',
     'M......................................M',
     'M......................................M',
-    'M......................................M',
-    'M......................................M',
-    'M......................................M',
-    'M......................................M',
-    'M......................................M',
-    'M......................................M',
-    'M......................................M',
-    'M......................................M',
-    'M......................................M',
-    'M......................................M',
-    'M......................................M',
-    'M......................................M',
-    'M......................................M',
-    'M......................................M',
-    'M......................................M',
-    'M......................................M',
-    'M......................................M',
-    'M......................................M',
-    'M......................................M',
-    'M......................................M',
-    'M......................................M',
-    'M......................................M',
-    'M......................................M',
-    'M......................................M',
-    'M...............E......................M',
-    'M......................................M',
-    'M......................................M',
+    'M...................E..................M',
     'MttttttttttttttttttttttttttttttttttttttM',
 ]
 
@@ -51,13 +43,13 @@ def create_tiled_map(game, mapa_atual_index, mapas_visitados, fases, enemies, it
         for j, column in enumerate(row):
             Ground(game, j, i)
             if column == ",":
-                Ground2(game, j, i)
+                ParedeInv(game, j, i)
             if column == "N":
                 game.player = Player(game, j, i)
                 Ground2(game, j, i)
             if column == "E" and fases[mapa_atual_index]:
                 enemy_name = "Rei Mundiça"
-                game.battle_enemy = ReiMundicaStatic(game, j, i, enemy_name)
+                game.battle_enemy = Enemy(game, j, i, enemy_name)
             if column == "t":
                 Tree1(game, j, i)
             if column == "T":
@@ -71,8 +63,8 @@ def create_tiled_map(game, mapa_atual_index, mapas_visitados, fases, enemies, it
             if column == "U":
                 item_cura = random.choices(itens_cura, weights=[60, 30, 8, 2])[0]
                 ItemCuraSprite(game, j, i, item_cura)
-
-    # Gradiente preto de cima para baixo (vertical) mais suave
+            
+            # Gradiente preto de cima para baixo (vertical) mais suaveAdd commentMore actions
     grad_end = len(tilemap) - 15  # agora só os últimos 15 blocos são totalmente pretos
     grad_steps = grad_end if grad_end > 0 else 1
     for i in range(grad_end):
@@ -104,36 +96,3 @@ class BlackBlockGrad(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect.x = self.x
         self.rect.y = self.y
-
-class ReiMundicaStatic(Enemy):
-    def __init__(self, game, x, y, enemy_name):
-        self._layer = PLAYER_LAYER
-        self.groups = game.all_sprites, game.enemy
-        pygame.sprite.Sprite.__init__(self, self.groups)
-        self.game = game
-        self.enemy_name = enemy_name
-        self.x = x * TILESIZE
-        self.y = y * TILESIZE
-        self.width = 128
-        self.height = 128
-        self.spritesheet = Spritesheet(enemy_spritesheets[enemy_name])
-        self.animation_frames = enemy_animations[enemy_name]
-        self.animation_loop = 0
-        img = self.spritesheet.get_sprite(0, 0, self.width, self.height, [CHARACTER_BG])
-        self.image = pygame.transform.scale(img, (128, 128))
-        # O rect é 128x128 e ALINHADO ao tile do mapa
-        self.rect = pygame.Rect(self.x, self.y, 128, 128)
-
-    def animate(self):
-        frame = self.animation_frames[math.floor(self.animation_loop)]
-        img = self.spritesheet.get_sprite(frame[0], frame[1], self.width, self.height, [CHARACTER_BG])
-        self.image = pygame.transform.scale(img, (128, 128))
-        # Mantém o topleft do rect ao animar
-        old_topleft = self.rect.topleft
-        self.rect = pygame.Rect(old_topleft[0], old_topleft[1], 128, 128)
-        self.animation_loop += 0.3
-        if self.animation_loop >= len(self.animation_frames):
-            self.animation_loop = 0
-
-    def random_movement(self):
-        pass  # Não se move

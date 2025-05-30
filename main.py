@@ -101,7 +101,7 @@ class Game:
         self.npc_dialog_speed = 2
         self.npc_dialog_last_update = 0
         self.npc_dialog_btn_rect = None
-        self.npc_dialog_npc_symbol = ""
+        self.npc_dialog_npc_symbol = "" 
         self.mapa_atual_index = 0
         self.mapa_atual = mapas[self.mapa_atual_index]["tilemap"]
         self.fases = [True] * len(mapas)
@@ -375,17 +375,19 @@ class Game:
 
         self.draw_hud_itens_cura()
 
-        restantes = len(self.enemy)
-        total = getattr(self, "inimigos_total", restantes)
-        if total > 0:
-            font = pygame.font.SysFont("arial", 22, bold=True)
-            texto = f"Inimigos: {restantes}/{total}"
-            text_surface = font.render(texto, True, (255, 255, 255))
-            padding = 16
-            self.screen.blit(
-                text_surface,
-                (WIN_WIDTH - text_surface.get_width() - padding, padding)
-            )
+        # Remover contador de inimigos apenas no mapa 5
+        if self.mapa_atual_index != 4:
+            restantes = len(self.enemy)
+            total = getattr(self, "inimigos_total", restantes)
+            if total > 0:
+                font = pygame.font.SysFont("arial", 22, bold=True)
+                texto = f"Inimigos: {restantes}/{total}"
+                text_surface = font.render(texto, True, (255, 255, 255))
+                padding = 16
+                self.screen.blit(
+                    text_surface,
+                    (WIN_WIDTH - text_surface.get_width() - padding, padding)
+                )
 
         self.clock.tick(FPS)
         pygame.display.update()
