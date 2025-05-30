@@ -13,16 +13,16 @@ import random
 
 tilemap = [
     'TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTM',
-    'pNpZ......u............................M',
+    'pN.Z......u...............E............M',
     't.........u.uuuuuu.uuu.uuuuuuuu.uuuuuu.M',
     'M.........u.uuuuUu.uuu.uuuuuuuu.uuuuuu.M',
     'M.........u......u.uuu.u........uuuuuu.M',
     'M.......k.uuuuuuuu.uuu.uuuuuuuuuu......M',
-    'M..................uuu.uuuuuuuuuu.uuuuuM',
+    'M............E.....uuu.uuuuuuuuuu.uuuuuM',
     'Muuuuuuuuuuuuuuuuuuu...u...............M',
     'Muuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuu.uuuuuM',
     'M......................................M',
-    'M......................................M',
+    'M.................E....................M',
     'M......................................M',
     'M.uuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuM',
     'M.u...uU...............................M',
@@ -38,11 +38,11 @@ tilemap = [
     'Muuuuuuuuuuuuuuuuuuuuuuuuuuuuuuu.......M',
     'Muuuuuuuuuuuuuuuuuuuuuuuuuuuuuuu.......M',
     'M......................................M',
-    'M......................................M',
+    'M...................E..................M',
     'M...uuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuM',
     'M......................................M',
     'M......................................T',
-    'M......................................p',
+    'M.....................................1p',
     'Mttttttttttttttttttttttttttttttttttttttt',
 ]
 
@@ -54,8 +54,7 @@ def create_tiled_map(game, mapa_atual_index, mapas_visitados, fases, enemies, it
             if column == ",":
                 Ground2(game, j, i)  # cria um tipo diferente de chao
             if column == "N":
-                game.player = Player(game, j, i)  # posiciona o jogador
-                Ground2(game, j, i)
+                game.player = Player(game, j, i)
             if column == "E" and fases[mapa_atual_index]:
                 enemy_names = [k for k in enemies.keys() if k != "Rei Mundiça"]
                 enemy_name = random.choice(enemy_names)
@@ -83,6 +82,8 @@ def create_tiled_map(game, mapa_atual_index, mapas_visitados, fases, enemies, it
                 Tenda(game, j, i)  # posiciona tendas
             if column == "k":
                 Placa(game, j, i, symbol="L")
+            if column == "1":
+                NPC7(game, j, i)
     mapas_visitados[mapa_atual_index] = True  # marca o mapa atual como visitado
 
 # classe que representa a tenda no mapa
@@ -138,3 +139,29 @@ class Placa(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect.x = self.x
         self.rect.y = self.y
+
+class NPC7(pygame.sprite.Sprite):
+    def __init__(self, game, x, y, symbol="M"):
+        self.game = game
+        self.symbol = symbol
+        self._layer = BLOCK_LAYER
+        self.groups = self.game.all_sprites
+        pygame.sprite.Sprite.__init__(self, self.groups)
+        self.x = x * TILESIZE
+        self.y = y * TILESIZE
+        self.width = TILESIZE
+        self.height = TILESIZE
+        self.spritesheet = Spritesheet("img/kaua.png")
+        self.image = self.spritesheet.get_sprite(1, 1, self.width, self.height, [])
+        self.image.set_colorkey((0, 176, 176))
+        self.rect = self.image.get_rect()
+        self.rect.x = self.x
+        self.rect.y = self.y
+        self.moved = False  # Flag para não mover mais de uma vez
+
+    def update(self):
+        # Só executa se o diálogo com Kauã foi concluído e ele ainda não se moveu
+        if not self.moved and hasattr(self.game, "npc_dialog_npc_symbol") and self.game.npc_dialog_npc_symbol == self.symbol:
+            if not self.game.npc_dialog_active:
+                self.rect.y -= TILESIZE
+                self.moved = True

@@ -38,7 +38,7 @@ npcs_data = {
         ]
     },
     "D": {
-        "nome": "Rosa",
+        "nome": "J. R.",
         "status": {"importante": False},
         "dialogos": [
             "Oh, meu jardim! Finalmente terminei de plantar!",
@@ -157,6 +157,17 @@ npcs_data = {
             "Avançe na floresta e derrote as bactérias...",
             "Confio em você!",
             "Você está indo muito bem...",
+        ]
+    },
+    "N": {
+        "nome": "Rei Mundiça",
+        "dialogos": [
+            "Pobre Kauã...",
+            "Não tinha bons hábitos, não se cuidava.",
+            "Usei ele de isca para atrair você!",
+            "Você é forte, mas não o suficiente.",
+            "Prepare-se para a batalha final!",
+            "HAHAHAHAHAHAHAHA!!!!!"
         ]
     }
 }

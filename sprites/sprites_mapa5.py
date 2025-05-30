@@ -6,9 +6,9 @@ from npcs import npcs_data
 import random
 
 tilemap = [
-    'TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTM',
-    'pN...................,.................M',
-    't,,,,,,,,,,,,,,,,,,,.,,,,,,,,,,,,,,,,,,M',
+    'MTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTM',
+    'MN...................,.................M',
+    'M,,,,,,,,,,,,,,,,,,,.,,,,,,,,,,,,,,,,,,M',
     'M..................,.,.................M',
     'M..................,.,.................M',
     'M..................,.,.................M',
@@ -28,13 +28,13 @@ tilemap = [
     'M..................,.,.................M',
     'M,,,,,,,,,,,,,,,,,,,.,,,,,,,,,,,,,,,,,,M',
     'M......................................M',
-    'M......................................M',
-    'M......................................M',
-    'M......................................M',
-    'M......................................M',
-    'M......................................M',
-    'M......................................M',
     'M...................E..................M',
+    'M......................................M',
+    'M......................................M',
+    'M......................................M',
+    'M......................................M',
+    'M......................................M',
+    'M......................................M',
     'MttttttttttttttttttttttttttttttttttttttM',
 ]
 
@@ -46,10 +46,9 @@ def create_tiled_map(game, mapa_atual_index, mapas_visitados, fases, enemies, it
                 ParedeInv(game, j, i)
             if column == "N":
                 game.player = Player(game, j, i)
-                Ground2(game, j, i)
             if column == "E" and fases[mapa_atual_index]:
                 enemy_name = "Rei Mundiça"
-                game.battle_enemy = Enemy(game, j, i, enemy_name)
+                ReiMundicaEvento(game, j, i)
             if column == "t":
                 Tree1(game, j, i)
             if column == "T":
@@ -65,8 +64,8 @@ def create_tiled_map(game, mapa_atual_index, mapas_visitados, fases, enemies, it
                 ItemCuraSprite(game, j, i, item_cura)
             
             # Gradiente preto de cima para baixo (vertical) mais suaveAdd commentMore actions
-    grad_end = len(tilemap) - 15  # agora só os últimos 15 blocos são totalmente pretos
-    grad_steps = grad_end if grad_end > 0 else 1
+    grad_end = len(tilemap) - 20  # agora só os últimos 15 blocos são totalmente pretos
+    grad_steps = grad_end if grad_end > 0 else 1 
     for i in range(grad_end):
         # Suave: alpha vai de 0 até 240 (deixa espaço para o preto total)
         alpha = int((i / (grad_steps - 1)) * 240)
@@ -74,7 +73,7 @@ def create_tiled_map(game, mapa_atual_index, mapas_visitados, fases, enemies, it
             BlackBlockGrad(game, j, i, alpha)
 
     # Últimos 15 blocos totalmente pretos
-    for i in range(len(tilemap) - 15, len(tilemap)):
+    for i in range(len(tilemap) - 20, len(tilemap)):
         for j in range(len(tilemap[0])):
             BlackBlockGrad(game, j, i, 255)
 

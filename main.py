@@ -112,6 +112,30 @@ class Game:
         self.spawn_tocha_apos_dialogo = False
         self.npc_moved = False
         self.sombra_ativa_mapa3 = True
+        self.movimento_bloqueado = False
+        self.saved_state = None
+    
+    def save_current_state(self):
+        self.saved_state = {
+            "mapa_atual_index": self.mapa_atual_index,
+            "fases": self.fases.copy(),
+            "mapas_visitados": self.mapas_visitados.copy(),
+            "inventario_cura": [item for item in self.inventario_cura],
+            "inventario_chave": [item for item in self.inventario_chave],
+            "fox_hp": self.fox_hp,
+        }
+    
+    def restore_saved_state(self):
+        # Restaura o estado salvo (após derrota)
+        if self.saved_state:
+            self.mapa_atual_index = self.saved_state["mapa_atual_index"]
+            self.fases = self.saved_state["fases"].copy()
+            self.mapas_visitados = self.saved_state["mapas_visitados"].copy()
+            self.inventario_cura = [item for item in self.saved_state["inventario_cura"]]
+            self.inventario_chave = [item for item in self.saved_state["inventario_chave"]]
+            self.fox_hp = self.saved_state["fox_hp"]
+            self.mapa_atual = mapas[self.mapa_atual_index]["tilemap"]
+            self.new()
 
     # essa funcao gerencia a tela de batalha, incluindo a musica, imagens e logica de vitoria/derrota
     def handle_battle(self):
@@ -290,6 +314,7 @@ class Game:
 
     # troca o mapa atual pelo proximo ou anterior na lista de mapas
     def trocar_mapa(self, direcao="proximo"):
+        self.save_current_state()  # <--- SALVA ANTES DE TROCAR
         anterior = self.mapa_atual_index
         if direcao == "proximo":
             if self.mapa_atual_index < len(mapas) - 1:
@@ -416,18 +441,13 @@ class Game:
                     self.game_over_flag = False
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_r:
-                        self.mapa_atual_index = 0
-                        self.mapa_atual = mapas[self.mapa_atual_index]["tilemap"]
-                        self.mapas_visitados = [False] * len(mapas)
-                        self.fases[:] = [True] * len(self.fases)
-                        self.fox_hp = 100
                         self.game_over_flag = False
                         self.playing = True
                         mixer.music.stop()
                         mixer.music.load("sounds/limpattack_ost_base.mp3")
                         mixer.music.set_volume(1)
                         mixer.music.play(-1)
-                        self.new()
+                        self.restore_saved_state()  # <--- RESTAURA O ESTADO SALVO
                         return
             self.screen.fill(BLACK)
             if fade_in:
@@ -530,6 +550,107 @@ class Game:
         for sprite in self.enemy:
             restantes += 1
         return restantes, total
+    
+    def intro_screen(self):
+        # Tela inicial do jogo com botão estilizado e transição fade-out
+        # Fonte pixelada para o título (tenta usar uma fonte pixel, senão usa Arial)
+        try:
+            title_font = pygame.font.Font("img/pixel.ttf", 72)
+        except Exception as e:
+            print(f"Erro ao carregar fonte pixel para o título: {e}")
+            title_font = pygame.font.SysFont("Arial", 72, bold=True)
+        # Fonte pixelada para o botão (tenta usar uma fonte pixel, senão usa Arial)
+        try:
+            button_font = pygame.font.Font("img/pixel.ttf", 36)
+        except:
+            button_font = pygame.font.SysFont("Arial", 36, bold=True)
+        running_intro = True
+        button_w, button_h = 160, 44  # tamanho reduzido do botão
+        button_x = (WIN_WIDTH - button_w) // 2
+        button_y = WIN_HEIGHT // 2 + 30  # subiu o botão
+        button_rect = pygame.Rect(button_x, button_y, button_w, button_h)
+        fade_out = False
+        fade_alpha = 0
+        fade_surface = pygame.Surface((WIN_WIDTH, WIN_HEIGHT))
+        fade_surface.fill((0, 0, 0))
+
+        # Carrega a imagem de fundo da tela inicial
+        try:
+            bg_img = pygame.image.load("img/tela_inicio.png").convert()
+            bg_img = pygame.transform.scale(bg_img, (WIN_WIDTH, WIN_HEIGHT))
+        except Exception as e:
+            print(f"Erro ao carregar imagem de fundo da intro: {e}")
+            bg_img = None
+
+        while running_intro:
+            # Desenha o background da imagem, se disponível
+            if bg_img:
+                self.screen.blit(bg_img, (0, 0))
+            else:
+                self.screen.fill((30, 30, 60))
+
+            title_surface = title_font.render("LimpAttack", True, (255, 255, 255))
+            title_rect = title_surface.get_rect(center=(WIN_WIDTH // 2, WIN_HEIGHT // 2 - 80))  # subiu o texto
+            title_surface = pygame.transform.smoothscale(title_surface, (int(title_rect.width * 0.75), int(title_rect.height * 0.75)))  # diminuiu um pouco mais o texto
+            title_rect = title_surface.get_rect(center=(WIN_WIDTH // 2, WIN_HEIGHT // 2 - 80))
+            self.screen.blit(title_surface, title_rect)
+
+            mouse_pos = pygame.mouse.get_pos()
+            mouse_over = button_rect.collidepoint(mouse_pos)
+            button_color = (60, 220, 120) if mouse_over else (255, 255, 255)
+            text_color = (255, 255, 255) if mouse_over else (30, 30, 60)
+            # Pixel art style: sombra
+            sombra_offset = 4
+            sombra_rect = button_rect.move(sombra_offset, sombra_offset)
+            pygame.draw.rect(self.screen, (0, 0, 0), sombra_rect, 0)  # sombra preta
+            # Pixel art style: botão principal (sem border_radius, bordas retas)
+            pygame.draw.rect(self.screen, button_color, button_rect, 0)
+            # Pixel art style: contorno preto grosso
+            pygame.draw.rect(self.screen, (0, 0, 0), button_rect, 4)
+            # Pixel art style: contorno branco fino interno
+            pygame.draw.rect(self.screen, (255, 255, 255), button_rect.inflate(-8, -8), 2)
+            button_text = button_font.render("INICIAR", True, text_color)
+            text_rect = button_text.get_rect(center=button_rect.center)
+            self.screen.blit(button_text, text_rect)
+
+            # --- PIXEL ART BUTTON ESTILO POKEMON ---
+            # Paleta de cores
+            cor_fundo = (92, 184, 92) if mouse_over else (176, 224, 136)  # verde escuro/claro
+            cor_borda = (0, 0, 0)  # preto
+            cor_highlight = (255, 255, 255)  # branco
+            cor_shadow = (48, 96, 48)  # verde sombra
+            # Sombra "pixelada" embaixo
+            shadow_rect = button_rect.move(0, 6)
+            pygame.draw.rect(self.screen, cor_shadow, shadow_rect, 0)
+            # Contorno preto grosso
+            pygame.draw.rect(self.screen, cor_borda, button_rect.inflate(6, 6), 0)
+            # Botão principal
+            pygame.draw.rect(self.screen, cor_fundo, button_rect, 0)
+            # Destaque branco em cima
+            highlight_rect = pygame.Rect(button_rect.x+4, button_rect.y+4, button_rect.width-8, 10)
+            pygame.draw.rect(self.screen, cor_highlight, highlight_rect, 0)
+            # Contorno preto interno
+            pygame.draw.rect(self.screen, cor_borda, button_rect, 3)
+            # Texto pixelado
+            button_text = button_font.render("INICIAR ", True, (30, 30, 60))
+            text_rect = button_text.get_rect(center=button_rect.center)
+            self.screen.blit(button_text, text_rect)
+
+            if fade_out:
+                fade_surface.set_alpha(fade_alpha)
+                self.screen.blit(fade_surface, (0, 0))
+                fade_alpha += 10
+                if fade_alpha >= 255:
+                    running_intro = False
+            
+            pygame.display.update()
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    self.running = False
+                    running_intro = False
+                if event.type == pygame.MOUSEBUTTONDOWN and mouse_over and not fade_out:
+                    fade_out = True
+            self.clock.tick(FPS)
 
 # inicializa o jogo
 g = Game()

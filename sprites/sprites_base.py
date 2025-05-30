@@ -129,6 +129,8 @@ class Player(pygame.sprite.Sprite):
     def grid_movement(self):
         if self.game.in_battle:
             return
+        if getattr(self.game, "movimento_bloqueado", False):  # <--- ADICIONE ESTA LINHA
+            return
         keys = pygame.key.get_pressed()
         if not self.moving:
             dx, dy = 0, 0
@@ -156,8 +158,7 @@ class Player(pygame.sprite.Sprite):
                     if npc.__class__.__name__ in ['NPC', 'NPC2', 'NPC3',
                                                   'NPC4', 'NPC5', 'NPC6',
                                                   'NPCTenda1', 'NPCTenda2', 'NPCTenda3', 'NPCTenda4', 'NPCTenda5',
-                                                  'Placa',
-                                                  'NPC7'] and next_rect.colliderect(npc.rect):
+                                                  'Placa', 'NPC7'] and next_rect.colliderect(npc.rect):
                         npc_hit = npc
                         break
                 portal_hit = None
@@ -770,3 +771,108 @@ class ParedeInv(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect.x = self.x
         self.rect.y = self.y
+
+class ReiMundicaEvento(pygame.sprite.Sprite):
+    """
+    Evento especial de aparição do Rei Mundiça com animação de transformação estilo Pokémon.
+    """
+    def __init__(self, game, x, y):
+        self.game = game
+        self._layer = PLAYER_LAYER
+        self.groups = self.game.all_sprites
+        pygame.sprite.Sprite.__init__(self, self.groups)
+        self.x = x * TILESIZE
+        self.y = y * TILESIZE
+        self.width = 32
+        self.height = 32
+
+        # Carrega e prepara os sprites
+        self.silhueta_kaua = pygame.image.load("img/kaua_branco.png").convert()
+        self.silhueta_kaua.set_colorkey((0, 184, 0))  # Remove fundo verde
+        self.silhueta_kaua = pygame.transform.scale(self.silhueta_kaua, (32, 32))
+
+        self.silhueta_rei = pygame.image.load("img/rei_branco.png").convert()
+        self.silhueta_rei.set_colorkey((0, 184, 0))  # Remove fundo verde
+        self.silhueta_rei = pygame.transform.scale(self.silhueta_rei, (32, 32))
+
+        self.sprite_rei_final = pygame.image.load("img/rei_luta.png").convert()
+        self.sprite_rei_final.set_colorkey((184, 200, 168))
+        self.sprite_rei_final = pygame.transform.scale(self.sprite_rei_final, (32, 32))
+
+        self.image = self.silhueta_kaua
+        self.rect = self.image.get_rect()
+        self.rect.x = self.x
+        self.rect.y = self.y
+
+        # State machine
+        self.state = "waiting_for_trigger"  # waiting_for_trigger, transforming, revealed, dialogue, finished
+        self.last_switch = pygame.time.get_ticks()
+        self.switch_interval = 200  # ms
+        self.current_sprite = 0
+        self.transform_start = None
+        self.reveal_start = None
+        self.dialogue_started = False
+
+        # Para congelar/descongelar Nala
+        self.nala_was_moving = False
+
+    def update(self):
+        now = pygame.time.get_ticks()
+        player = self.game.player
+        dx = abs((self.rect.centerx - player.rect.centerx) // TILESIZE)
+        dy = abs((self.rect.centery - player.rect.centery) // TILESIZE)
+        manhattan = dx + dy
+
+        if self.state == "waiting_for_trigger":
+            if manhattan <= 2:
+                self.game.movimento_bloqueado = True  # <--- BLOQUEIA MOVIMENTO
+                self.transform_start = now
+                self.state = "transforming"
+            else:
+                # Alternância visual mesmo antes do trigger (opcional)
+                if now - self.last_switch > self.switch_interval:
+                    self.current_sprite = 1 - self.current_sprite
+                    self.image = self.silhueta_kaua if self.current_sprite == 0 else self.silhueta_rei
+                    self.last_switch = now
+
+        elif self.state == "transforming":
+            # Alterna sprites por 3 segundos
+            if now - self.last_switch > self.switch_interval:
+                self.current_sprite = 1 - self.current_sprite
+                self.image = self.silhueta_kaua if self.current_sprite == 0 else self.silhueta_rei
+                self.last_switch = now
+            if now - self.transform_start > 3000:
+                self.image = self.sprite_rei_final
+                self.reveal_start = now
+                self.state = "revealed"
+
+        elif self.state == "revealed":
+            # Espera 0.5s antes do diálogo
+            if now - self.reveal_start > 500:
+                self.state = "dialogue"
+                self.dialogue_started = False
+
+        elif self.state == "dialogue":
+            # Inicia diálogo do Rei Mundiça automaticamente
+            if not self.dialogue_started:
+                npc_info = npcs_data.get("N")
+                if npc_info and "dialogos" in npc_info:
+                    self.game.npc_dialog_active = True
+                    self.game.npc_dialog_texts = npc_info["dialogos"]
+                    self.game.npc_dialog_index = 0
+                    self.game.npc_dialog_current = ""
+                    self.game.npc_dialog_char_index = 0
+                    self.game.npc_dialog_last_update = now
+                    self.game.npc_dialog_npc_symbol = "N"
+                self.dialogue_started = True
+            # Espera o diálogo terminar
+            if not self.game.npc_dialog_active:
+                self.game.movimento_bloqueado = False  # <--- LIBERA MOVIMENTO
+                self.state = "finished"
+
+        elif self.state == "finished":
+            # Substitui o evento pelo inimigo real (só uma vez)
+            if not hasattr(self, "_spawned_enemy"):
+                Enemy(self.game, self.rect.x // TILESIZE, self.rect.y // TILESIZE, "Rei Mundiça")
+                self._spawned_enemy = True
+                self.kill()  # Remove o sprite do evento
