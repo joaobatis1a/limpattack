@@ -311,6 +311,34 @@ class Game:
                 self.sombra_ativa_mapa3 = False
             else:
                 self.sombra_ativa_mapa3 = True
+        # ADICIONE ISSO PARA O MAPA 5:
+        if self.mapa_atual_index == 4:
+            # Controle de variável: só cria o Path se ainda não foi criado e o Rei Mundiça morreu
+            if not hasattr(self, "path_spawned"):
+                self.path_spawned = False  # inicializa a flag na primeira vez
+
+            # Verifica se o Path já foi criado
+            if not self.path_spawned:
+                # Verifica se o Rei Mundiça ainda está vivo
+                rei_vivo = any(
+                    getattr(e, "enemy_name", "") == "Rei Mundiça"
+                    for e in self.enemy
+                )
+                if not rei_vivo:
+                    # Cria o Path do centro dos "E" até o "p" na linha correta
+                    for i, row in enumerate(self.mapa_atual):
+                        if "E" in row:
+                            linha_e = i
+                            col_e_inicio = row.index("E")
+                            col_e_fim = row.rindex("E")
+                            break
+                    col_p = self.mapa_atual[linha_e].index("p")
+                    from sprites.sprites_mapa5 import Path
+                    col_centro_e = (col_e_inicio + col_e_fim) // 2
+                    passo = 1 if col_p > col_centro_e else -1
+                    for j in range(col_centro_e, col_p + passo, passo):
+                        Path(self, j, linha_e)
+                    self.path_spawned = True  # Marca que o Path já foi criado
 
     # troca o mapa atual pelo proximo ou anterior na lista de mapas
     def trocar_mapa(self, direcao="proximo"):
@@ -606,7 +634,7 @@ class Game:
             # Pixel art style: botão principal (sem border_radius, bordas retas)
             pygame.draw.rect(self.screen, button_color, button_rect, 0)
             # Pixel art style: contorno preto grosso
-            pygame.draw.rect(self.screen, (0, 0, 0), button_rect, 4)
+            pygame.draw.rect(self.screen, (0, 0, 0), button_rect.inflate(6, 6), 0)
             # Pixel art style: contorno branco fino interno
             pygame.draw.rect(self.screen, (255, 255, 255), button_rect.inflate(-8, -8), 2)
             button_text = button_font.render("INICIAR", True, text_color)

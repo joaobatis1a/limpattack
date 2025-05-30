@@ -66,7 +66,7 @@ def create_tiled_map(game, mapa_atual_index, mapas_visitados, fases, enemies, it
     if not hasattr(game, "tocha_coletada_tenda4"):
         game.tocha_coletada_tenda4 = False
     if not game.tocha_coletada_tenda4:
-        TochaSprite(game, 12, 22)  # ajuste a posição se necessário
+        TochaSprite(game, 8, 2)  # ajuste a posição se necessário
 
 class GroundT(pygame.sprite.Sprite):
     def __init__(self, game, x, y):

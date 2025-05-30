@@ -84,20 +84,20 @@ class Player(pygame.sprite.Sprite):
         self.y_change = 0
         # verifica colisao com itens e portais
         for item in pygame.sprite.spritecollide(self, self.game.all_sprites, False):
-            if hasattr(self.game, 'mapa1_state'):
-                if item.__class__.__name__ == 'Sabonete':
-                    if 'sabonete' not in self.game.inventario_chave:
-                        self.game.inventario_chave.append('sabonete')
-                        item.kill()
+            if item.__class__.__name__ == 'Sabonete':
+                if 'sabonete' not in self.game.inventario_chave:
+                    self.game.inventario_chave.append('sabonete')
+                    item.kill()
+                    if hasattr(self.game, 'mapa1_state'):
                         self.game.mapa1_state['sabonete_coletado'] = True
-                if item.__class__.__name__ == 'ItemCuraSprite':
-                    pos = (item.rect.x // TILESIZE, item.rect.y // TILESIZE)
-                    if not hasattr(self.game, 'itens_cura_coletados'):
-                        self.game.itens_cura_coletados = set()
-                    if pos not in self.game.itens_cura_coletados:
-                        self.game.inventario_cura.append(item.item_cura)
-                        self.game.itens_cura_coletados.add(pos)
-                        item.kill()
+            if item.__class__.__name__ == 'ItemCuraSprite':
+                pos = (item.rect.x // TILESIZE, item.rect.y // TILESIZE)
+                if not hasattr(self.game, 'itens_cura_coletados'):
+                    self.game.itens_cura_coletados = set()
+                if pos not in self.game.itens_cura_coletados:
+                    self.game.inventario_cura.append(item.item_cura)
+                    self.game.itens_cura_coletados.add(pos)
+                    item.kill()
             if item.__class__.__name__ == 'TochaSprite':
                 if 'tocha' not in self.game.inventario_chave:
                     self.game.inventario_chave.append('tocha')

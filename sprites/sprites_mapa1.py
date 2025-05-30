@@ -29,7 +29,7 @@ tilemap = [ #40x30
     'M....,.....,.....,.....,.....,.........M',
     'M....,.....,.....,.....,.....,.........M',
     'M....,.....,.....,.....,.....,.........M',
-    'M....,.....,.....,.....,.....,.........M',
+    'M.UUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUp',
     'M....,.....,.....,.....,.....,.........M',
     'M....,..e..,..e..,..e..,..e..,.........M',
     'M....,.....,.....,.....,.....,.........M',
@@ -552,8 +552,8 @@ class Toco(pygame.sprite.Sprite):
         self.y = y * TILESIZE
         self.width = TILESIZE
         self.height = TILESIZE
-        bg_colors = [CHARACTER_BG, ENEYMY_BG, TERRAIN_BG]
-        self.image = self.game.terrain_spritesheet.get_sprite(130, 386, self.width, self.height, bg_colors)
+        bg_colors = [TERRAIN_BG]
+        self.image = self.game.terrain_spritesheet.get_sprite(582, 4722, self.width, self.height, bg_colors)
         self.rect = self.image.get_rect()
         self.rect.x = self.x
         self.rect.y = self.y
