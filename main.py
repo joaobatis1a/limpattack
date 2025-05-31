@@ -656,6 +656,37 @@ class Game:
         self.new()
         self.intro_screen()
 
+    def draw_hud_itens_cura(self):
+        inventario_dict = {}
+        for item in self.inventario_cura:
+            if item.nome not in inventario_dict:
+                inventario_dict[item.nome] = {"item": item, "quantidade": 1}
+            else:
+                inventario_dict[item.nome]["quantidade"] += 1
+        imagens = {
+            "Curativo": "img/curativo.png",
+            "Pomada": "img/pomada.png",
+            "Xarope": "img/xarope.png",
+            "Chá Natural": "img/cha.png"
+        }
+        font = pygame.font.SysFont("arial", 18)
+        hud_x = 10
+        hud_y = 10
+        for i, (nome, data) in enumerate(inventario_dict.items()):
+            img_path = imagens.get(nome, "img/curativo.png")
+            sprite = HudItemCuraSprite(hud_x + i*48, hud_y, img_path, data["quantidade"])
+            sprite.draw(self.screen, font)
+        if hasattr(self, 'inventario_chave') and 'tocha' in self.inventario_chave:
+            tocha_sprite = HudItemCuraSprite(hud_x, hud_y + 54, "img/tocha.png", 1)
+            tocha_sprite.draw(self.screen, font)
+            font2 = pygame.font.SysFont("arial", 16)
+            self.screen.blit(font2.render("Tocha", True, (255,255,255)), (hud_x + 40, hud_y + 60))
+        elif hasattr(self, 'inventario_chave') and 'sabonete' in self.inventario_chave:
+            sabonete_sprite = HudItemCuraSprite(hud_x, hud_y + 54, "img/sabonete.png", 1)
+            sabonete_sprite.draw(self.screen, font)
+            font2 = pygame.font.SysFont("arial", 16)
+            self.screen.blit(font2.render("Sabonete", True, (255,255,255)), (hud_x + 40, hud_y + 60))
+
 # inicializa o jogo
 g = Game()
 g.new()
