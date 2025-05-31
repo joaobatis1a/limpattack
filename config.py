@@ -22,6 +22,7 @@ PLAYER_LAYER = 4 # camada do jogador
 MID_LAYER = 3
 BLOCK_LAYER = 2  # camada de blocos/obstaculos
 GROUND_LAYER = 1 # camada do chao
+DOWN_LAYER = 0 # camada de fundo
 
 # define a velocidade do jogador
 PLAYER_SPEED = 8
@@ -39,4 +40,4 @@ ENEYMY_BG = (0, 0, 0)          # cor de fundo do inimigo
 TERRAIN_BG = (0, 0, 0)         # cor de fundo do terreno
 
 # lista que indica se cada fase esta ativa
-fases = [True, True, True, True, True]
+fases = [True, True, True, True, True, True]

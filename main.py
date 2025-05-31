@@ -29,6 +29,7 @@ from sprites.sprites_mapa2 import tilemap as tilemap2, create_tiled_map as creat
 from sprites.sprites_mapa3 import tilemap as tilemap3, create_tiled_map as create_tiled_map3
 from sprites.sprites_mapa4 import tilemap as tilemap4, create_tiled_map as create_tiled_map4
 from sprites.sprites_mapa5 import tilemap as tilemap5, create_tiled_map as create_tiled_map5
+from sprites.sprites_mapa6 import tilemap as tilemap6, create_tiled_map as create_tiled_map6
 from battleData import *
 from battle import *
 from npcs import npcs_data
@@ -44,6 +45,7 @@ mapas = [
     {"tilemap": tilemap3, "create": create_tiled_map3},
     {"tilemap": tilemap4, "create": create_tiled_map4},
     {"tilemap": tilemap5, "create": create_tiled_map5},
+    {"tilemap": tilemap6, "create": create_tiled_map6},
 ]
 
 MAPA_SPAWNS = {
@@ -56,7 +58,7 @@ MAPA_SPAWNS = {
     },
     2: {  # mapa 3
         "left": (1, 1),    # entrada vinda do mapa 2
-        "right": (38, 38),  # entrada vinda do mapa 4
+        "right": (38, 30),  # entrada vinda do mapa 4
     },
     3: {  # mapa 4
         "left": (1, 1),    # entrada vinda do mapa 3
@@ -64,7 +66,10 @@ MAPA_SPAWNS = {
     },
     4: {  # mapa 5
         "left": (1, 1),
-        "right": (38, 1),
+        "right": (38, 24),
+    },
+    5: {  # mapa 6
+        "left": (1, 24), 
     },
 }
 
@@ -114,6 +119,7 @@ class Game:
         self.sombra_ativa_mapa3 = True
         self.movimento_bloqueado = False
         self.saved_state = None
+        self.rei_mundica_derrotado = False
     
     def save_current_state(self):
         self.saved_state = {
@@ -202,8 +208,18 @@ class Game:
         if isinstance(resultado, int):
             self.fox_hp = resultado
             if self.fox_hp > 0:
-                self.battle_enemy.kill()
-                self.fases[self.mapa_atual_index] = False
+                if self.battle_enemy.enemy_name == "Rei Mundiça":
+                    self.rei_mundica_derrotado = True
+                    self.fases[self.mapa_atual_index] = False  # Marcar fase como concluída antes de reiniciar
+                    # Salva a posição da Nala antes de recarregar o mapa
+                    player_pos = (self.player.rect.x, self.player.rect.y) if hasattr(self, 'player') and self.player else None
+                    self.new()  # recarrega o mapa para mostrar o Path
+                    # Restaura a posição da Nala após recarregar o mapa
+                    if player_pos and hasattr(self, 'player') and self.player:
+                        self.player.rect.x, self.player.rect.y = player_pos
+                else:
+                    self.battle_enemy.kill()
+                    self.fases[self.mapa_atual_index] = False
             else:
                 self.game_over_flag = True
         elif resultado == "derrota":
@@ -224,7 +240,6 @@ class Game:
         map_width = len(mapas[self.mapa_atual_index]["tilemap"][0]) * TILESIZE
         map_height = len(mapas[self.mapa_atual_index]["tilemap"]) * TILESIZE
         self.camera = Camera(map_width, map_height)
-        # Salva o total inicial de inimigos
         self.inimigos_total = len(self.enemy)
 
     # verifica se o jogador colidiu com um portal ou se ainda ha inimigos no mapa
@@ -293,11 +308,59 @@ class Game:
                 break
         if self.npc_dialog_active:
             self.draw_npc_dialog()
+
+        # Move Kauã após o diálogo no mapa 5 (checa sempre fora do bloco do diálogo)
+        if (
+            not self.npc_dialog_active
+            and self.mapa_atual_index == 4
+            and hasattr(self, 'npc_dialog_npc_symbol')
+            and self.npc_dialog_npc_symbol == 'O'
+        ):
+            for sprite in self.all_sprites:
+                if (
+                    hasattr(sprite, 'symbol')
+                    and sprite.symbol == 'O'
+                    and hasattr(sprite, 'move_left_two_tiles')
+                    and not getattr(sprite, 'moved', False)
+                ):
+                    sprite.move_left_two_tiles()
+                    break
         if len(self.enemy) == 0:
             for sprite in self.blocks:
                 if isinstance(sprite, ClosedPortal):
                     sprite.kill()
                     Portal(self, sprite.rect.x // TILESIZE, sprite.rect.y // TILESIZE)
+            # --- LÓGICA DO PATH NO MAPA 5 ---
+            if self.mapa_atual_index == 4 and getattr(self, 'rei_mundica_derrotado', False):
+                if not hasattr(self, 'path_spawned_mapa5'):
+                    self.path_spawned_mapa5 = False
+                if not self.path_spawned_mapa5:
+                    from sprites.sprites_mapa5 import Path
+                    # Remove paredes invisíveis do caminho (linha 24, colunas 20 a 38)
+                    for col in range(20, 39):
+                        for sprite in list(self.blocks):
+                            if sprite.rect.x // TILESIZE == col and sprite.rect.y // TILESIZE == 24 and sprite.__class__.__name__ == 'ParedeInv':
+                                sprite.kill()
+                    # Cria o Path alinhado, 1 tile de largura para cada coluna
+                    for col in range(20, 39):
+                        Path(self, col, 24)
+                    self.path_spawned_mapa5 = True
+        else:
+            if self.mapa_atual_index == 4:
+                self.path_spawned_mapa5 = False
+        # --- FIM DA LÓGICA DO PATH NO MAPA 5 ---
+        # --- FADE OUT E REINICIO APÓS CRÉDITOS (MAPA 5) ---
+        if self.mapa_atual_index == 4:
+            # Se o jogador passou pelo final do caminho dos créditos (coluna >= 38, linha 24)
+            if hasattr(self, 'player') and self.player and self.player.rect.x // TILESIZE >= 38 and self.player.rect.y // TILESIZE == 24:
+                self.fade_out_and_restart()
+                return
+        # --- FADE OUT E REINICIO APÓS DIÁLOGO DA SOMBRA DE KAUÃ (MAPA 6) ---
+        if self.mapa_atual_index == 5:
+            # Se acabou de sair do diálogo com a sombra de Kauã (símbolo 'P')
+            if hasattr(self, 'npc_dialog_npc_symbol') and self.npc_dialog_npc_symbol == 'P' and not self.npc_dialog_active:
+                self.fade_out_and_restart()
+                return
         if self.verificar_portal():
             print("jogador colidiu com um portal.")
         if self.player is not None:
@@ -311,34 +374,6 @@ class Game:
                 self.sombra_ativa_mapa3 = False
             else:
                 self.sombra_ativa_mapa3 = True
-        # ADICIONE ISSO PARA O MAPA 5:
-        if self.mapa_atual_index == 4:
-            # Controle de variável: só cria o Path se ainda não foi criado e o Rei Mundiça morreu
-            if not hasattr(self, "path_spawned"):
-                self.path_spawned = False  # inicializa a flag na primeira vez
-
-            # Verifica se o Path já foi criado
-            if not self.path_spawned:
-                # Verifica se o Rei Mundiça ainda está vivo
-                rei_vivo = any(
-                    getattr(e, "enemy_name", "") == "Rei Mundiça"
-                    for e in self.enemy
-                )
-                if not rei_vivo:
-                    # Cria o Path do centro dos "E" até o "p" na linha correta
-                    for i, row in enumerate(self.mapa_atual):
-                        if "E" in row:
-                            linha_e = i
-                            col_e_inicio = row.index("E")
-                            col_e_fim = row.rindex("E")
-                            break
-                    col_p = self.mapa_atual[linha_e].index("p")
-                    from sprites.sprites_mapa5 import Path
-                    col_centro_e = (col_e_inicio + col_e_fim) // 2
-                    passo = 1 if col_p > col_centro_e else -1
-                    for j in range(col_centro_e, col_p + passo, passo):
-                        Path(self, j, linha_e)
-                    self.path_spawned = True  # Marca que o Path já foi criado
 
     # troca o mapa atual pelo proximo ou anterior na lista de mapas
     def trocar_mapa(self, direcao="proximo"):
@@ -679,6 +714,26 @@ class Game:
                 if event.type == pygame.MOUSEBUTTONDOWN and mouse_over and not fade_out:
                     fade_out = True
             self.clock.tick(FPS)
+
+    def fade_out_and_restart(self, duration_ms=2000):
+        fade_surface = pygame.Surface((WIN_WIDTH, WIN_HEIGHT))
+        fade_surface.fill((0, 0, 0))
+        clock = pygame.time.Clock()
+        alpha = 0
+        start_time = pygame.time.get_ticks()
+        while alpha < 255:
+            now = pygame.time.get_ticks()
+            elapsed = now - start_time
+            alpha = min(255, int(255 * (elapsed / duration_ms)))
+            fade_surface.set_alpha(alpha)
+            self.draw()  # Draw current frame
+            self.screen.blit(fade_surface, (0, 0))
+            pygame.display.update()
+            clock.tick(FPS)
+        # Reset game state and show intro
+        self.__init__
+        self.new()
+        self.intro_screen()
 
 # inicializa o jogo
 g = Game()

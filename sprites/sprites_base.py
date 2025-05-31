@@ -158,7 +158,9 @@ class Player(pygame.sprite.Sprite):
                     if npc.__class__.__name__ in ['NPC', 'NPC2', 'NPC3',
                                                   'NPC4', 'NPC5', 'NPC6',
                                                   'NPCTenda1', 'NPCTenda2', 'NPCTenda3', 'NPCTenda4', 'NPCTenda5',
-                                                  'Placa', 'NPC7'] and next_rect.colliderect(npc.rect):
+                                                  'Placa', 'NPC7',
+                                                  'NPC8',
+                                                  'NPC9'] and next_rect.colliderect(npc.rect):
                         npc_hit = npc
                         break
                 portal_hit = None
@@ -561,6 +563,8 @@ class Portal(pygame.sprite.Sprite):
     def __init__(self, game, x, y):
         self.game = game
         self._layer = BLOCK_LAYER
+        if self.game.mapa_atual_index == 4:
+            self._layer = UP_LAYER
         self.groups = self.game.all_sprites, self.game.portals
         pygame.sprite.Sprite.__init__(self, self.groups)
         self.x = x * TILESIZE
@@ -648,12 +652,29 @@ class NPC(pygame.sprite.Sprite):
         self.width = TILESIZE
         self.height = TILESIZE
         # carrega a spritesheet do npc
-        self.spritesheet = Spritesheet("img/carlos.png")
-        self.image = self.spritesheet.get_sprite(1, 1, self.width, self.height, [])
-        self.image.set_colorkey((0, 176, 0))
+        if symbol == "O":
+            # Kauã normal (mapa 5)
+            self.spritesheet = Spritesheet("img/kaua.png")
+            self.image = self.spritesheet.get_sprite(1, 1, self.width, self.height, [(0, 184, 0)])
+            self.image.set_colorkey((0, 184, 0))
+        elif symbol == "P":
+            # Sombra de Kauã (mapa 6)
+            self.spritesheet = Spritesheet("img/kaua_branco.png")
+            self.image = self.spritesheet.get_sprite(0, 0, self.width, self.height, [(0, 184, 0)])
+            self.image.set_colorkey((0, 184, 0))
+        else:
+            self.spritesheet = Spritesheet("img/carlos.png")
+            self.image = self.spritesheet.get_sprite(1, 1, self.width, self.height, [])
+            self.image.set_colorkey((0, 176, 0))
         self.rect = self.image.get_rect()
         self.rect.x = self.x
         self.rect.y = self.y
+        self.moved = False
+
+    def move_left_two_tiles(self):
+        self.rect.x -= 2 * TILESIZE
+        self.x = self.rect.x
+        self.moved = True
 
 # classe para npcs alternativos, que herda de Sprite
 class NPC2(pygame.sprite.Sprite):

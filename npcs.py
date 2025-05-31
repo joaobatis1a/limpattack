@@ -62,7 +62,7 @@ npcs_data = {
         "dialogos_bloqueando": [
             "Acabei de chegar da floresta, tá muito escuro lá dentro!",
             "Estive com Kauã agora há pouco, ele quer sua ajuda...",
-            "Procure uma tocha na aldeia e volte aqui, por favor!",
+            "Procure uma tocha nas tendas e volte aqui, por favor!",
         ],
         "dialogos_entrega": [
             "Ótimo, você trouxe a tocha! Kauã precisa atravessar a floresta.",
@@ -168,6 +168,29 @@ npcs_data = {
             "Você é forte, mas não o suficiente.",
             "Prepare-se para a batalha final!",
             "HAHAHAHAHAHAHAHA!!!!!"
+        ]
+    },
+    "O": {
+        "nome": "Kauã",
+        "status": {"importante": False},
+        "dialogos": [
+            "Olha só, você conseguiu derrotá-lo.",
+            "Você realmente aprendeu a cuidar de si mesma.",
+            "Eu não ligava para isso antes, mas agora vejo a importância.",
+            "Depois que o Rei Mundiça tomou conta de mim...",
+            "Eu percebi que precisava mudar meus hábitos.",
+            "Você é uma verdadeira heroína, Nala.",
+            "Agora vamos.",
+            "Vamos para o lugar que você merece..."
+        ]
+    },
+    "P": {
+        "nome": "Kauã",
+        "status": {"importante": False},
+        "dialogos": [
+            "Parabéns, Nala.",
+            "Você conseguiu.",
+            "Enfim, descansaremos...",
         ]
     }
 }

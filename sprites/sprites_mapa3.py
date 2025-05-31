@@ -118,7 +118,7 @@ def create_tiled_map(game, mapa_atual_index, mapas_visitados, fases, enemies, it
             if column == "k":
                 Placa(game, j, i, symbol="L")
             if column == "1":
-                NPC7(game, j, i)
+                NPC7(game, j, i, symbol="M")
     mapas_visitados[mapa_atual_index] = True  # marca o mapa atual como visitado
 
 # classe que representa a tenda no mapa
