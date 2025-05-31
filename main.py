@@ -309,7 +309,7 @@ class Game:
         if self.npc_dialog_active:
             self.draw_npc_dialog()
 
-        # Move Kauã após o diálogo no mapa 5 (checa sempre fora do bloco do diálogo)
+        # Move Kauã (NPC 'O') para a esquerda após o diálogo no mapa 5
         if (
             not self.npc_dialog_active
             and self.mapa_atual_index == 4
@@ -320,10 +320,14 @@ class Game:
                 if (
                     hasattr(sprite, 'symbol')
                     and sprite.symbol == 'O'
-                    and hasattr(sprite, 'move_left_two_tiles')
                     and not getattr(sprite, 'moved', False)
                 ):
-                    sprite.move_left_two_tiles()
+                    sprite.rect.x -= 3 * TILESIZE
+                    sprite.x = sprite.rect.x
+                    sprite.moved = True
+                    # Garante que o NPC continue bloqueando se necessário
+                    if hasattr(sprite, 'add') and hasattr(self, 'blocks'):
+                        sprite.add(self.blocks)
                     break
         if len(self.enemy) == 0:
             for sprite in self.blocks:
@@ -349,12 +353,6 @@ class Game:
             if self.mapa_atual_index == 4:
                 self.path_spawned_mapa5 = False
         # --- FIM DA LÓGICA DO PATH NO MAPA 5 ---
-        # --- FADE OUT E REINICIO APÓS CRÉDITOS (MAPA 5) ---
-        if self.mapa_atual_index == 4:
-            # Se o jogador passou pelo final do caminho dos créditos (coluna >= 38, linha 24)
-            if hasattr(self, 'player') and self.player and self.player.rect.x // TILESIZE >= 38 and self.player.rect.y // TILESIZE == 24:
-                self.fade_out_and_restart()
-                return
         # --- FADE OUT E REINICIO APÓS DIÁLOGO DA SOMBRA DE KAUÃ (MAPA 6) ---
         if self.mapa_atual_index == 5:
             # Se acabou de sair do diálogo com a sombra de Kauã (símbolo 'P')
@@ -533,88 +531,7 @@ class Game:
             self.clock.tick(FPS)
 
     def intro_screen(self):
-        pass
-
-    # desenha os itens de cura no HUD do jogador
-    def draw_hud_itens_cura(self):
-        inventario_dict = {}
-        for item in self.inventario_cura:
-            if item.nome not in inventario_dict:
-                inventario_dict[item.nome] = {"item": item, "quantidade": 1}
-            else:
-                inventario_dict[item.nome]["quantidade"] += 1
-        imagens = {
-            "Curativo": "img/curativo.png",
-            "Pomada": "img/pomada.png",
-            "Xarope": "img/xarope.png",
-            "Chá Natural": "img/cha.png"
-        }
-        font = pygame.font.SysFont("arial", 18)
-        hud_x = 10
-        hud_y = 10
-        for i, (nome, data) in enumerate(inventario_dict.items()):
-            img_path = imagens.get(nome, "img/curativo.png")
-            sprite = HudItemCuraSprite(hud_x + i*48, hud_y, img_path, data["quantidade"])
-            sprite.draw(self.screen, font)
-        if hasattr(self, 'inventario_chave') and 'tocha' in self.inventario_chave:
-            tocha_sprite = HudItemCuraSprite(hud_x, hud_y + 54, "img/tocha.png", 1)
-            tocha_sprite.draw(self.screen, font)
-            font2 = pygame.font.SysFont("arial", 16)
-            self.screen.blit(font2.render("Tocha", True, (255,255,255)), (hud_x + 40, hud_y + 60))
-        elif hasattr(self, 'inventario_chave') and 'sabonete' in self.inventario_chave:
-            sabonete_sprite = HudItemCuraSprite(hud_x, hud_y + 54, "img/sabonete.png", 1)
-            sabonete_sprite.draw(self.screen, font)
-            font2 = pygame.font.SysFont("arial", 16)
-            self.screen.blit(font2.render("Sabonete", True, (255,255,255)), (hud_x + 40, hud_y + 60))
-
-    # desenha o dialogo dos NPCs na tela
-    def draw_npc_dialog(self):
-        dialog_box_rect = pygame.Rect(40, WIN_HEIGHT - 120, WIN_WIDTH - 80, 80)
-        pygame.draw.rect(self.screen, (255, 255, 255), dialog_box_rect, border_radius=10)
-        pygame.draw.rect(self.screen, (0, 0, 0), dialog_box_rect, 2, border_radius=10)
-        nome_npc = ""
-        npc_symbol = getattr(self, "npc_dialog_npc_symbol", None)
-        if npc_symbol:
-            npc_info = npcs_data.get(npc_symbol)
-            if npc_info:
-                nome_npc = npc_info["nome"]
-        if nome_npc:
-            name_box_rect = pygame.Rect(dialog_box_rect.x + 20, dialog_box_rect.y - 32, 180, 28)
-            pygame.draw.rect(self.screen, (255, 230, 250), name_box_rect, border_radius=8)
-            pygame.draw.rect(self.screen, (0, 0, 0), name_box_rect, 2, border_radius=8)
-            name_font = pygame.font.SysFont("arial", 20, bold=True)
-            name_text = name_font.render(nome_npc, True, (0, 0, 0))
-            self.screen.blit(name_text, (name_box_rect.x + 12, name_box_rect.y + 3))
-        font = pygame.font.SysFont("arial", 16)
-        now = pygame.time.get_ticks()
-        if self.npc_dialog_char_index < len(self.npc_dialog_texts[self.npc_dialog_index]):
-            if now - self.npc_dialog_last_update > 20:
-                self.npc_dialog_char_index += self.npc_dialog_speed
-                self.npc_dialog_last_update = now
-        self.npc_dialog_current = self.npc_dialog_texts[self.npc_dialog_index][:self.npc_dialog_char_index]
-        text_surface = font.render(self.npc_dialog_current, True, (0, 0, 0))
-        self.screen.blit(text_surface, (dialog_box_rect.x + 20, dialog_box_rect.y + 20))
-        btn_rect = pygame.Rect(dialog_box_rect.right - 120, dialog_box_rect.bottom - 40, 100, 30)
-        pygame.draw.rect(self.screen, (200, 200, 255), btn_rect, border_radius=8)
-        pygame.draw.rect(self.screen, (0, 0, 0), btn_rect, 2, border_radius=8)
-        btn_font = pygame.font.SysFont("arial", 18)
-        btn_text = btn_font.render("Avançar", True, (0, 0, 0))
-        self.screen.blit(btn_text, (btn_rect.x + 18, btn_rect.y + 5))
-        self.npc_dialog_btn_rect = btn_rect
-
-    # checa e retorna a quantidade de inimigos restantes e o total de inimigos no mapa atual
-    def checar_inimigos(self):
-        """Retorna (restantes, total) de inimigos no mapa atual."""
-        total = 0
-        restantes = 0
-        for sprite in self.all_sprites:
-            if hasattr(sprite, "enemy_name"):
-                total += 1
-        for sprite in self.enemy:
-            restantes += 1
-        return restantes, total
-    
-    def intro_screen(self):
+        import math
         # Tela inicial do jogo com botão estilizado e transição fade-out
         # Fonte pixelada para o título (tenta usar uma fonte pixel, senão usa Arial)
         try:
@@ -628,36 +545,43 @@ class Game:
         except:
             button_font = pygame.font.SysFont("Arial", 36, bold=True)
         running_intro = True
-        button_w, button_h = 160, 44  # tamanho reduzido do botão
+        button_w, button_h = 160, 44
         button_x = (WIN_WIDTH - button_w) // 2
-        button_y = WIN_HEIGHT // 2 + 30  # subiu o botão
+        button_y = WIN_HEIGHT // 2 + 30
         button_rect = pygame.Rect(button_x, button_y, button_w, button_h)
         fade_out = False
         fade_alpha = 0
         fade_surface = pygame.Surface((WIN_WIDTH, WIN_HEIGHT))
         fade_surface.fill((0, 0, 0))
-
-        # Carrega a imagem de fundo da tela inicial
         try:
             bg_img = pygame.image.load("img/tela_inicio.png").convert()
             bg_img = pygame.transform.scale(bg_img, (WIN_WIDTH, WIN_HEIGHT))
         except Exception as e:
             print(f"Erro ao carregar imagem de fundo da intro: {e}")
             bg_img = None
-
         while running_intro:
-            # Desenha o background da imagem, se disponível
             if bg_img:
                 self.screen.blit(bg_img, (0, 0))
             else:
                 self.screen.fill((30, 30, 60))
-
-            title_surface = title_font.render("LimpAttack", True, (255, 255, 255))
-            title_rect = title_surface.get_rect(center=(WIN_WIDTH // 2, WIN_HEIGHT // 2 - 80))  # subiu o texto
-            title_surface = pygame.transform.smoothscale(title_surface, (int(title_rect.width * 0.75), int(title_rect.height * 0.75)))  # diminuiu um pouco mais o texto
-            title_rect = title_surface.get_rect(center=(WIN_WIDTH // 2, WIN_HEIGHT // 2 - 80))
+            # --- ANIMAÇÃO DO TÍTULO ---
+            t = pygame.time.get_ticks() / 700.0
+            float_offset = int(12 * math.sin(t))  # Oscilação vertical
+            # Interpolação de cor entre amarelo e azul
+            c1 = (254, 217, 102)
+            c2 = (28, 69, 135)
+            interp = (math.sin(t) + 1) / 2  # 0..1
+            color = (
+                int(c1[0] * interp + c2[0] * (1 - interp)),
+                int(c1[1] * interp + c2[1] * (1 - interp)),
+                int(c1[2] * interp + c2[2] * (1 - interp))
+            )
+            title_surface = title_font.render("LimpAttack", True, color)
+            title_rect = title_surface.get_rect(center=(WIN_WIDTH // 2, WIN_HEIGHT // 2 - 80 + float_offset))
+            title_surface = pygame.transform.smoothscale(title_surface, (int(title_rect.width * 0.75), int(title_rect.height * 0.75)))
+            title_rect = title_surface.get_rect(center=(WIN_WIDTH // 2, WIN_HEIGHT // 2 - 80 + float_offset))
             self.screen.blit(title_surface, title_rect)
-
+            # --- RESTANTE DA FUNÇÃO (botão, fade, eventos) ---
             mouse_pos = pygame.mouse.get_pos()
             mouse_over = button_rect.collidepoint(mouse_pos)
             button_color = (60, 220, 120) if mouse_over else (255, 255, 255)
@@ -669,16 +593,15 @@ class Game:
             # Pixel art style: botão principal (sem border_radius, bordas retas)
             pygame.draw.rect(self.screen, button_color, button_rect, 0)
             # Pixel art style: contorno preto grosso
-            pygame.draw.rect(self.screen, (0, 0, 0), button_rect.inflate(6, 6), 0)
+            pygame.draw.rect(self.screen, (0, 0, 0), button_rect, 4)
             # Pixel art style: contorno branco fino interno
             pygame.draw.rect(self.screen, (255, 255, 255), button_rect.inflate(-8, -8), 2)
             button_text = button_font.render("INICIAR", True, text_color)
             text_rect = button_text.get_rect(center=button_rect.center)
             self.screen.blit(button_text, text_rect)
-
             # --- PIXEL ART BUTTON ESTILO POKEMON ---
             # Paleta de cores
-            cor_fundo = (92, 184, 92) if mouse_over else (176, 224, 136)  # verde escuro/claro
+            cor_fundo = (28, 69, 135) if mouse_over else (58, 89, 175)  # verde escuro/claro
             cor_borda = (0, 0, 0)  # preto
             cor_highlight = (255, 255, 255)  # branco
             cor_shadow = (48, 96, 48)  # verde sombra
@@ -698,14 +621,12 @@ class Game:
             button_text = button_font.render("INICIAR ", True, (30, 30, 60))
             text_rect = button_text.get_rect(center=button_rect.center)
             self.screen.blit(button_text, text_rect)
-
             if fade_out:
                 fade_surface.set_alpha(fade_alpha)
                 self.screen.blit(fade_surface, (0, 0))
                 fade_alpha += 10
                 if fade_alpha >= 255:
                     running_intro = False
-            
             pygame.display.update()
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
