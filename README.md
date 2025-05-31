@@ -5,7 +5,7 @@ projeto criado como parte dos estudos de programação e desenvolvimento de jogo
 ---
 
 ## 🚀 como rodar o projeto
-0. instale o python 3.1 ou superior
+0. instale git e o python 3.1 ou superior
 
 1. instale o pygame com o comando:
 ```bash
@@ -20,8 +20,6 @@ python -m pip install pygame
 ```bash
 git clone https://github.com/guifigueireedo/limpattack.git
 ```
-- no vs code:
-  - ctrl+P → Git: Clone → https://github.com/guifigueireedo/limpattack.git
 
 3. execute o jogo com:
 ```bash
@@ -49,11 +47,11 @@ os monstros representam diferentes tipos de descuidados com a higiene, e o heró
 - ✅ detalhes dos mapas
 - ✅ estruturas das fases
 - ✅ visual dos inimigos, HUD e batalhas
-- 🧩 em implementação: efeitos visuais, sons e músicas
-- 🧩 em implementação: desenvolvimento da história
-- 🧩 em implementação: npcs e diálogos
-- ⚠️ em construção: menu inicial funcional
-- ⚠️ em construção: batalha final do boss
+- ✅ efeitos visuais, sons e músicas
+- ✅ desenvolvimento da história
+- ✅ npcs e diálogos
+- ✅ menu inicial funcional
+- ✅ batalha final do boss
 - ⚠️ em construção: implementação online
 
 ## 🤝 contribuições
