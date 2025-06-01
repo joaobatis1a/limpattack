@@ -153,47 +153,47 @@ enemies = {
 }
 # dicionario que mapeia os itens e suas respectivas propriedades
 itens = {
-    "Escova de Dente": Item("Escova de Dente", 212, {
+    "Escova de Dente": Item("Escova de Dente", 12, {
         "Cárie": 4, "Mão Podre": 0.5, "Caspa no Cabelo": 0.2, "Acne": 0.2,
         "Bactéria de Resfriado": 0.2, "Bactéria do Pé": 0.2, "Gordura na Pele": 0.2
     }),
-    "Pasta de Dente": Item("Pasta de Dente", 210, {
+    "Pasta de Dente": Item("Pasta de Dente", 10, {
         "Cárie": 4, "Mão Podre": 0.5, "Caspa no Cabelo": 0.2, "Acne": 0.2,
         "Bactéria de Resfriado": 0.2, "Bactéria do Pé": 0.2, "Gordura na Pele": 0.2
     }),
-    "Álcool 70%": Item("Álcool 70%", 215, {
+    "Álcool 70%": Item("Álcool 70%", 15, {
         "Mão Podre": 4, "Bactéria de Resfriado": 3, "Cárie": 0.2, "Caspa no Cabelo": 0.2,
         "Acne": 0.5, "Bactéria do Pé": 1, "Gordura na Pele": 0.5
     }),
-    "Sabão Líquido": Item("Sabão Líquido", 214, {
+    "Sabão Líquido": Item("Sabão Líquido", 14, {
         "Mão Podre": 4, "Gordura na Pele": 4, "Cárie": 0.2, "Caspa no Cabelo": 0.5,
         "Acne": 1, "Bactéria de Resfriado": 1, "Bactéria do Pé": 1
     }),
-    "Bucha": Item("Bucha", 210, {
+    "Bucha": Item("Bucha", 10, {
         "Gordura na Pele": 4, "Acne": 4, "Cárie": 0.2, "Caspa no Cabelo": 0.5,
         "Mão Podre": 1, "Bactéria de Resfriado": 1, "Bactéria do Pé": 1
     }),
-    "Sabonete": Item("Sabonete", 212, {
+    "Sabonete": Item("Sabonete", 12, {
         "Gordura na Pele": 4, "Bactéria do Pé": 4, "Cárie": 0.2, "Caspa no Cabelo": 0.5,
         "Mão Podre": 4, "Acne": 1, "Bactéria de Resfriado": 2
     }),
-    "Shampoo": Item("Shampoo", 210, {
+    "Shampoo": Item("Shampoo", 10, {
         "Caspa no Cabelo": 4, "Gordura na Pele": 2, "Cárie": 0.2, "Mão Podre": 0.5,
         "Acne": 0.5, "Bactéria de Resfriado": 0.2, "Bactéria do Pé": 0.2
     }),
-    "Condicionador": Item("Condicionador", 208, {
+    "Condicionador": Item("Condicionador", 8, {
         "Caspa no Cabelo": 4, "Gordura na Pele": 1.5, "Cárie": 0.2, "Mão Podre": 0.5,
         "Acne": 0.5, "Bactéria de Resfriado": 0.2, "Bactéria do Pé": 0.2
     }),
-    "Sabonete Facial": Item("Sabonete Facial", 210, {
+    "Sabonete Facial": Item("Sabonete Facial", 10, {
         "Acne": 4, "Gordura na Pele": 2, "Cárie": 0.2, "Caspa no Cabelo": 0.5,
         "Mão Podre": 2, "Bactéria de Resfriado": 0.2, "Bactéria do Pé": 0.2
     }),
-    "Lenço Umidecido": Item("Lenço Umidecido", 228, {
+    "Lenço Umidecido": Item("Lenço Umidecido", 8, {
         "Acne": 4, "Bactéria de Resfriado": 2, "Cárie": 0.2, "Caspa no Cabelo": 0.5,
         "Mão Podre": 1, "Gordura na Pele": 1, "Bactéria do Pé": 0.5
     }),
-    "Talco": Item("Talco", 210, {
+    "Talco": Item("Talco", 10, {
         "Bactéria do Pé": 4, "Gordura na Pele": 1.5, "Cárie": 0.2, "Caspa no Cabelo": 0.2,
         "Mão Podre": 0.5, "Acne": 0.5, "Bactéria de Resfriado": 0.2
     }),
