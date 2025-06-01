@@ -13,7 +13,7 @@ import random
 
 tilemap = [
     'TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTM',
-    'pNp.............................U......M',
+    'pN..............................U......M',
     't.........1............................M',
     'M....R..E...........R..2...............M',
     'M..........................1...........M',
@@ -71,7 +71,7 @@ tilemap = [
 #     'M......................................M',
 #     'M......................................M',
 #     'M......................................M',
-#     'M......................................M',
+#     'M................U.....................M',
 #     'M......................................T',
 #     'M......................................p',
 #     'Mttttttttttttttttttttttttttttttttttttttt',
@@ -104,8 +104,12 @@ def create_tiled_map(game, mapa_atual_index, mapas_visitados, fases, enemies, it
             if column == "p" and len(game.enemy) == 0:
                 Portal(game, j, i)  # posiciona portal aberto se nao houver inimigos
             if column == "U":
-                item_cura = random.choices(itens_cura, weights=[60, 30, 8, 2])[0]
-                ItemCuraSprite(game, j, i, item_cura)  # posiciona itens de cura
+                pos = (j, i)
+                if not hasattr(game, 'itens_cura_coletados'):
+                    game.itens_cura_coletados = set()
+                if pos not in game.itens_cura_coletados:
+                    item_cura = random.choices(itens_cura, weights=[60, 30, 8, 2])[0]
+                    ItemCuraSprite(game, j, i, item_cura)
             if column == "1":
                 Tronco1(game, j, i)
             if column == "2":

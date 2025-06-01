@@ -21,6 +21,7 @@
 import pygame
 from pygame import mixer
 import importlib
+import os
 from config import *
 from sprites import *
 from sprites.sprites_base import *
@@ -120,6 +121,7 @@ class Game:
         self.movimento_bloqueado = False
         self.saved_state = None
         self.rei_mundica_derrotado = False
+        self.save_file = "savegame.dat"
     
     def save_current_state(self):
         self.saved_state = {
@@ -652,8 +654,7 @@ class Game:
             pygame.display.update()
             clock.tick(FPS)
         # Reset game state and show intro
-        self.__init__
-        self.new()
+        self.reset_save()
         self.intro_screen()
 
     def draw_hud_itens_cura(self):
@@ -686,6 +687,78 @@ class Game:
             sabonete_sprite.draw(self.screen, font)
             font2 = pygame.font.SysFont("arial", 16)
             self.screen.blit(font2.render("Sabonete", True, (255,255,255)), (hud_x + 40, hud_y + 60))
+        
+    def draw_npc_dialog(self):
+        dialog_box_rect = pygame.Rect(40, WIN_HEIGHT - 120, WIN_WIDTH - 80, 80)
+        pygame.draw.rect(self.screen, (255, 255, 255), dialog_box_rect, border_radius=10)
+        pygame.draw.rect(self.screen, (0, 0, 0), dialog_box_rect, 2, border_radius=10)
+        nome_npc = ""
+        npc_symbol = getattr(self, "npc_dialog_npc_symbol", None)
+        if npc_symbol:
+            npc_info = npcs_data.get(npc_symbol)
+            if npc_info:
+                nome_npc = npc_info["nome"]
+        if nome_npc:
+            name_box_rect = pygame.Rect(dialog_box_rect.x + 20, dialog_box_rect.y - 32, 180, 28)
+            pygame.draw.rect(self.screen, (255, 230, 250), name_box_rect, border_radius=8)
+            pygame.draw.rect(self.screen, (0, 0, 0), name_box_rect, 2, border_radius=8)
+            name_font = pygame.font.SysFont("arial", 20, bold=True)
+            name_text = name_font.render(nome_npc, True, (0, 0, 0))
+            self.screen.blit(name_text, (name_box_rect.x + 12, name_box_rect.y + 3))
+        font = pygame.font.SysFont("arial", 16)
+        now = pygame.time.get_ticks()
+        if self.npc_dialog_char_index < len(self.npc_dialog_texts[self.npc_dialog_index]):
+            if now - self.npc_dialog_last_update > 20:
+                self.npc_dialog_char_index += self.npc_dialog_speed
+                self.npc_dialog_last_update = now
+        self.npc_dialog_current = self.npc_dialog_texts[self.npc_dialog_index][:self.npc_dialog_char_index]
+        text_surface = font.render(self.npc_dialog_current, True, (0, 0, 0))
+        self.screen.blit(text_surface, (dialog_box_rect.x + 20, dialog_box_rect.y + 20))
+        btn_rect = pygame.Rect(dialog_box_rect.right - 120, dialog_box_rect.bottom - 40, 100, 30)
+        pygame.draw.rect(self.screen, (200, 200, 255), btn_rect, border_radius=8)
+        pygame.draw.rect(self.screen, (0, 0, 0), btn_rect, 2, border_radius=8)
+        btn_font = pygame.font.SysFont("arial", 18)
+        btn_text = btn_font.render("Avançar", True, (0, 0, 0))
+        self.screen.blit(btn_text, (btn_rect.x + 18, btn_rect.y + 5))
+        self.npc_dialog_btn_rect = btn_rect
+
+    # checa e retorna a quantidade de inimigos restantes e o total de inimigos no mapa atual
+    def checar_inimigos(self):
+        """Retorna (restantes, total) de inimigos no mapa atual."""
+        total = 0
+        restantes = 0
+        for sprite in self.all_sprites:
+            if hasattr(sprite, "enemy_name"):
+                total += 1
+        for sprite in self.enemy:
+            restantes += 1
+        return restantes, total
+    
+    def reset_save(self):
+        # Reseta todas as variáveis de progresso do jogo para o estado inicial
+        self.mapa_atual_index = 0
+        self.mapa_atual = mapas[self.mapa_atual_index]["tilemap"]
+        self.fases = [True] * len(mapas)
+        self.mapas_visitados = [False] * len(mapas)
+        self.inventario_cura = []
+        self.inventario_chave = []
+        self.fox_hp = 100
+        self.sabonete_spawned = False
+        self.tocha_spawned = False
+        self.npcs_moveram = False
+        self.spawn_tocha_apos_dialogo = False
+        self.npc_moved = False
+        self.sombra_ativa_mapa3 = True
+        self.movimento_bloqueado = False
+        self.saved_state = None
+        self.rei_mundica_derrotado = False
+        if hasattr(self, "path_spawned_mapa5"):
+            self.path_spawned_mapa5 = False
+        # Remove arquivo de save se existir
+        if hasattr(self, "save_file") and os.path.exists(self.save_file):
+            os.remove(self.save_file)
+        # Reinicia o mapa e sprites
+        self.new()
 
 # inicializa o jogo
 g = Game()
