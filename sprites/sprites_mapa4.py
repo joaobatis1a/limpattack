@@ -40,7 +40,7 @@ tilemap = [
     'M......................................M',
     'M............E.........................M',
     'M......................................T',
-    'M......................................p',
+    'M...............................U......p',
     'Mttttttttttttttttttttttttttttttttttttttt',
 ]
 
@@ -108,7 +108,7 @@ def create_tiled_map(game, mapa_atual_index, mapas_visitados, fases, enemies, it
                 if not hasattr(game, 'itens_cura_coletados'):
                     game.itens_cura_coletados = set()
                 if pos not in game.itens_cura_coletados:
-                    item_cura = random.choices(itens_cura, weights=[60, 30, 8, 2])[0]
+                    item_cura = random.choices(itens_cura, weights=[50, 30, 10, 10])[0]
                     ItemCuraSprite(game, j, i, item_cura)
             if column == "1":
                 Tronco1(game, j, i)

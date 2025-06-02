@@ -82,9 +82,6 @@ class Game:
         self.screen = pygame.display.set_mode((WIN_WIDTH, WIN_HEIGHT))
         self.clock = pygame.time.Clock()
         self.running = True
-        mixer.music.load("sounds/limpattack_ost_base.mp3")
-        mixer.music.set_volume(1)
-        mixer.music.play(-1)
         self.character_spritesheet = Spritesheet('img/character.png')
         self.terrain_spritesheet = Spritesheet('img/terrain1.png')
         self.tree_spritesheet = Spritesheet('img/tree_Mid.png')
@@ -122,6 +119,9 @@ class Game:
         self.saved_state = None
         self.rei_mundica_derrotado = False
         self.save_file = "savegame.dat"
+        mixer.music.load("sounds/limpattack_ost_base.mp3")
+        mixer.music.set_volume(1)
+        mixer.music.play(-1)
     
     def save_current_state(self):
         self.saved_state = {
@@ -196,17 +196,17 @@ class Game:
             mixer.music.load("sounds/limpattack_ost_base.mp3")
             mixer.music.set_volume(1)
             mixer.music.play(-1)
-        elif resultado == "derrota":
+        elif resultado == "vitoria":
             mixer.music.stop()
             mixer.music.load("sounds/limpattack_tune_vitoria.mp3")
             mixer.music.set_volume(1)
-            mixer.music.play()
-            self.game_over_flag = True
-        else:
+            mixer.music.play(-1)
+        elif resultado == "derrota":
             mixer.music.stop()
-            mixer.music.load("sounds/limpattack_ost_base.mp3")
+            mixer.music.load("sounds/limpattack_tune_derrota.mp3")
             mixer.music.set_volume(1)
             mixer.music.play(-1)
+            self.game_over_flag = True
         if isinstance(resultado, int):
             self.fox_hp = resultado
             if self.fox_hp > 0:
@@ -403,6 +403,16 @@ class Game:
         if spawn and hasattr(self, "player") and self.player:
             self.player.rect.x = spawn[0] * TILESIZE
             self.player.rect.y = spawn[1] * TILESIZE
+        if self.mapa_atual_index == 4:
+            mixer.music.stop()
+            mixer.music.load("sounds/limpattack_ost_rei.mp3")
+            mixer.music.set_volume(1)
+            mixer.music.play(-1)
+        if self.mapa_atual_index == 5:
+            mixer.music.stop()
+            mixer.music.load("sounds/limpattack_ost_base.mp3")
+            mixer.music.set_volume(1)
+            mixer.music.play(-1)
 
     # troca o mapa para o interior de uma tenda
     def trocar_para_tenda(self, tenda_num):
@@ -759,6 +769,12 @@ class Game:
             os.remove(self.save_file)
         # Reinicia o mapa e sprites
         self.new()
+    
+    def change_ost(self):
+        if self.mapa_atual_index == 0:
+            mixer.music.load("sounds/limpattack_ost_rei.mp3")
+            mixer.music.set_volume(1)
+            mixer.music.play(-1)
 
 # inicializa o jogo
 g = Game()
