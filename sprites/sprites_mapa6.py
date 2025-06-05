@@ -71,7 +71,6 @@ def create_tiled_map(game, mapa_atual_index, mapas_visitados, fases, enemies, it
             if column == "C":
                 Cavalo(game, j, i)
             if column == "P":
-                # Sombra de Kauã: sprite e diálogo
                 NPC9(game, j, i, symbol="P")
             if column == "-":
                 AgCdt(game, j, i)

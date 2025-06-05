@@ -1,14 +1,10 @@
-# este arquivo define o comportamento dos npcs do jogo
-# cada npc tem um simbolo unico usado no mapa
-# cada npc possui nome, status e dialogos
-# dialogos podem ser diferentes dependendo do estado do npc
-# comentarios em minusculo e sem acento para facilitar entendimento
+
 
 npcs_data = {
     "A": {
-        "nome": "Carlos",  # nome do npc
-        "status": {"importante": True},  # status do npc, se e importante ou nao
-        "dialogos": [  # dialogos do npc
+        "nome": "Carlos",
+        "status": {"importante": True},
+        "dialogos": [
             "Caramba, isso tá demorando pra crescer...",
             "Os tomates do Will vão crescer mais rápido que isso!",
         ]
@@ -24,16 +20,16 @@ npcs_data = {
     "C": {
         "nome": "Piu",
         "status": {"importante": True},
-        "dialogos_bloqueando": [  # dialogos que aparecem quando algo esta bloqueando o npc
+        "dialogos_bloqueando": [
             "Aaaaai! Meus Olhos! Sujos de lamaaaa!",
             "Não consigo enxergar a passagem, alguém me ajuda!",
             "Ei, você! Procure um sabonete para mim! Preciso enxergar!"
         ],
-        "dialogos_entrega": [  # dialogos de agradecimento ao receber ajuda
+        "dialogos_entrega": [
             "Oh, como você é gentil! Obrigado por me ajudar!",
             "Perdão por atrapalhar sua jornada, por favor, siga em frente!"
         ],
-        "dialogos_livre": [  # dialogos quando o npc esta livre
+        "dialogos_livre": [
             "Olhinhos, olhinhos... Enxergo, enxergo... Piu!"
         ]
     },
@@ -191,6 +187,22 @@ npcs_data = {
             "Parabéns, Nala.",
             "Você conseguiu.",
             "Enfim, descansaremos...",
+        ]
+    },
+    "Q": {
+        "nome": "Gui",
+        "status": {"importante": False},
+        "dialogos": [
+            "Clique no ícone de pause para pausar o jogo!",
+            "Colete curas ao redor do mapa!",
+            "É importante para se curar em batalha.",
+            "Ataque usando o mouse, ou clicando na tela.",
+            "Interaja com os outros encostando nos-",
+            "Calma, você já descobriu isso...",
+            "Ah! Se movimente com as setas direcionais ou com WASD!",
+            "Mas acho que você também já sabe disso...",
+            "Enfim...",
+            "Boa aventura!"
         ]
     }
 }

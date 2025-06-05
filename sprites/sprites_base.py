@@ -5,18 +5,6 @@ import math
 import random
 from npcs import npcs_data
 
-# este arquivo define as classes base de sprites e logica de movimento do jogador
-# Spritesheet carrega e recorta sprites das imagens
-# Player gerencia o movimento, animacao e colisao do jogador
-# Enemy representa inimigos no mapa
-# Ground, Ground2, Tree1, Tree2, Tree3 desenham o cenario
-# Portal e ClosedPortal gerenciam portais do mapa
-# ItemCuraSprite representa itens de cura no mapa
-# NPC e NPC2 representam npcs comuns
-# Camera controla o deslocamento da tela
-# Sabonete e TochaSprite sao itens especiais
-# comentarios em minusculo e sem acento para facilitar entendimento
-
 # class Base(pygame.sprite.Sprite):
 #     def __init__(self, game, x, y):
 #         self.game = game
@@ -155,7 +143,7 @@ class Player(pygame.sprite.Sprite):
                 npc_hit = None
                 # verifica colisao com npcs
                 for npc in self.game.all_sprites:
-                    if npc.__class__.__name__ in ['NPC', 'NPC2', 'NPC3',
+                    if npc.__class__.__name__ in ['NPC', 'NPC2', 'NPC3', 'NPC10',
                                                   'NPC4', 'NPC5', 'NPC6',
                                                   'NPCTenda1', 'NPCTenda2', 'NPCTenda3', 'NPCTenda4', 'NPCTenda5',
                                                   'Placa', 'NPC7',
@@ -688,7 +676,6 @@ class NPC2(pygame.sprite.Sprite):
         self.y = y * TILESIZE
         self.width = TILESIZE
         self.height = TILESIZE
-        # carrega a spritesheet do npc alternativo
         self.spritesheet = Spritesheet("img/will.png")
         self.image = self.spritesheet.get_sprite(1, 1, self.width, self.height, [])
         self.image.set_colorkey((0, 176, 0))
@@ -696,25 +683,21 @@ class NPC2(pygame.sprite.Sprite):
         self.rect.x = self.x
         self.rect.y = self.y
 
-# classe para a camera, que controla o deslocamento da tela
 class Camera:
     def __init__(self, width, height):
         self.camera = pygame.Rect(0, 0, width, height)
         self.width = width
         self.height = height
-    # aplica o deslocamento da camera ao objeto
     def apply(self, entity):
         return entity.rect.move(self.camera.topleft)
-    # atualiza a posicao da camera de acordo com o alvo
     def update(self, target):
-        x = -target.rect.centerx + WIN_WIDTH // 2
-        y = -target.rect.centery + WIN_HEIGHT // 2
+        x = -target.rect.centerx + BASE_WIN_WIDTH // 2
+        y = -target.rect.centery + BASE_WIN_HEIGHT // 2
         x = min(0, x)
         y = min(0, y)
-        x = max(-(self.width - WIN_WIDTH), x)
-        y = max(-(self.height - WIN_HEIGHT), y)
+        x = max(-(self.width - BASE_WIN_WIDTH), x)
+        y = max(-(self.height - BASE_WIN_HEIGHT), y)
         self.camera = pygame.Rect(x, y, self.width, self.height)
-    # retorna a posicao na tela de um retangulo no mundo
     def get_screen_pos(self, rect):
         return rect.centerx + self.camera.x, rect.centery + self.camera.y
 

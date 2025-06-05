@@ -23,7 +23,7 @@ tilemap = [ #40x30
     'M..W.................W.........uuu3uuuuM',
     'M....,...W.............,...W......,....M',
     'M....,.....,...........,.....,....,....M',
-    'M....,.....,...........,.....,....,....M',
+    'M....,.....G...........,.....,....,....M',
     'M....,.....,...........,.....,....,....M',
     'M....,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,....M',
     'M....,.....,.....,.....,.....,.........M',
@@ -44,7 +44,6 @@ tilemap = [ #40x30
     'MttttttttttttttttttttttttttttttttttttttM',
 ]
 
-# cria o mapa com base no tilemap definido acima
 def create_tiled_map(game, mapa_atual_index, mapas_visitados, fases, enemies, itens_cura):
     if not hasattr(game, 'mapa1_state'):
         game.mapa1_state = {
@@ -53,42 +52,34 @@ def create_tiled_map(game, mapa_atual_index, mapas_visitados, fases, enemies, it
             'npc3_pos': None,
             'sabonete_coletado': False
         }
-    # percorre cada linha e coluna do tilemap
     for i, row in enumerate(tilemap):
         for j, column in enumerate(row):
-            # cria o sprite de chao
             Ground(game, j, i)
             if column == ",":
                 Ground2(game, j, i)
             if column == "N":
                 Ground2(game, j, i)
-                # posiciona o jogador no mapa, dependendo se o mapa foi visitado ou nao
                 if not mapas_visitados[mapa_atual_index]:
                     game.player = Player(game, 5, 10)
                 else:
                     game.player = Player(game, j, i)
                     Ground2(game, j, i)
-            # cria inimigos aleatorios nas posicoes marcadas com "E" no tilemap
             if column == "E" and fases[mapa_atual_index]:
                 enemy_names = [k for k in enemies.keys() if k != "Rei Mundiça"]
                 enemy_name = random.choice(enemy_names)
                 game.battle_enemy = Enemy(game, j, i, enemy_name)
-            # cria diferentes tipos de arvores, dependendo do caractere no tilemap
             if column == "t":
                 Tree1(game, j, i)
             if column == "T":
                 Tree2(game, j, i)
             if column == "M":
                 Tree3(game, j, i)
-            # cria portais fechados e abertos, dependendo das condicoes do jogo
             if column == "p":
                 ClosedPortal(game, j, i)
             if column == "p" and len(game.enemy) == 0:
                 Portal(game, j, i)
-            # cria as casas no mapa
             if column == "H":
                 House(game, j, i)
-            # cria as cercas superiores
             if column == "C":
                 CercaTop1(game, j, i)
             if column == "h":
@@ -98,14 +89,12 @@ def create_tiled_map(game, mapa_atual_index, mapas_visitados, fases, enemies, it
                 Ground2(game, j, i)
             if column == "F":
                 CercaTop3(game, j, i)
-            # cria as cercas do meio
             if column == "c":
                 CercaTopMid1(game, j, i)
             if column == "Y":
                 CercaTopMid2(game, j, i)
             if column == "f":
                 CercaTopMid3(game, j, i)
-            # cria as cercas inferiores
             if column == "j":
                 CercaMid1(game, j, i)
             if column == "i":
@@ -116,14 +105,12 @@ def create_tiled_map(game, mapa_atual_index, mapas_visitados, fases, enemies, it
                 CercaBotMid2(game, j, i)
             if column == "I":
                 CercaBotMid3(game, j, i)
-            # cria as cercas na parte inferior do mapa
             if column == "L":
                 CercaBot1(game, j, i)
             if column == "l":
                 CercaBot2(game, j, i)
             if column == "K":
                 CercaBot3(game, j, i)
-            # cria objetos como arvores grandes, arbustos, poços, sacos e elementos de vento
             if column == "o":
                 BigTree(game, j, i)
             if column == "a":
@@ -142,7 +129,6 @@ def create_tiled_map(game, mapa_atual_index, mapas_visitados, fases, enemies, it
                 Wind(game, j, i)
             if column == "u":
                 Toco(game, j, i)
-            # cria itens de cura em posicoes especificas do mapa
             if column == "U":
                 pos = (j, i)
                 if not hasattr(game, 'itens_cura_coletados'):
@@ -150,7 +136,6 @@ def create_tiled_map(game, mapa_atual_index, mapas_visitados, fases, enemies, it
                 if pos not in game.itens_cura_coletados:
                     item_cura = random.choices(itens_cura, weights=[60, 30, 8, 2])[0]
                     ItemCuraSprite(game, j, i, item_cura)
-            # cria os NPCs do mapa
             if column == "1":
                 NPC(game, j, i, symbol="A")
             if column == "2":
@@ -158,23 +143,24 @@ def create_tiled_map(game, mapa_atual_index, mapas_visitados, fases, enemies, it
             if column == "3":
                 Ground2(game, j, i)
                 npc3_x, npc3_y = j, i
-                # posiciona o NPC3 dependendo do estado salvo no jogo
                 if game.mapa1_state['npc3_moved'] and game.mapa1_state['npc3_pos']:
                     npc3_x, npc3_y = game.mapa1_state['npc3_pos']
                 npc3 = NPC3(game, npc3_x, npc3_y, symbol="C")
                 npc3.estado = game.mapa1_state['npc3_estado']
                 npc3.moved = game.mapa1_state['npc3_moved']
-                # remove o NPC3 da sua posicao anterior, se necessario
                 if npc3.moved:
                     try:
                         npc3.remove(game.blocks)
                     except Exception:
                         pass
                 game.npc3_ref = npc3
-            # cria o sabonete apenas uma vez, se ainda nao foi coletado
             if column == "B":
                 if not game.mapa1_state['sabonete_coletado'] and 'sabonete' not in getattr(game, 'inventario_chave', []):
                     Sabonete(game, j, i)
+            if column == "G":
+                NPC10(game, j, i, symbol="Q")
+                Ground2(game, j, i)
+
     mapas_visitados[mapa_atual_index] = True
 
 # classe para criar as casas no mapa
@@ -579,6 +565,26 @@ class NPC3(pygame.sprite.Sprite):
         self.estado = 'bloqueando'
         self.portal_pos = (x, y)
         self.moved = False
+
+class NPC10(pygame.sprite.Sprite):
+    def __init__(self, game, x, y, symbol="Q"):
+        self.game = game
+        self.symbol = symbol
+        self._layer = BLOCK_LAYER
+        self.groups = self.game.all_sprites
+        pygame.sprite.Sprite.__init__(self, self.groups)
+        self.x = x * TILESIZE
+        self.y = y * TILESIZE
+        self.width = TILESIZE
+        self.height = TILESIZE
+        # self.spritesheet = Spritesheet("img/rosa.png")
+        # self.image = self.spritesheet.get_sprite(1, 1, self.width, self.height, [])
+        # self.image.set_colorkey((0, 176, 120))
+        self.image = pygame.Surface((TILESIZE, TILESIZE), pygame.SRCALPHA)
+        self.image.fill((205, 55, 150))
+        self.rect = self.image.get_rect()
+        self.rect.x = self.x
+        self.rect.y = self.y
 
     def update(self):
         pass

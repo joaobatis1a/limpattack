@@ -1,23 +1,3 @@
-# este arquivo contem a classe principal do jogo e a logica de troca de mapas
-# importa bibliotecas principais, modulos de sprites, dados de batalha e npcs
-# mapas contem os dados de cada mapa do jogo, cada um com seu tilemap e funcao de criacao
-# classe Game gerencia o estado geral do jogo, eventos, atualizacoes, transicoes de mapas e batalhas
-# variaveis de instancia controlam sprites, inventario, dialogos, estado de batalha, progresso e flags de controle
-# handle_battle gerencia toda a logica da tela de batalha, incluindo imagens, musica e resultado
-# new reinicia o mapa atual, recriando todos os sprites e a camera
-# verificar_portal checa se o jogador pode trocar de mapa, considerando inimigos restantes e colisao com portais
-# events processa eventos do pygame, incluindo dialogos com npcs e saida do jogo
-# update atualiza todos os sprites, gerencia dialogos, portais, inimigos e camera
-# trocar_mapa troca o mapa atual para o proximo ou anterior, reiniciando o estado
-# trocar_para_tenda troca o mapa para o interior de uma tenda, importando dinamicamente o modulo correto
-# draw desenha todos os sprites, hud, dialogos e efeitos visuais na tela
-# main e o loop principal do jogo, chamando eventos, update e draw
-# game_over exibe a tela de game over e permite reiniciar o jogo
-# draw_hud_itens_cura desenha o inventario de itens de cura e chaves no hud
-# draw_npc_dialog desenha a caixa de dialogo dos npcs na tela
-# checar_inimigos retorna a quantidade de inimigos restantes e o total no mapa
-# ao final, o jogo e inicializado e o loop principal e executado ate o usuario sair
-
 import pygame
 from pygame import mixer
 import importlib
@@ -36,6 +16,7 @@ from battle import *
 from npcs import npcs_data
 import sys
 import random
+import math
 sys.stdout.reconfigure(encoding='utf-8')
 
 pygame.display.set_caption("LimpAttack")
@@ -50,36 +31,27 @@ mapas = [
 ]
 
 MAPA_SPAWNS = {
-    0: {  # mapa 1
-        "right": (38, 1),
-    },
-    1: {  # mapa 2
-        "left": (1, 1),    # entrada vinda do mapa 1
-        "right": (38, 1),  # entrada vinda do mapa 3
-    },
-    2: {  # mapa 3
-        "left": (1, 1),    # entrada vinda do mapa 2
-        "right": (38, 30),  # entrada vinda do mapa 4
-    },
-    3: {  # mapa 4
-        "left": (1, 1),    # entrada vinda do mapa 3
-        "right": (38, 30),  # entrada vinda do mapa 5
-    },
-    4: {  # mapa 5
-        "left": (1, 1),
-        "right": (38, 24),
-    },
-    5: {  # mapa 6
-        "left": (1, 24), 
-    },
+    0: { "right": (38, 1), },
+    1: { "left": (1, 1), "right": (38, 1), },
+    2: { "left": (1, 1), "right": (38, 30), },
+    3: { "left": (1, 1), "right": (38, 30), },
+    4: { "left": (1, 1), "right": (38, 24), },
+    5: { "left": (1, 24), },
 }
 
-# esta e a classe principal do jogo, que gerencia o estado geral, eventos, atualizacoes e transicoes
 class Game:
     def __init__(self):
         pygame.init()
         mixer.init()
-        self.screen = pygame.display.set_mode((WIN_WIDTH, WIN_HEIGHT))
+        info = pygame.display.Info()
+        self.screen_width, self.screen_height = info.current_w, info.current_h
+        self.screen = pygame.display.set_mode((self.screen_width, self.screen_height), pygame.FULLSCREEN)
+        self.base_surface = pygame.Surface((BASE_WIN_WIDTH, BASE_WIN_HEIGHT))
+        self.scale_factor = min(self.screen_width / BASE_WIN_WIDTH, self.screen_height / BASE_WIN_HEIGHT)
+        self.scaled_width = int(BASE_WIN_WIDTH * self.scale_factor)
+        self.scaled_height = int(BASE_WIN_HEIGHT * self.scale_factor)
+        self.offset_x = (self.screen_width - self.scaled_width) // 2
+        self.offset_y = (self.screen_height - self.scaled_height) // 2
         self.clock = pygame.time.Clock()
         self.running = True
         self.character_spritesheet = Spritesheet('img/character.png')
@@ -119,22 +91,47 @@ class Game:
         self.saved_state = None
         self.rei_mundica_derrotado = False
         self.save_file = "savegame.dat"
+        self.paused = False
+
+        self.pause_button_font = pygame.font.SysFont("arial", 24, bold=True)
+        self.pause_button_text = "||"
+        self.pause_button_color = GRAY
+        self.pause_button_hover_color = LIGHT_ORANGE
+        text_surf = self.pause_button_font.render(self.pause_button_text, True, BLACK)
+        button_width = text_surf.get_width() + 20
+        button_height = text_surf.get_height() + 10
+        button_x = (BASE_WIN_WIDTH - button_width) // 2
+        button_y = 10
+        self.pause_button_rect = pygame.Rect(button_x, button_y, button_width, button_height)
+
         mixer.music.load("sounds/limpattack_ost_base.mp3")
         mixer.music.set_volume(1)
         mixer.music.play(-1)
-    
+
+    def get_scaled_mouse_pos(self):
+        mx, my = pygame.mouse.get_pos()
+        scaled_mx = (mx - self.offset_x) / self.scale_factor
+        scaled_my = (my - self.offset_y) / self.scale_factor
+        return int(scaled_mx), int(scaled_my)
+
+    def _render_final_screen(self):
+        """Função auxiliar para escalar e desenhar a tela final."""
+        self.screen.fill(BLACK)
+        scaled_surface = pygame.transform.scale(self.base_surface, (self.scaled_width, self.scaled_height))
+        self.screen.blit(scaled_surface, (self.offset_x, self.offset_y))
+        pygame.display.update()
+
     def save_current_state(self):
-        self.saved_state = {
+        self.saved_state = { 
             "mapa_atual_index": self.mapa_atual_index,
             "fases": self.fases.copy(),
             "mapas_visitados": self.mapas_visitados.copy(),
             "inventario_cura": [item for item in self.inventario_cura],
             "inventario_chave": [item for item in self.inventario_chave],
             "fox_hp": self.fox_hp,
-        }
+            }
     
     def restore_saved_state(self):
-        # Restaura o estado salvo (após derrota)
         if self.saved_state:
             self.mapa_atual_index = self.saved_state["mapa_atual_index"]
             self.fases = self.saved_state["fases"].copy()
@@ -145,7 +142,6 @@ class Game:
             self.mapa_atual = mapas[self.mapa_atual_index]["tilemap"]
             self.new()
 
-    # essa funcao gerencia a tela de batalha, incluindo a musica, imagens e logica de vitoria/derrota
     def handle_battle(self):
         enemy_battle_images = {
             "Cárie": "img/carie_luta.png",
@@ -181,6 +177,7 @@ class Game:
             bg_img = pygame.transform.scale(pygame.image.load("img/luta_bg.png"), (640, 480))
         itens_selecionados = selecionar_ataques_eficazes_e_aleatorios(enemy_name)
         resultado = battle_screen(
+            self,
             player_hp=self.fox_hp,
             player_max_hp=100,
             enemy=enemy_data,
@@ -212,11 +209,9 @@ class Game:
             if self.fox_hp > 0:
                 if self.battle_enemy.enemy_name == "Rei Mundiça":
                     self.rei_mundica_derrotado = True
-                    self.fases[self.mapa_atual_index] = False  # Marcar fase como concluída antes de reiniciar
-                    # Salva a posição da Nala antes de recarregar o mapa
+                    self.fases[self.mapa_atual_index] = False
                     player_pos = (self.player.rect.x, self.player.rect.y) if hasattr(self, 'player') and self.player else None
-                    self.new()  # recarrega o mapa para mostrar o Path
-                    # Restaura a posição da Nala após recarregar o mapa
+                    self.new()
                     if player_pos and hasattr(self, 'player') and self.player:
                         self.player.rect.x, self.player.rect.y = player_pos
                 else:
@@ -229,22 +224,18 @@ class Game:
         self.in_battle = False
         self.battle_started = False
 
-    # esta funcao inicia um novo jogo ou reinicia o mapa atual
     def new(self):
         self.playing = True
         self.all_sprites = pygame.sprite.LayeredUpdates()
         self.blocks = pygame.sprite.LayeredUpdates()
         self.enemy = pygame.sprite.LayeredUpdates()
         self.portals = pygame.sprite.LayeredUpdates()
-        mapas[self.mapa_atual_index]["create"](
-            self, self.mapa_atual_index, self.mapas_visitados, self.fases, enemies, itens_cura
-        )
+        mapas[self.mapa_atual_index]["create"]( self, self.mapa_atual_index, self.mapas_visitados, self.fases, enemies, itens_cura )
         map_width = len(mapas[self.mapa_atual_index]["tilemap"][0]) * TILESIZE
         map_height = len(mapas[self.mapa_atual_index]["tilemap"]) * TILESIZE
         self.camera = Camera(map_width, map_height)
         self.inimigos_total = len(self.enemy)
 
-    # verifica se o jogador colidiu com um portal ou se ainda ha inimigos no mapa
     def verificar_portal(self):
         if len(self.enemy) > 0:
             if not self.inimigos_aviso_exibido:
@@ -266,27 +257,69 @@ class Game:
         self.trocando_mapa = False
         return False
 
-    # gerencia os eventos do jogo, incluindo entrada do jogador e interacoes com NPCs
     def events(self):
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 self.playing = False
                 self.running = False
-            if self.npc_dialog_active:
-                if (event.type == pygame.MOUSEBUTTONDOWN and self.npc_dialog_btn_rect and self.npc_dialog_btn_rect.collidepoint(event.pos)) \
-                   or (event.type == pygame.KEYDOWN and event.key == pygame.K_RETURN):
-                    if self.npc_dialog_char_index < len(self.npc_dialog_texts[self.npc_dialog_index]):
-                        self.npc_dialog_char_index = len(self.npc_dialog_texts[self.npc_dialog_index])
-                    else:
-                        self.npc_dialog_index += 1
-                        if self.npc_dialog_index >= len(self.npc_dialog_texts):
-                            self.npc_dialog_active = False
-                        else:
-                            self.npc_dialog_char_index = 0
-                            self.npc_dialog_last_update = pygame.time.get_ticks()
 
-    # atualiza o estado dos sprites e verifica interacoes como colisao com NPCs e inimigos
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:
+                    self.paused = not self.paused
+
+            if self.paused:
+                if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+                    mouse_pos = self.get_scaled_mouse_pos()
+                    
+                    button_width = 200
+                    button_height = 40
+                    spacing = 15
+                    start_y = BASE_WIN_HEIGHT / 2 - 60
+
+                    continue_rect_local = pygame.Rect(BASE_WIN_WIDTH / 2 - button_width / 2, start_y, button_width, button_height)
+                    restart_rect_local = pygame.Rect(BASE_WIN_WIDTH / 2 - button_width / 2, start_y + button_height + spacing, button_width, button_height)
+                    quit_rect_local = pygame.Rect(BASE_WIN_WIDTH / 2 - button_width / 2, start_y + 2 * (button_height + spacing), button_width, button_height)
+
+                    if continue_rect_local.collidepoint(mouse_pos):
+                        self.paused = False
+                    elif restart_rect_local.collidepoint(mouse_pos):
+                        self.reset_save()  
+                        self.paused = False 
+                    elif quit_rect_local.collidepoint(mouse_pos):
+                        self.playing = False 
+                        self.running = False
+            
+            else:
+                if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+                    scaled_mouse_pos = self.get_scaled_mouse_pos()
+                    if self.pause_button_rect.collidepoint(scaled_mouse_pos):
+                        self.paused = True 
+                
+                if self.npc_dialog_active:
+                    should_advance = False
+
+                    if event.type == pygame.MOUSEBUTTONDOWN and self.npc_dialog_btn_rect:
+                        scaled_mouse_pos = self.get_scaled_mouse_pos()
+                        if self.npc_dialog_btn_rect.collidepoint(scaled_mouse_pos):
+                            should_advance = True
+
+                    if event.type == pygame.KEYDOWN and event.key == pygame.K_RETURN:
+                        should_advance = True
+
+                    if should_advance:
+                        if self.npc_dialog_char_index < len(self.npc_dialog_texts[self.npc_dialog_index]):
+                            self.npc_dialog_char_index = len(self.npc_dialog_texts[self.npc_dialog_index])
+                        else:
+                            self.npc_dialog_index += 1
+                            if self.npc_dialog_index >= len(self.npc_dialog_texts):
+                                self.npc_dialog_active = False
+                            else:
+                                self.npc_dialog_char_index = 0
+                                self.npc_dialog_last_update = pygame.time.get_ticks()
+                            
     def update(self):
+        if self.paused:
+            return
         self.all_sprites.update()
         if not self.npc_dialog_active and self.player is not None:
             for sprite in self.all_sprites:
@@ -311,7 +344,6 @@ class Game:
         if self.npc_dialog_active:
             self.draw_npc_dialog()
 
-        # Move Kauã (NPC 'O') para a esquerda após o diálogo no mapa 5
         if (
             not self.npc_dialog_active
             and self.mapa_atual_index == 4
@@ -327,7 +359,6 @@ class Game:
                     sprite.rect.x -= 3 * TILESIZE
                     sprite.x = sprite.rect.x
                     sprite.moved = True
-                    # Garante que o NPC continue bloqueando se necessário
                     if hasattr(sprite, 'add') and hasattr(self, 'blocks'):
                         sprite.add(self.blocks)
                     break
@@ -336,28 +367,22 @@ class Game:
                 if isinstance(sprite, ClosedPortal):
                     sprite.kill()
                     Portal(self, sprite.rect.x // TILESIZE, sprite.rect.y // TILESIZE)
-            # --- LÓGICA DO PATH NO MAPA 5 ---
             if self.mapa_atual_index == 4 and getattr(self, 'rei_mundica_derrotado', False):
                 if not hasattr(self, 'path_spawned_mapa5'):
                     self.path_spawned_mapa5 = False
                 if not self.path_spawned_mapa5:
                     from sprites.sprites_mapa5 import Path
-                    # Remove paredes invisíveis do caminho (linha 24, colunas 20 a 38)
                     for col in range(20, 39):
                         for sprite in list(self.blocks):
                             if sprite.rect.x // TILESIZE == col and sprite.rect.y // TILESIZE == 24 and sprite.__class__.__name__ == 'ParedeInv':
                                 sprite.kill()
-                    # Cria o Path alinhado, 1 tile de largura para cada coluna
                     for col in range(20, 39):
                         Path(self, col, 24)
                     self.path_spawned_mapa5 = True
         else:
             if self.mapa_atual_index == 4:
                 self.path_spawned_mapa5 = False
-        # --- FIM DA LÓGICA DO PATH NO MAPA 5 ---
-        # --- FADE OUT E REINICIO APÓS DIÁLOGO DA SOMBRA DE KAUÃ (MAPA 6) ---
         if self.mapa_atual_index == 5:
-            # Se acabou de sair do diálogo com a sombra de Kauã (símbolo 'P')
             if hasattr(self, 'npc_dialog_npc_symbol') and self.npc_dialog_npc_symbol == 'P' and not self.npc_dialog_active:
                 self.fade_out_and_restart()
                 return
@@ -375,9 +400,8 @@ class Game:
             else:
                 self.sombra_ativa_mapa3 = True
 
-    # troca o mapa atual pelo proximo ou anterior na lista de mapas
     def trocar_mapa(self, direcao="proximo"):
-        self.save_current_state()  # <--- SALVA ANTES DE TROCAR
+        self.save_current_state()
         anterior = self.mapa_atual_index
         if direcao == "proximo":
             if self.mapa_atual_index < len(mapas) - 1:
@@ -385,20 +409,19 @@ class Game:
             else:
                 print("ja esta no ultimo mapa. nao e possivel avancar.")
                 return
-            entrada = "left"  # vindo da esquerda ao avançar
+            entrada = "left"
         elif direcao == "anterior":
             if self.mapa_atual_index > 0:
                 self.mapa_atual_index -= 1
             else:
                 print("ja esta no primeiro mapa. nao e possivel voltar.")
                 return
-            entrada = "right"  # vindo da direita ao voltar
+            entrada = "right"
         else:
             entrada = "left"
         self.mapa_atual = mapas[self.mapa_atual_index]["tilemap"]
         print(f"mudando para o mapa {self.mapa_atual_index + 1}")
         self.new()
-        # Após criar o novo mapa, posicione a Nala no ponto correto
         spawn = MAPA_SPAWNS.get(self.mapa_atual_index, {}).get(entrada)
         if spawn and hasattr(self, "player") and self.player:
             self.player.rect.x = spawn[0] * TILESIZE
@@ -414,7 +437,6 @@ class Game:
             mixer.music.set_volume(1)
             mixer.music.play(-1)
 
-    # troca o mapa para o interior de uma tenda
     def trocar_para_tenda(self, tenda_num):
         import importlib
         if self.mapa_atual_index is None:
@@ -443,73 +465,91 @@ class Game:
         self.portals = pygame.sprite.LayeredUpdates()
         modulo.create_tiled_map(self, 0, [False], [True], {}, [])
 
-    # desenha os sprites na tela, incluindo o fundo, personagens e elementos do mapa
     def draw(self):
-        self.screen.fill(BLACK)
+        self.base_surface.fill(BLACK)
         for sprite in self.all_sprites:
-            self.screen.blit(sprite.image, self.camera.apply(sprite))
+            self.base_surface.blit(sprite.image, self.camera.apply(sprite))
 
-        # Desenha a sombra primeiro
         if self.mapa_atual_index == 2 and getattr(self, "sombra_ativa_mapa3", True):
-            darkness = pygame.Surface((int(WIN_WIDTH), int(WIN_HEIGHT)), pygame.SRCALPHA)
+            darkness = pygame.Surface((BASE_WIN_WIDTH, BASE_WIN_HEIGHT), pygame.SRCALPHA)
             darkness.fill((0, 0, 0, 255))
             nala_screen_x, nala_screen_y = self.camera.get_screen_pos(self.player.rect)
-            max_radius = 150
-            min_radius = 78
+            max_radius, min_radius = 150, 78
             for r in range(max_radius, min_radius, -1):
                 alpha = int(255 * ((r - min_radius) / (max_radius - min_radius)))
-                pygame.draw.circle(
-                    darkness,
-                    (0, 0, 0, alpha),
-                    (int(nala_screen_x), int(nala_screen_y)),
-                    r
-                )
+                pygame.draw.circle(darkness, (0, 0, 0, alpha), (int(nala_screen_x), int(nala_screen_y)), r)
             pygame.draw.circle(darkness, (0, 0, 0, 0), (int(nala_screen_x), int(nala_screen_y)), min_radius)
-            self.screen.blit(darkness, (0, 0))
+            self.base_surface.blit(darkness, (0, 0))
 
-        # Agora desenha o diálogo por cima da sombra
         if self.npc_dialog_active:
             self.draw_npc_dialog()
 
         self.draw_hud_itens_cura()
 
-        # Remover contador de inimigos apenas no mapa 5
+        if not self.paused:
+            self.draw_visual_pause_button()
+
+        if self.paused:
+            overlay = pygame.Surface((BASE_WIN_WIDTH, BASE_WIN_HEIGHT), pygame.SRCALPHA)
+            overlay.fill(MENU_OVERLAY_COLOR)
+            self.base_surface.blit(overlay, (0, 0))
+
+            menu_font = pygame.font.SysFont("arial", 40, bold=True)
+            button_font = pygame.font.SysFont("arial", 28)
+
+            title_text = menu_font.render("Jogo Pausado", True, WHITE)
+            title_rect = title_text.get_rect(center=(BASE_WIN_WIDTH / 2, BASE_WIN_HEIGHT / 2 - 120))
+            self.base_surface.blit(title_text, title_rect)
+
+            button_width = 200
+            button_height = 40
+            spacing = 15
+            
+            start_y = BASE_WIN_HEIGHT / 2 - 60 
+
+            self.continue_button_rect = pygame.Rect(BASE_WIN_WIDTH / 2 - button_width / 2, start_y, button_width, button_height)
+            pygame.draw.rect(self.base_surface, LIGHT_ORANGE, self.continue_button_rect, border_radius=10)
+            continue_text = button_font.render("Continuar", True, BLACK)
+            self.base_surface.blit(continue_text, continue_text.get_rect(center=self.continue_button_rect.center))
+
+            self.restart_button_rect_menu = pygame.Rect(BASE_WIN_WIDTH / 2 - button_width / 2, start_y + button_height + spacing, button_width, button_height)
+            pygame.draw.rect(self.base_surface, LIGHT_ORANGE, self.restart_button_rect_menu, border_radius=10)
+            restart_text = button_font.render("Reiniciar", True, BLACK)
+            self.base_surface.blit(restart_text, restart_text.get_rect(center=self.restart_button_rect_menu.center))
+
+            self.quit_button_rect_menu = pygame.Rect(BASE_WIN_WIDTH / 2 - button_width / 2, start_y + 2 * (button_height + spacing), button_width, button_height)
+            pygame.draw.rect(self.base_surface, LIGHT_ORANGE, self.quit_button_rect_menu, border_radius=10)
+            quit_text = button_font.render("Fechar Jogo", True, BLACK)
+            self.base_surface.blit(quit_text, quit_text.get_rect(center=self.quit_button_rect_menu.center))
+        
         if self.mapa_atual_index != 4:
             restantes = len(self.enemy)
             total = getattr(self, "inimigos_total", restantes)
             if total > 0:
                 font = pygame.font.SysFont("arial", 22, bold=True)
                 texto = f"Inimigos: {restantes}/{total}"
-                text_surface = font.render(texto, True, (255, 255, 255))
+                text_surface = font.render(texto, True, WHITE)
                 padding = 16
-                self.screen.blit(
-                    text_surface,
-                    (WIN_WIDTH - text_surface.get_width() - padding, padding)
-                )
+                self.base_surface.blit(text_surface, (BASE_WIN_WIDTH - text_surface.get_width() - padding, padding))
 
+        self._render_final_screen()
         self.clock.tick(FPS)
-        pygame.display.update()
 
-    # loop principal do jogo, gerencia a ordem de eventos, atualizacoes e desenho na tela
     def main(self):
         while self.playing:
             self.events()
             self.update()
             self.draw()
-            if not any(isinstance(s, Player) for s in self.all_sprites):
-                self.playing = False
-                self.game_over_flag = True
-            break
 
-    # gerencia a tela de game over, incluindo opcoes de reinicio
     def game_over(self):
         font = pygame.font.SysFont("Arial", 80)
         small_font = pygame.font.SysFont("Arial", 40)
         alpha = 0
         fade_in = True
+        
         while self.game_over_flag:
             for event in pygame.event.get():
-                if event.type == pygame.QUIT:
+                if event.type == pygame.QUIT or (event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE):
                     self.running = False
                     self.game_over_flag = False
                 if event.type == pygame.KEYDOWN:
@@ -520,136 +560,105 @@ class Game:
                         mixer.music.load("sounds/limpattack_ost_base.mp3")
                         mixer.music.set_volume(1)
                         mixer.music.play(-1)
-                        self.restore_saved_state()  # <--- RESTAURA O ESTADO SALVO
+                        self.restore_saved_state()
                         return
-            self.screen.fill(BLACK)
+
+            self.base_surface.fill(BLACK)
             if fade_in:
-                alpha += 5
-                if alpha >= 255:
-                    alpha = 255
-                    fade_in = False
+                alpha = min(alpha + 5, 255)
+                if alpha == 255: fade_in = False
             else:
-                alpha -= 2
-                if alpha <= 100:
-                    fade_in = True
+                alpha = max(alpha - 2, 100)
+                if alpha == 100: fade_in = True
+
             text_surface = font.render("GAME OVER", True, (255, 0, 0))
             text_surface.set_alpha(alpha)
-            rect = text_surface.get_rect(center=(WIN_WIDTH // 2, WIN_HEIGHT // 2 - 50))
-            self.screen.blit(text_surface, rect)
-            info_surface = small_font.render("aperte R para voltar a recuperar a higiene", True, (255, 255, 255))
-            info_rect = info_surface.get_rect(center=(WIN_WIDTH // 2, WIN_HEIGHT // 2 + 50))
-            self.screen.blit(info_surface, info_rect)
-            pygame.display.update()
+            rect = text_surface.get_rect(center=(BASE_WIN_WIDTH // 2, BASE_WIN_HEIGHT // 2 - 50))
+            self.base_surface.blit(text_surface, rect)
+
+            info_surface = small_font.render("aperte R para voltar a recuperar a higiene", True, WHITE)
+            info_rect = info_surface.get_rect(center=(BASE_WIN_WIDTH // 2, BASE_WIN_HEIGHT // 2 + 50))
+            self.base_surface.blit(info_surface, info_rect)
+            
+            self._render_final_screen()
             self.clock.tick(FPS)
 
     def intro_screen(self):
-        import math
-        # Tela inicial do jogo com botão estilizado e transição fade-out
-        # Fonte pixelada para o título (tenta usar uma fonte pixel, senão usa Arial)
         try:
             title_font = pygame.font.Font("img/pixel.ttf", 72)
-        except Exception as e:
-            print(f"Erro ao carregar fonte pixel para o título: {e}")
+        except:
             title_font = pygame.font.SysFont("Arial", 72, bold=True)
-        # Fonte pixelada para o botão (tenta usar uma fonte pixel, senão usa Arial)
         try:
             button_font = pygame.font.Font("img/pixel.ttf", 36)
         except:
             button_font = pygame.font.SysFont("Arial", 36, bold=True)
+            
         running_intro = True
-        button_w, button_h = 160, 44
-        button_x = (WIN_WIDTH - button_w) // 2
-        button_y = WIN_HEIGHT // 2 + 30
+        button_w, button_h = 200, 50
+        button_x = (BASE_WIN_WIDTH - button_w) // 2
+        button_y = BASE_WIN_HEIGHT // 2 + 40
         button_rect = pygame.Rect(button_x, button_y, button_w, button_h)
         fade_out = False
         fade_alpha = 0
-        fade_surface = pygame.Surface((WIN_WIDTH, WIN_HEIGHT))
-        fade_surface.fill((0, 0, 0))
+        fade_surface = pygame.Surface((BASE_WIN_WIDTH, BASE_WIN_HEIGHT))
+        fade_surface.fill(BLACK)
+        
         try:
             bg_img = pygame.image.load("img/tela_inicio.png").convert()
-            bg_img = pygame.transform.scale(bg_img, (WIN_WIDTH, WIN_HEIGHT))
-        except Exception as e:
-            print(f"Erro ao carregar imagem de fundo da intro: {e}")
+            bg_img = pygame.transform.scale(bg_img, (BASE_WIN_WIDTH, BASE_WIN_HEIGHT))
+        except:
             bg_img = None
+
         while running_intro:
-            if bg_img:
-                self.screen.blit(bg_img, (0, 0))
-            else:
-                self.screen.fill((30, 30, 60))
-            # --- ANIMAÇÃO DO TÍTULO ---
-            t = pygame.time.get_ticks() / 700.0
-            float_offset = int(12 * math.sin(t))  # Oscilação vertical
-            # Interpolação de cor entre amarelo e azul
-            c1 = (254, 217, 102)
-            c2 = (28, 69, 135)
-            interp = (math.sin(t) + 1) / 2  # 0..1
-            color = (
-                int(c1[0] * interp + c2[0] * (1 - interp)),
-                int(c1[1] * interp + c2[1] * (1 - interp)),
-                int(c1[2] * interp + c2[2] * (1 - interp))
-            )
-            title_surface = title_font.render("LimpAttack", True, color)
-            title_rect = title_surface.get_rect(center=(WIN_WIDTH // 2, WIN_HEIGHT // 2 - 80 + float_offset))
-            title_surface = pygame.transform.smoothscale(title_surface, (int(title_rect.width * 0.75), int(title_rect.height * 0.75)))
-            title_rect = title_surface.get_rect(center=(WIN_WIDTH // 2, WIN_HEIGHT // 2 - 80 + float_offset))
-            self.screen.blit(title_surface, title_rect)
-            # --- RESTANTE DA FUNÇÃO (botão, fade, eventos) ---
-            mouse_pos = pygame.mouse.get_pos()
+            mouse_pos = self.get_scaled_mouse_pos()
             mouse_over = button_rect.collidepoint(mouse_pos)
-            button_color = (60, 220, 120) if mouse_over else (255, 255, 255)
-            text_color = (255, 255, 255) if mouse_over else (30, 30, 60)
-            # Pixel art style: sombra
-            sombra_offset = 4
-            sombra_rect = button_rect.move(sombra_offset, sombra_offset)
-            pygame.draw.rect(self.screen, (0, 0, 0), sombra_rect, 0)  # sombra preta
-            # Pixel art style: botão principal (sem border_radius, bordas retas)
-            pygame.draw.rect(self.screen, button_color, button_rect, 0)
-            # Pixel art style: contorno preto grosso
-            pygame.draw.rect(self.screen, (0, 0, 0), button_rect, 4)
-            # Pixel art style: contorno branco fino interno
-            pygame.draw.rect(self.screen, (255, 255, 255), button_rect.inflate(-8, -8), 2)
-            button_text = button_font.render("INICIAR", True, text_color)
-            text_rect = button_text.get_rect(center=button_rect.center)
-            self.screen.blit(button_text, text_rect)
-            # --- PIXEL ART BUTTON ESTILO POKEMON ---
-            # Paleta de cores
-            cor_fundo = (28, 69, 135) if mouse_over else (58, 89, 175)  # verde escuro/claro
-            cor_borda = (0, 0, 0)  # preto
-            cor_highlight = (255, 255, 255)  # branco
-            cor_shadow = (48, 96, 48)  # verde sombra
-            # Sombra "pixelada" embaixo
-            shadow_rect = button_rect.move(0, 6)
-            pygame.draw.rect(self.screen, cor_shadow, shadow_rect, 0)
-            # Contorno preto grosso
-            pygame.draw.rect(self.screen, cor_borda, button_rect.inflate(6, 6), 0)
-            # Botão principal
-            pygame.draw.rect(self.screen, cor_fundo, button_rect, 0)
-            # Destaque branco em cima
-            highlight_rect = pygame.Rect(button_rect.x+4, button_rect.y+4, button_rect.width-8, 10)
-            pygame.draw.rect(self.screen, cor_highlight, highlight_rect, 0)
-            # Contorno preto interno
-            pygame.draw.rect(self.screen, cor_borda, button_rect, 3)
-            # Texto pixelado
-            button_text = button_font.render("INICIAR ", True, (30, 30, 60))
-            text_rect = button_text.get_rect(center=button_rect.center)
-            self.screen.blit(button_text, text_rect)
-            if fade_out:
-                fade_surface.set_alpha(fade_alpha)
-                self.screen.blit(fade_surface, (0, 0))
-                fade_alpha += 10
-                if fade_alpha >= 255:
-                    running_intro = False
-            pygame.display.update()
+
             for event in pygame.event.get():
-                if event.type == pygame.QUIT:
+                if event.type == pygame.QUIT or (event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE):
                     self.running = False
                     running_intro = False
                 if event.type == pygame.MOUSEBUTTONDOWN and mouse_over and not fade_out:
                     fade_out = True
+
+            if bg_img:
+                self.base_surface.blit(bg_img, (0, 0))
+            else:
+                self.base_surface.fill((30, 30, 60))
+
+            t = pygame.time.get_ticks() / 700.0
+            float_offset = int(12 * math.sin(t))
+            c1, c2 = (254, 217, 102), (28, 69, 135)
+            interp = (math.sin(t) + 1) / 2
+            color = (int(c1[0]*interp + c2[0]*(1-interp)), int(c1[1]*interp + c2[1]*(1-interp)), int(c1[2]*interp + c2[2]*(1-interp)))
+            
+            title_surface = title_font.render("LimpAttack", True, color)
+            title_rect = title_surface.get_rect(center=(BASE_WIN_WIDTH//2, BASE_WIN_HEIGHT//2 - 80 + float_offset))
+            self.base_surface.blit(title_surface, title_rect)
+
+            cor_fundo = (28, 69, 135) if mouse_over else (58, 89, 175)
+            pygame.draw.rect(self.base_surface, (0,0,0), button_rect.move(0, 6), 0)
+            pygame.draw.rect(self.base_surface, (0,0,0), button_rect.inflate(6, 6), 0)
+            pygame.draw.rect(self.base_surface, cor_fundo, button_rect, 0)
+            highlight_rect = pygame.Rect(button_rect.x+4, button_rect.y+4, button_rect.width-8, 10)
+            pygame.draw.rect(self.base_surface, WHITE, highlight_rect, 0)
+            pygame.draw.rect(self.base_surface, (0,0,0), button_rect, 3)
+            
+            button_text = button_font.render("INICIAR", True, WHITE)
+            text_rect = button_text.get_rect(center=button_rect.center)
+            self.base_surface.blit(button_text, text_rect.move(0,-3))
+            
+            if fade_out:
+                fade_alpha = min(fade_alpha + 10, 255)
+                fade_surface.set_alpha(fade_alpha)
+                self.base_surface.blit(fade_surface, (0, 0))
+                if fade_alpha >= 255:
+                    running_intro = False
+            
+            self._render_final_screen()
             self.clock.tick(FPS)
 
     def fade_out_and_restart(self, duration_ms=2000):
-        fade_surface = pygame.Surface((WIN_WIDTH, WIN_HEIGHT))
+        fade_surface = pygame.Surface((BASE_WIN_WIDTH, BASE_WIN_HEIGHT))
         fade_surface.fill((0, 0, 0))
         clock = pygame.time.Clock()
         alpha = 0
@@ -659,11 +668,10 @@ class Game:
             elapsed = now - start_time
             alpha = min(255, int(255 * (elapsed / duration_ms)))
             fade_surface.set_alpha(alpha)
-            self.draw()  # Draw current frame
-            self.screen.blit(fade_surface, (0, 0))
+            self.draw()
+            self.base_surface.blit(fade_surface, (0, 0))
             pygame.display.update()
             clock.tick(FPS)
-        # Reset game state and show intro
         self.reset_save()
         self.intro_screen()
 
@@ -686,22 +694,22 @@ class Game:
         for i, (nome, data) in enumerate(inventario_dict.items()):
             img_path = imagens.get(nome, "img/curativo.png")
             sprite = HudItemCuraSprite(hud_x + i*48, hud_y, img_path, data["quantidade"])
-            sprite.draw(self.screen, font)
+            sprite.draw(self.base_surface, font)
         if hasattr(self, 'inventario_chave') and 'tocha' in self.inventario_chave:
             tocha_sprite = HudItemCuraSprite(hud_x, hud_y + 54, "img/tocha.png", 1)
-            tocha_sprite.draw(self.screen, font)
+            tocha_sprite.draw(self.base_surface, font)
             font2 = pygame.font.SysFont("arial", 16)
-            self.screen.blit(font2.render("Tocha", True, (255,255,255)), (hud_x + 40, hud_y + 60))
+            self.base_surface.blit(font2.render("Tocha", True, (255,255,255)), (hud_x + 40, hud_y + 60))
         elif hasattr(self, 'inventario_chave') and 'sabonete' in self.inventario_chave:
             sabonete_sprite = HudItemCuraSprite(hud_x, hud_y + 54, "img/sabonete.png", 1)
-            sabonete_sprite.draw(self.screen, font)
+            sabonete_sprite.draw(self.base_surface, font)
             font2 = pygame.font.SysFont("arial", 16)
-            self.screen.blit(font2.render("Sabonete", True, (255,255,255)), (hud_x + 40, hud_y + 60))
+            self.base_surface.blit(font2.render("Sabonete", True, (255,255,255)), (hud_x + 40, hud_y + 60))
         
     def draw_npc_dialog(self):
-        dialog_box_rect = pygame.Rect(40, WIN_HEIGHT - 120, WIN_WIDTH - 80, 80)
-        pygame.draw.rect(self.screen, (255, 255, 255), dialog_box_rect, border_radius=10)
-        pygame.draw.rect(self.screen, (0, 0, 0), dialog_box_rect, 2, border_radius=10)
+        dialog_box_rect = pygame.Rect(40, BASE_WIN_HEIGHT - 120, BASE_WIN_WIDTH - 80, 80)
+        pygame.draw.rect(self.base_surface, (255, 255, 255), dialog_box_rect, border_radius=10)
+        pygame.draw.rect(self.base_surface, (0, 0, 0), dialog_box_rect, 2, border_radius=10)
         nome_npc = ""
         npc_symbol = getattr(self, "npc_dialog_npc_symbol", None)
         if npc_symbol:
@@ -710,11 +718,11 @@ class Game:
                 nome_npc = npc_info["nome"]
         if nome_npc:
             name_box_rect = pygame.Rect(dialog_box_rect.x + 20, dialog_box_rect.y - 32, 180, 28)
-            pygame.draw.rect(self.screen, (255, 230, 250), name_box_rect, border_radius=8)
-            pygame.draw.rect(self.screen, (0, 0, 0), name_box_rect, 2, border_radius=8)
+            pygame.draw.rect(self.base_surface, (255, 230, 250), name_box_rect, border_radius=8)
+            pygame.draw.rect(self.base_surface, (0, 0, 0), name_box_rect, 2, border_radius=8)
             name_font = pygame.font.SysFont("arial", 20, bold=True)
             name_text = name_font.render(nome_npc, True, (0, 0, 0))
-            self.screen.blit(name_text, (name_box_rect.x + 12, name_box_rect.y + 3))
+            self.base_surface.blit(name_text, (name_box_rect.x + 12, name_box_rect.y + 3))
         font = pygame.font.SysFont("arial", 16)
         now = pygame.time.get_ticks()
         if self.npc_dialog_char_index < len(self.npc_dialog_texts[self.npc_dialog_index]):
@@ -723,18 +731,16 @@ class Game:
                 self.npc_dialog_last_update = now
         self.npc_dialog_current = self.npc_dialog_texts[self.npc_dialog_index][:self.npc_dialog_char_index]
         text_surface = font.render(self.npc_dialog_current, True, (0, 0, 0))
-        self.screen.blit(text_surface, (dialog_box_rect.x + 20, dialog_box_rect.y + 20))
+        self.base_surface.blit(text_surface, (dialog_box_rect.x + 20, dialog_box_rect.y + 20))
         btn_rect = pygame.Rect(dialog_box_rect.right - 120, dialog_box_rect.bottom - 40, 100, 30)
-        pygame.draw.rect(self.screen, (200, 200, 255), btn_rect, border_radius=8)
-        pygame.draw.rect(self.screen, (0, 0, 0), btn_rect, 2, border_radius=8)
+        pygame.draw.rect(self.base_surface, (200, 200, 255), btn_rect, border_radius=8)
+        pygame.draw.rect(self.base_surface, (0, 0, 0), btn_rect, 2, border_radius=8)
         btn_font = pygame.font.SysFont("arial", 18)
         btn_text = btn_font.render("Avançar", True, (0, 0, 0))
-        self.screen.blit(btn_text, (btn_rect.x + 18, btn_rect.y + 5))
+        self.base_surface.blit(btn_text, (btn_rect.x + 18, btn_rect.y + 5))
         self.npc_dialog_btn_rect = btn_rect
 
-    # checa e retorna a quantidade de inimigos restantes e o total de inimigos no mapa atual
     def checar_inimigos(self):
-        """Retorna (restantes, total) de inimigos no mapa atual."""
         total = 0
         restantes = 0
         for sprite in self.all_sprites:
@@ -745,7 +751,6 @@ class Game:
         return restantes, total
     
     def reset_save(self):
-        # Reseta todas as variáveis de progresso do jogo para o estado inicial
         self.mapa_atual_index = 0
         self.mapa_atual = mapas[self.mapa_atual_index]["tilemap"]
         self.fases = [True] * len(mapas)
@@ -764,10 +769,15 @@ class Game:
         self.rei_mundica_derrotado = False
         if hasattr(self, "path_spawned_mapa5"):
             self.path_spawned_mapa5 = False
-        # Remove arquivo de save se existir
+        self.npc_dialog_active = False
+        self.npc_dialog_texts = []
+        self.npc_dialog_index = 0
+        self.npc_dialog_current = ""
+        self.npc_dialog_char_index = 0 
+        self.npc_dialog_npc_symbol = ""
+        self.npc_dialog_btn_rect = None
         if hasattr(self, "save_file") and os.path.exists(self.save_file):
             os.remove(self.save_file)
-        # Reinicia o mapa e sprites
         self.new()
     
     def change_ost(self):
@@ -776,12 +786,30 @@ class Game:
             mixer.music.set_volume(1)
             mixer.music.play(-1)
 
-# inicializa o jogo
+    def draw_visual_pause_button(self):
+        mouse_pos = self.get_scaled_mouse_pos()
+        
+        current_color = self.pause_button_color
+        if self.pause_button_rect.collidepoint(mouse_pos):
+            current_color = self.pause_button_hover_color
+
+        pygame.draw.rect(self.base_surface, current_color, self.pause_button_rect, border_radius=5)
+        pygame.draw.rect(self.base_surface, BLACK, self.pause_button_rect, 2, border_radius=5)
+
+        text_surf = self.pause_button_font.render(self.pause_button_text, True, BLACK)
+        text_rect = text_surf.get_rect(center=self.pause_button_rect.center)
+        self.base_surface.blit(text_surf, text_rect)
+
 g = Game()
-g.new()
 g.intro_screen()
-while g.running:
+
+if g.running:
+    g.new()
     g.main()
-    g.game_over()
+    while g.running:
+        g.game_over()
+        if g.playing:
+            g.main()
+
 pygame.quit()
 sys.exit()

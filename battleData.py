@@ -1,30 +1,19 @@
-# este arquivo define as classes de batalha e os dados dos inimigos
-# EnemyBattle representa um inimigo em batalha
-# Item e ItemCura representam itens que podem ser usados
-# selecionar_ataques_eficazes_e_aleatorios escolhe ataques para o inimigo
-# enemies contem os dados de todos os inimigos do jogo
-# comentarios em minusculo e sem acento para facilitar entendimento
-
 from config import *
 import random
 import time
 
-# classe que representa um inimigo em batalha
 class EnemyBattle:
     def __init__(self, nome, hp, ataques):
-        self.nome = nome  # nome do inimigo
-        self.hp = hp  # pontos de vida do inimigo
-        self.ataques = ataques  # ataques que o inimigo pode realizar
+        self.nome = nome
+        self.hp = hp
+        self.ataques = ataques
 
-    # metodo para escolher um ataque aleatorio do inimigo
     def ataque_aleatorio(self):
-        # comportamento padrão (probabilidade)
         for nome, dados in self.ataques.items():
-            # verifica se o ataque deve ser realizado baseado na probabilidade
             if random.random() <= dados["probabilidade"]:
-                return nome, dados["dano"]  # retorna o nome e dano do ataque
+                return nome, dados["dano"]
         nome = random.choice(list(self.ataques.keys()))
-        return nome, self.ataques[nome]["dano"]  # ataque default caso nenhum ataque seja escolhido
+        return nome, self.ataques[nome]["dano"]
 
 class ReiMundicaBattle(EnemyBattle):
     def __init__(self, nome, vida, ataques):
@@ -40,10 +29,9 @@ class ReiMundicaBattle(EnemyBattle):
 
     def tomar_dano(self, dano, screen=None, x=None, y=None, font=None, draw_hp_bar=None):
         self.vida -= dano
-        # Garante que nunca fique negativo
         if self.vida < 0:
             self.vida = 0
-        self.hp = self.vida  # Sincroniza com hp usado no resto do código
+        self.hp = self.vida
         if self.vida <= 0 and not self.regenerou:
             self.vida = 0
             self.hp = 0
@@ -55,7 +43,6 @@ class ReiMundicaBattle(EnemyBattle):
                 self.animar_regeneracao_visual(screen, x, y, font, draw_hp_bar)
             self.vida = self.vida_max
             self.hp = self.vida_max
-        # Garante que após a segunda vida, nunca fique negativo
         if self.regenerou and self.vida < 0:
             self.vida = 0
             self.hp = 0
@@ -74,24 +61,20 @@ class ReiMundicaBattle(EnemyBattle):
         self.hp = self.vida_max
         print(f"{self.nome} regenerou completamente!")
 
-# classe que representa um item que pode ser usado em batalha
 class Item:
     def __init__(self, nome, dano_base, eficacias):
-        self.nome = nome  # nome do item
-        self.dano_base = dano_base  # dano base do item
-        self.eficacias = eficacias  # eficacias do item contra inimigos
+        self.nome = nome
+        self.dano_base = dano_base
+        self.eficacias = eficacias
 
-    # metodo que calcula o dano que o item pode causar em um inimigo
     def calcular_dano(self, inimigo_nome):
-        return self.dano_base * self.eficacias.get(inimigo_nome, 0.2)  # dano base multiplicado pela eficacia contra o inimigo
+        return self.dano_base * self.eficacias.get(inimigo_nome, 0.2)
 
-# classe que representa um item de cura
 class ItemCura:
     def __init__(self, nome, cura):
-        self.nome = nome  # nome do item de cura
-        self.cura = cura  # quantidade de cura que o item fornece
+        self.nome = nome
+        self.cura = cura
 
-# funcao que seleciona ataques eficazes e aleatorios para um inimigo
 def selecionar_ataques_eficazes_e_aleatorios(enemy_name):
     todos_itens = list(itens.values())
     eficazes = sorted(
@@ -106,7 +89,6 @@ def selecionar_ataques_eficazes_e_aleatorios(enemy_name):
     random.shuffle(opcoes)
     return opcoes
 
-# dicionario que contem os dados de todos os inimigos do jogo
 enemies = {
     "Cárie": EnemyBattle("Cárie", 100, {
         "Dente Sujo": {"dano": 5, "probabilidade": 0.4},
@@ -151,7 +133,7 @@ enemies = {
         "Acne com Sebo": {"dano": 18, "probabilidade": 0.1}
     }),
 }
-# dicionario que mapeia os itens e suas respectivas propriedades
+
 itens = {
     "Escova de Dente": Item("Escova de Dente", 12, {
         "Cárie": 4, "Mão Podre": 0.5, "Caspa no Cabelo": 0.2, "Acne": 0.2,
@@ -203,7 +185,6 @@ itens = {
     # })
 }
 
-# lista de itens de cura disponiveis no jogo
 itens_cura = [
     ItemCura("Curativo", 15),
     ItemCura("Pomada", 30),
@@ -211,7 +192,6 @@ itens_cura = [
     ItemCura("Chá Natural", 100)
 ]
 
-# dicionario que mapeia os inimigos para suas respectivas spritesheets
 enemy_spritesheets = {
     "Cárie": "img/carie_spritesheet.png",
     "Mão Podre": "img/mao_podre_spritesheet.png",
@@ -223,7 +203,6 @@ enemy_spritesheets = {
     "Rei Mundiça": "img/rei_luta.png"
 }
 
-# dicionario que mapeia os inimigos para suas respectivas animações
 enemy_animations = {
      "Cárie": [(0, 0), (64, 0), (128, 0), (192, 0), (256, 0), (320, 0),
               (0, 64), (64, 64), (128, 64), (192, 64), (256, 64), (320, 64),
