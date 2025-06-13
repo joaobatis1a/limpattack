@@ -168,7 +168,7 @@ class Placa(pygame.sprite.Sprite):
         self.y = y * TILESIZE
         self.width = TILESIZE
         self.height = TILESIZE
-        self.spritesheet = Spritesheet("img/placa.png")
+        self.spritesheet = Spritesheet(resource_path("img/placa.png"))
         self.image = self.spritesheet.get_sprite(0, 0, self.width, self.height, [])
         self.image.set_colorkey((0, 184, 0))
         self.rect = self.image.get_rect()
@@ -186,7 +186,7 @@ class NPC7(pygame.sprite.Sprite):
         self.y = y * TILESIZE
         self.width = TILESIZE
         self.height = TILESIZE
-        self.spritesheet = Spritesheet("img/kaua.png")
+        self.spritesheet = Spritesheet(resource_path("img/kaua.png"))
         self.image = self.spritesheet.get_sprite(1, 1, self.width, self.height, [])
         self.image.set_colorkey((0, 176, 176))
         self.rect = self.image.get_rect()

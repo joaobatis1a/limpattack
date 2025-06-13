@@ -1,3 +1,6 @@
+import os
+import sys
+
 BASE_WIN_WIDTH = 1280/2 #640
 BASE_WIN_HEIGHT = 960/2#480
 MENU_OVERLAY_COLOR = (0, 0, 0, 170)
@@ -25,3 +28,11 @@ ENEYMY_BG = (0, 0, 0)
 TERRAIN_BG = (0, 0, 0)         
 
 fases = [True, True, True, True, True, True]
+
+def resource_path(relative_path):
+    try:
+        base_path = sys._MEIPASS
+    except Exception:
+        base_path = os.path.abspath(".")
+    
+    return os.path.join(base_path, relative_path)

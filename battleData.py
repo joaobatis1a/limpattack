@@ -182,7 +182,7 @@ itens = {
     # "Nulo": Item("Nulo", 0, {
     #     "Cárie": 0, "Mão Podre": 0, "Caspa no Cabelo": 0, "Acne": 0,
     #     "Bactéria de Resfriado": 0, "Bactéria do Pé": 0, "Gordura na Pele": 0
-    # })
+    # }
 }
 
 itens_cura = [
@@ -193,14 +193,14 @@ itens_cura = [
 ]
 
 enemy_spritesheets = {
-    "Cárie": "img/carie_spritesheet.png",
-    "Mão Podre": "img/mao_podre_spritesheet.png",
-    "Caspa no Cabelo": "img/caspa_spritesheet.png",
-    "Acne": "img/acne_spritesheet.png",
-    "Bactéria de Resfriado": "img/resfriado_spritesheet.png",
-    "Bactéria do Pé": "img/pe_spritesheet.png",
-    "Gordura na Pele": "img/gordura_spritesheet.png",
-    "Rei Mundiça": "img/rei_luta.png"
+    "Cárie": resource_path("img/carie_spritesheet.png"),
+    "Mão Podre": resource_path("img/mao_podre_spritesheet.png"),
+    "Caspa no Cabelo": resource_path("img/caspa_spritesheet.png"),
+    "Acne": resource_path("img/acne_spritesheet.png"),
+    "Bactéria de Resfriado": resource_path("img/resfriado_spritesheet.png"),
+    "Bactéria do Pé": resource_path("img/pe_spritesheet.png"),
+    "Gordura na Pele": resource_path("img/gordura_spritesheet.png"),
+    "Rei Mundiça": resource_path("img/rei_luta.png")
 }
 
 enemy_animations = {

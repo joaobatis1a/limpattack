@@ -28,6 +28,7 @@ tilemap = [
     ',..................,.,.................,',
     ',..................,.,.................,',
     ',..................,.,.................,',
+    ',..................,.,.................,',
     ',,,,,,,,,,,,,,,,,,,,.,,,,,,,,,,,,,,,,,,,',
     ',..................,...................p',
     ',..................,E.................1p',
@@ -121,7 +122,7 @@ class NPC8(pygame.sprite.Sprite):
         self.y = y * TILESIZE
         self.width = TILESIZE
         self.height = TILESIZE
-        self.spritesheet = Spritesheet("img/kauã.png")
+        self.spritesheet = Spritesheet(resource_path("img/kauã.png"))
         self.image = self.spritesheet.get_sprite(34, 1, self.width, self.height, [(0, 176, 176)])
         self.rect = self.image.get_rect()
         self.rect.x = self.x
@@ -129,6 +130,6 @@ class NPC8(pygame.sprite.Sprite):
         self.moved = False
 
     def move_left_two_tiles(self):
-        self.rect.x -= 2 * TILESIZE
+        self.rect.x -= 1 * TILESIZE
         self.x = self.rect.x
         self.moved = True

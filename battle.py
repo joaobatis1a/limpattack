@@ -118,12 +118,12 @@ def battle_screen(game, player_hp, player_max_hp, enemy, enemy_img, player_img, 
             draw_text(f"{item.nome} (+{item.cura} HP)", button_rect.x + 32, button_rect.y + 6, small_button_font)
             draw_text(f"x{quantidade}", button_rect.x + button_width - 28, button_rect.y + 6, small_button_font)
             imagens = {
-                "Curativo": "img/curativo.png",
-                "Pomada": "img/pomada.png",
-                "Xarope": "img/xarope.png",
-                "Chá Natural": "img/cha.png"
+                "Curativo": resource_path("img/curativo.png"),
+                "Pomada": resource_path("img/pomada.png"),
+                "Xarope": resource_path("img/xarope.png"),
+                "Chá Natural": resource_path("img/cha.png")
             }
-            img_path = imagens.get(item.nome, "img/curativo.png")
+            img_path = imagens.get(item.nome, resource_path("img/curativo.png"))
             try:
                 img = pygame.image.load(img_path).convert()
                 img.set_colorkey((184, 200, 168))
@@ -413,7 +413,7 @@ def battle_screen(game, player_hp, player_max_hp, enemy, enemy_img, player_img, 
 
 def mostrar_vitoria(game, mensagem, tempo_ms=2500):
     mixer.music.stop()
-    mixer.music.load("sounds/limpattack_tune_vitoria.mp3")
+    mixer.music.load(resource_path("sounds/limpattack_tune_vitoria.mp3"))
     mixer.music.set_volume(1)
     mixer.music.play()
     

@@ -1,9 +1,9 @@
 import pygame
 from config import *
 from battleData import *
+from npcs import npcs_data
 import math
 import random
-from npcs import npcs_data
 
 # class Base(pygame.sprite.Sprite):
 #     def __init__(self, game, x, y):
@@ -416,7 +416,7 @@ class Enemy(pygame.sprite.Sprite):
         self.width = 64
         self.height = 64
         # carrega a spritesheet e os frames de animacao do inimigo
-        self.spritesheet = Spritesheet(enemy_spritesheets[enemy_name])
+        self.spritesheet = Spritesheet(resource_path(enemy_spritesheets[enemy_name]))
         self.animation_frames = enemy_animations[enemy_name]
         self.animation_loop = 0
         img = self.spritesheet.get_sprite(0, 0, self.width, self.height, bg_colors)
@@ -463,8 +463,6 @@ class Ground(pygame.sprite.Sprite):
         self.y = y * TILESIZE
         self.width = TILESIZE
         self.height = TILESIZE
-        self.width = TILESIZE
-        self.height = TILESIZE
         bg_colors = [CHARACTER_BG, ENEYMY_BG, TERRAIN_BG]
         # carrega a imagem do chao a partir da spritesheet
         self.image = self.game.terrain_spritesheet.get_sprite(518, 2442, self.width, self.height, bg_colors)
@@ -481,8 +479,6 @@ class Ground2(pygame.sprite.Sprite):
         pygame.sprite.Sprite.__init__(self, self.groups)
         self.x = x * TILESIZE
         self.y = y * TILESIZE
-        self.width = TILESIZE
-        self.height = TILESIZE
         self.width = TILESIZE
         self.height = TILESIZE
         bg_colors = [CHARACTER_BG, ENEYMY_BG, TERRAIN_BG]
@@ -598,12 +594,12 @@ class ItemCuraSprite(pygame.sprite.Sprite):
         self.item_cura = item_cura
         # caminhos das imagens dos itens de cura
         imagens = {
-            "Curativo": "img/curativo.png",
-            "Pomada": "img/pomada.png",
-            "Xarope": "img/xarope.png",
-            "Chá Natural": "img/cha.png"
+            "Curativo": resource_path("img/curativo.png"),
+            "Pomada": resource_path("img/pomada.png"),
+            "Xarope": resource_path("img/xarope.png"),
+            "Chá Natural": resource_path("img/cha.png")
         }
-        img_path = imagens.get(item_cura.nome, "img/curativo.png")
+        img_path = imagens.get(item_cura.nome, resource_path("img/curativo.png"))
         img = pygame.image.load(img_path).convert()
         img.set_colorkey((184, 200, 168))
         self.image = pygame.transform.scale(img, (32, 32))
@@ -642,16 +638,16 @@ class NPC(pygame.sprite.Sprite):
         # carrega a spritesheet do npc
         if symbol == "O":
             # Kauã normal (mapa 5)
-            self.spritesheet = Spritesheet("img/kaua.png")
+            self.spritesheet = Spritesheet(resource_path("img/kaua.png"))
             self.image = self.spritesheet.get_sprite(1, 1, self.width, self.height, [(0, 184, 0)])
             self.image.set_colorkey((0, 184, 0))
         elif symbol == "P":
             # Sombra de Kauã (mapa 6)
-            self.spritesheet = Spritesheet("img/kaua_branco.png")
+            self.spritesheet = Spritesheet(resource_path("img/kaua_branco.png"))
             self.image = self.spritesheet.get_sprite(0, 0, self.width, self.height, [(0, 184, 0)])
             self.image.set_colorkey((0, 184, 0))
         else:
-            self.spritesheet = Spritesheet("img/carlos.png")
+            self.spritesheet = Spritesheet(resource_path("img/carlos.png"))
             self.image = self.spritesheet.get_sprite(1, 1, self.width, self.height, [])
             self.image.set_colorkey((0, 176, 0))
         self.rect = self.image.get_rect()
@@ -676,7 +672,7 @@ class NPC2(pygame.sprite.Sprite):
         self.y = y * TILESIZE
         self.width = TILESIZE
         self.height = TILESIZE
-        self.spritesheet = Spritesheet("img/will.png")
+        self.spritesheet = Spritesheet(resource_path("img/will.png"))
         self.image = self.spritesheet.get_sprite(1, 1, self.width, self.height, [])
         self.image.set_colorkey((0, 176, 0))
         self.rect = self.image.get_rect()
@@ -731,7 +727,7 @@ class TochaSprite(pygame.sprite.Sprite):
         self.y = y * TILESIZE
         self.width = TILESIZE
         self.height = TILESIZE
-        img = pygame.image.load("img/tocha.png").convert()
+        img = pygame.image.load(resource_path("img/tocha.png")).convert()
         img.set_colorkey((184, 200, 168))
         self.image = pygame.transform.scale(img, (32, 32))
         self.rect = self.image.get_rect()
@@ -791,15 +787,15 @@ class ReiMundicaEvento(pygame.sprite.Sprite):
         self.height = 32
 
         # Carrega e prepara os sprites
-        self.silhueta_kaua = pygame.image.load("img/kaua_branco.png").convert()
+        self.silhueta_kaua = pygame.image.load(resource_path("img/kaua_branco.png")).convert()
         self.silhueta_kaua.set_colorkey((0, 184, 0))  # Remove fundo verde
         self.silhueta_kaua = pygame.transform.scale(self.silhueta_kaua, (32, 32))
 
-        self.silhueta_rei = pygame.image.load("img/rei_branco.png").convert()
+        self.silhueta_rei = pygame.image.load(resource_path("img/rei_branco.png")).convert()
         self.silhueta_rei.set_colorkey((0, 184, 0))  # Remove fundo verde
         self.silhueta_rei = pygame.transform.scale(self.silhueta_rei, (32, 32))
 
-        self.sprite_rei_final = pygame.image.load("img/rei_luta.png").convert()
+        self.sprite_rei_final = pygame.image.load(resource_path("img/rei_luta.png")).convert()
         self.sprite_rei_final.set_colorkey((184, 200, 168))
         self.sprite_rei_final = pygame.transform.scale(self.sprite_rei_final, (32, 32))
 

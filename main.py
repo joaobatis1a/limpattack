@@ -17,7 +17,6 @@ from npcs import npcs_data
 import sys
 import random
 import math
-sys.stdout.reconfigure(encoding='utf-8')
 
 pygame.display.set_caption("LimpAttack")
 
@@ -54,10 +53,10 @@ class Game:
         self.offset_y = (self.screen_height - self.scaled_height) // 2
         self.clock = pygame.time.Clock()
         self.running = True
-        self.character_spritesheet = Spritesheet('img/character.png')
-        self.terrain_spritesheet = Spritesheet('img/terrain1.png')
-        self.tree_spritesheet = Spritesheet('img/tree_Mid.png')
-        self.sabonete_spritesheet = Spritesheet('img/sabonete.png')
+        self.character_spritesheet = Spritesheet(resource_path('img/character.png'))
+        self.terrain_spritesheet = Spritesheet(resource_path('img/terrain1.png'))
+        self.tree_spritesheet = Spritesheet(resource_path('img/tree_Mid.png'))
+        self.sabonete_spritesheet = Spritesheet(resource_path('img/sabonete.png'))
         self.in_battle = False
         self.battle_started = False
         self.battle_enemy = None
@@ -104,7 +103,7 @@ class Game:
         button_y = 10
         self.pause_button_rect = pygame.Rect(button_x, button_y, button_width, button_height)
 
-        mixer.music.load("sounds/limpattack_ost_base.mp3")
+        mixer.music.load(resource_path("sounds/limpattack_ost_base.mp3"))
         mixer.music.set_volume(1)
         mixer.music.play(-1)
 
@@ -144,17 +143,17 @@ class Game:
 
     def handle_battle(self):
         enemy_battle_images = {
-            "Cárie": "img/carie_luta.png",
-            "Mão Podre": "img/mao_podre_luta.png",
-            "Caspa no Cabelo": "img/caspa_luta.png",
-            "Acne": "img/acne_luta.png",
-            "Bactéria de Resfriado": "img/resfriado_luta.png",
-            "Bactéria do Pé": "img/pe_luta.png",
-            "Gordura na Pele": "img/gordura_luta.png",
-            "Rei Mundiça": "img/rei_luta.png"
+            "Cárie": resource_path("img/carie_luta.png"),
+            "Mão Podre": resource_path("img/mao_podre_luta.png"),
+            "Caspa no Cabelo": resource_path("img/caspa_luta.png"),
+            "Acne": resource_path("img/acne_luta.png"),
+            "Bactéria de Resfriado": resource_path("img/resfriado_luta.png"),
+            "Bactéria do Pé": resource_path("img/pe_luta.png"),
+            "Gordura na Pele": resource_path("img/gordura_luta.png"),
+            "Rei Mundiça": resource_path("img/rei_luta.png")
         }
         mixer.music.stop()
-        mixer.music.load("sounds/limpattack_ost_luta.mp3")
+        mixer.music.load(resource_path("sounds/limpattack_ost_luta.mp3"))
         mixer.music.set_volume(1)
         mixer.music.play(-1)
         enemy_name = self.battle_enemy.enemy_name
@@ -165,16 +164,16 @@ class Game:
                 enemy_data.hp = enemies[enemy_name].hp
             else:
                 enemy_data.hp = enemy_data.max_hp if hasattr(enemy_data, "max_hp") else 100
-        enemy_img = pygame.image.load(enemy_battle_images[enemy_name]).convert()
+        enemy_img = pygame.image.load(resource_path(enemy_battle_images[enemy_name])).convert()
         enemy_img.set_colorkey((184, 200, 168))
         enemy_img = pygame.transform.scale(enemy_img, (120, 120))
-        player_img = pygame.image.load("img/nala_luta.png").convert()
+        player_img = pygame.image.load(resource_path('img/nala_luta.png')).convert()
         player_img.set_colorkey((184, 200, 168))
         player_img = pygame.transform.scale(player_img, (120, 120))
         if enemy_name == "Rei Mundiça":
-            bg_img = pygame.transform.scale(pygame.image.load("img/boss.luta.png"), (640, 480))
+            bg_img = pygame.transform.scale(pygame.image.load(resource_path("img/boss.luta.png")), (640, 480))
         else:
-            bg_img = pygame.transform.scale(pygame.image.load("img/luta_bg.png"), (640, 480))
+            bg_img = pygame.transform.scale(pygame.image.load(resource_path("img/luta_bg.png")), (640, 480))
         itens_selecionados = selecionar_ataques_eficazes_e_aleatorios(enemy_name)
         resultado = battle_screen(
             self,
@@ -190,17 +189,17 @@ class Game:
         )
         if isinstance(resultado, int) and resultado > 0:
             mixer.music.stop()
-            mixer.music.load("sounds/limpattack_ost_base.mp3")
+            mixer.music.load(resource_path("sounds/limpattack_ost_base.mp3"))
             mixer.music.set_volume(1)
             mixer.music.play(-1)
         elif resultado == "vitoria":
             mixer.music.stop()
-            mixer.music.load("sounds/limpattack_tune_vitoria.mp3")
+            mixer.music.load(resource_path("sounds/limpattack_tune_vitoria.mp3"))
             mixer.music.set_volume(1)
             mixer.music.play(-1)
         elif resultado == "derrota":
             mixer.music.stop()
-            mixer.music.load("sounds/limpattack_tune_derrota.mp3")
+            mixer.music.load(resource_path("sounds/limpattack_tune_derrota.mp3"))
             mixer.music.set_volume(1)
             mixer.music.play(-1)
             self.game_over_flag = True
@@ -428,12 +427,12 @@ class Game:
             self.player.rect.y = spawn[1] * TILESIZE
         if self.mapa_atual_index == 4:
             mixer.music.stop()
-            mixer.music.load("sounds/limpattack_ost_rei.mp3")
+            mixer.music.load(resource_path("sounds/limpattack_ost_rei.mp3"))
             mixer.music.set_volume(1)
             mixer.music.play(-1)
         if self.mapa_atual_index == 5:
             mixer.music.stop()
-            mixer.music.load("sounds/limpattack_ost_base.mp3")
+            mixer.music.load(resource_path("sounds/limpattack_ost_base.mp3"))
             mixer.music.set_volume(1)
             mixer.music.play(-1)
 
@@ -557,7 +556,7 @@ class Game:
                         self.game_over_flag = False
                         self.playing = True
                         mixer.music.stop()
-                        mixer.music.load("sounds/limpattack_ost_base.mp3")
+                        mixer.music.load(resource_path("sounds/limpattack_ost_base.mp3"))
                         mixer.music.set_volume(1)
                         mixer.music.play(-1)
                         self.restore_saved_state()
@@ -585,11 +584,11 @@ class Game:
 
     def intro_screen(self):
         try:
-            title_font = pygame.font.Font("img/pixel.ttf", 72)
+            title_font = pygame.font.Font(resource_path("img/pixel.ttf"), 72)
         except:
             title_font = pygame.font.SysFont("Arial", 72, bold=True)
         try:
-            button_font = pygame.font.Font("img/pixel.ttf", 36)
+            button_font = pygame.font.Font(resource_path("img/pixel.ttf"), 36)
         except:
             button_font = pygame.font.SysFont("Arial", 36, bold=True)
             
@@ -604,7 +603,7 @@ class Game:
         fade_surface.fill(BLACK)
         
         try:
-            bg_img = pygame.image.load("img/tela_inicio.png").convert()
+            bg_img = pygame.image.load(resource_path("img/tela_inicio.png")).convert()
             bg_img = pygame.transform.scale(bg_img, (BASE_WIN_WIDTH, BASE_WIN_HEIGHT))
         except:
             bg_img = None
@@ -683,25 +682,25 @@ class Game:
             else:
                 inventario_dict[item.nome]["quantidade"] += 1
         imagens = {
-            "Curativo": "img/curativo.png",
-            "Pomada": "img/pomada.png",
-            "Xarope": "img/xarope.png",
-            "Chá Natural": "img/cha.png"
+            "Curativo": resource_path("img/curativo.png"),
+            "Pomada": resource_path("img/pomada.png"),
+            "Xarope": resource_path("img/xarope.png"),
+            "Chá Natural": resource_path("img/cha.png")
         }
         font = pygame.font.SysFont("arial", 18)
         hud_x = 10
         hud_y = 10
         for i, (nome, data) in enumerate(inventario_dict.items()):
-            img_path = imagens.get(nome, "img/curativo.png")
+            img_path = imagens.get(nome, resource_path("img/curativo.png"))
             sprite = HudItemCuraSprite(hud_x + i*48, hud_y, img_path, data["quantidade"])
             sprite.draw(self.base_surface, font)
         if hasattr(self, 'inventario_chave') and 'tocha' in self.inventario_chave:
-            tocha_sprite = HudItemCuraSprite(hud_x, hud_y + 54, "img/tocha.png", 1)
+            tocha_sprite = HudItemCuraSprite(hud_x, hud_y + 54, resource_path("img/tocha.png"), 1)
             tocha_sprite.draw(self.base_surface, font)
             font2 = pygame.font.SysFont("arial", 16)
             self.base_surface.blit(font2.render("Tocha", True, (255,255,255)), (hud_x + 40, hud_y + 60))
         elif hasattr(self, 'inventario_chave') and 'sabonete' in self.inventario_chave:
-            sabonete_sprite = HudItemCuraSprite(hud_x, hud_y + 54, "img/sabonete.png", 1)
+            sabonete_sprite = HudItemCuraSprite(hud_x, hud_y + 54, resource_path("img/sabonete.png"), 1)
             sabonete_sprite.draw(self.base_surface, font)
             font2 = pygame.font.SysFont("arial", 16)
             self.base_surface.blit(font2.render("Sabonete", True, (255,255,255)), (hud_x + 40, hud_y + 60))
@@ -782,7 +781,7 @@ class Game:
     
     def change_ost(self):
         if self.mapa_atual_index == 0:
-            mixer.music.load("sounds/limpattack_ost_rei.mp3")
+            mixer.music.load(resource_path("sounds/limpattack_ost_rei.mp3"))
             mixer.music.set_volume(1)
             mixer.music.play(-1)
 

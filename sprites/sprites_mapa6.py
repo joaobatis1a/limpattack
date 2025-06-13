@@ -115,7 +115,7 @@ class Piu(pygame.sprite.Sprite):
         self.width = TILESIZE
         self.height = TILESIZE
         # carrega a spritesheet do npc
-        self.spritesheet = Spritesheet("img/piu_s.png")
+        self.spritesheet = Spritesheet(resource_path("img/piu_s.png"))
         self.image = self.spritesheet.get_sprite(1, 1, self.width, self.height, [])
         self.image.set_colorkey((160, 192, 144))
         self.rect = self.image.get_rect()
@@ -133,7 +133,7 @@ class Will(pygame.sprite.Sprite):
         self.width = TILESIZE
         self.height = TILESIZE
         # carrega a spritesheet do npc
-        self.spritesheet = Spritesheet("img/will_s.png")
+        self.spritesheet = Spritesheet(resource_path("img/will_s.png"))
         self.image = self.spritesheet.get_sprite(1, 1, self.width, self.height, [])
         self.image.set_colorkey((0, 176, 0))
         self.rect = self.image.get_rect()
@@ -150,7 +150,7 @@ class Tigre(pygame.sprite.Sprite):
         self.y = y * TILESIZE
         self.width = TILESIZE
         self.height = TILESIZE
-        self.spritesheet = Spritesheet("img/tigre_s.png")
+        self.spritesheet = Spritesheet(resource_path("img/tigre_s.png"))
         sprite = self.spritesheet.get_sprite(0, 0, 64, 64, [(160, 192, 144)])  # ajuste a cor do fundo conforme necessário
         self.image = pygame.transform.scale(sprite, (32, 32))
         self.rect = self.image.get_rect()
@@ -167,7 +167,7 @@ class Rino(pygame.sprite.Sprite):
         self.y = y * TILESIZE
         self.width = TILESIZE
         self.height = TILESIZE
-        self.spritesheet = Spritesheet("img/rino_s.png")
+        self.spritesheet = Spritesheet(resource_path("img/rino_s.png"))
         sprite = self.spritesheet.get_sprite(0, 0, 64, 64, [(0, 176, 0)])  # ajuste a cor do fundo conforme necessário
         self.image = pygame.transform.scale(sprite, (32, 32))
         self.rect = self.image.get_rect()
@@ -184,7 +184,7 @@ class Mamute(pygame.sprite.Sprite):
         self.y = y * TILESIZE
         self.width = TILESIZE
         self.height = TILESIZE
-        self.spritesheet = Spritesheet("img/mamute_s.png")
+        self.spritesheet = Spritesheet(resource_path("img/mamute_s.png"))
         sprite = self.spritesheet.get_sprite(0, 0, 64, 64, [(0, 176, 0)])  # ajuste a cor do fundo conforme necessário
         self.image = pygame.transform.scale(sprite, (32, 32))
         self.rect = self.image.get_rect()
@@ -201,7 +201,7 @@ class Kaiki(pygame.sprite.Sprite):
         self.y = y * TILESIZE
         self.width = TILESIZE
         self.height = TILESIZE
-        self.spritesheet = Spritesheet("img/kaiki_s.png")
+        self.spritesheet = Spritesheet(resource_path("img/kaiki_s.png"))
         self.image = self.spritesheet.get_sprite(1, 1, self.width, self.height, [])
         self.image.set_colorkey((184, 200, 168))
         self.rect = self.image.get_rect()
@@ -218,7 +218,7 @@ class Ouriço(pygame.sprite.Sprite):
         self.y = y * TILESIZE
         self.width = TILESIZE
         self.height = TILESIZE
-        self.spritesheet = Spritesheet("img/carlos_s.png")
+        self.spritesheet = Spritesheet(resource_path("img/carlos_s.png"))
         self.image = self.spritesheet.get_sprite(1, 1, self.width, self.height, [])
         self.image.set_colorkey((0, 176, 0))
         self.rect = self.image.get_rect()
@@ -235,7 +235,7 @@ class Porco(pygame.sprite.Sprite):
         self.y = y * TILESIZE
         self.width = TILESIZE
         self.height = TILESIZE
-        self.spritesheet = Spritesheet("img/jr_s.png")
+        self.spritesheet = Spritesheet(resource_path("img/jr_s.png"))
         self.image = self.spritesheet.get_sprite(1, 1, self.width, self.height, [])
         self.image.set_colorkey((0, 176, 120))
         self.rect = self.image.get_rect()
@@ -252,7 +252,7 @@ class Elefante(pygame.sprite.Sprite):
         self.y = y * TILESIZE
         self.width = TILESIZE
         self.height = TILESIZE
-        self.spritesheet = Spritesheet("img/elefante_s.png")
+        self.spritesheet = Spritesheet(resource_path("img/elefante_s.png"))
         sprite = self.spritesheet.get_sprite(0, 0, 64, 64, [(0, 176, 0)])  # ajuste a cor do fundo conforme necessário
         self.image = pygame.transform.scale(sprite, (32, 32))
         self.rect = self.image.get_rect()
@@ -269,7 +269,7 @@ class Cavalo(pygame.sprite.Sprite):
         self.y = y * TILESIZE
         self.width = TILESIZE
         self.height = TILESIZE
-        self.spritesheet = Spritesheet("img/cavalo_s.png")
+        self.spritesheet = Spritesheet(resource_path("img/cavalo_s.png"))
         sprite = self.spritesheet.get_sprite(0, 0, 64, 64, [(0, 184, 0)])  # ajuste a cor do fundo conforme necessário
         self.image = pygame.transform.scale(sprite, (32, 32))
         self.rect = self.image.get_rect()
@@ -288,7 +288,7 @@ class NPC9(pygame.sprite.Sprite):
         self.width = TILESIZE
         self.height = TILESIZE
         # carrega a spritesheet do npc
-        self.spritesheet = Spritesheet("img/kaua_s.png")
+        self.spritesheet = Spritesheet(resource_path("img/kaua_s.png"))
         self.image = self.spritesheet.get_sprite(1, 1, self.width, self.height, [])
         self.image.set_colorkey((0, 184, 0))
         self.rect = self.image.get_rect()
@@ -305,7 +305,7 @@ class AgCdt(pygame.sprite.Sprite):
         self.y = y * TILESIZE
         self.width = TILESIZE
         self.height = TILESIZE
-        self.spritesheet = Spritesheet("img/ag_cdt.png")
+        self.spritesheet = Spritesheet(resource_path("img/ag_cdt.png"))
         self.image = self.spritesheet.get_sprite(0, 0, 96, 64, [(0,184,0)])
         self.rect = self.image.get_rect()
         self.rect.x = self.x
@@ -321,7 +321,7 @@ class GaCdt(pygame.sprite.Sprite):
         self.y = y * TILESIZE
         self.width = TILESIZE
         self.height = TILESIZE
-        self.spritesheet = Spritesheet("img/ga_cdt.png")
+        self.spritesheet = Spritesheet(resource_path("img/ga_cdt.png"))
         self.image = self.spritesheet.get_sprite(0, 0, 96, 64, [(0,184,0)])
         self.rect = self.image.get_rect()
         self.rect.x = self.x
@@ -337,7 +337,7 @@ class GsCdt(pygame.sprite.Sprite):
         self.y = y * TILESIZE
         self.width = TILESIZE
         self.height = TILESIZE
-        self.spritesheet = Spritesheet("img/gs_cdt.png")
+        self.spritesheet = Spritesheet(resource_path("img/gs_cdt.png"))
         self.image = self.spritesheet.get_sprite(0, 0, 96, 64, [(0,184,0)])
         self.rect = self.image.get_rect()
         self.rect.x = self.x
@@ -353,7 +353,7 @@ class JbCdt(pygame.sprite.Sprite):
         self.y = y * TILESIZE
         self.width = TILESIZE
         self.height = TILESIZE
-        self.spritesheet = Spritesheet("img/jb_cdt.png")
+        self.spritesheet = Spritesheet(resource_path("img/jb_cdt.png"))
         self.image = self.spritesheet.get_sprite(0, 0, 96, 64, [(0,184,0)])
         self.rect = self.image.get_rect()
         self.rect.x = self.x
@@ -369,7 +369,7 @@ class PbCdt(pygame.sprite.Sprite):
         self.y = y * TILESIZE
         self.width = TILESIZE
         self.height = TILESIZE
-        self.spritesheet = Spritesheet("img/pb_cdt.png")
+        self.spritesheet = Spritesheet(resource_path("img/pb_cdt.png"))
         self.image = self.spritesheet.get_sprite(0, 0, 96, 64, [(0,184,0)])
         self.rect = self.image.get_rect()
         self.rect.x = self.x
