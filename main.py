@@ -196,12 +196,12 @@ class Game:
             mixer.music.stop()
             mixer.music.load(resource_path("sounds/limpattack_tune_vitoria.mp3"))
             mixer.music.set_volume(1)
-            mixer.music.play(-1)
+            mixer.music.play()
         elif resultado == "derrota":
             mixer.music.stop()
             mixer.music.load(resource_path("sounds/limpattack_tune_derrota.mp3"))
             mixer.music.set_volume(1)
-            mixer.music.play(-1)
+            mixer.music.play()
             self.game_over_flag = True
         if isinstance(resultado, int):
             self.fox_hp = resultado
@@ -220,6 +220,7 @@ class Game:
                 self.game_over_flag = True
         elif resultado == "derrota":
             self.game_over_flag = True
+            self.playing = False
         self.in_battle = False
         self.battle_started = False
 
@@ -238,7 +239,7 @@ class Game:
     def verificar_portal(self):
         if len(self.enemy) > 0:
             if not self.inimigos_aviso_exibido:
-                print("Ainda há inimigos no mapa! Derrote-os antes de sair.")
+                self.draw_temporary_message("Derrote os inimigos para avançar!")
                 self.inimigos_aviso_exibido = True
             return False
         self.inimigos_aviso_exibido = False
@@ -534,11 +535,11 @@ class Game:
         self._render_final_screen()
         self.clock.tick(FPS)
 
-    def main(self):
-        while self.playing:
-            self.events()
-            self.update()
-            self.draw()
+    # def main(self):
+    #     while self.playing:
+    #         self.events()
+    #         self.update()
+    #         self.draw()
 
     def game_over(self):
         font = pygame.font.SysFont("Arial", 80)
@@ -804,11 +805,14 @@ g.intro_screen()
 
 if g.running:
     g.new()
-    g.main()
-    while g.running:
+
+while g.running:
+    if g.playing:
+        g.events()
+        g.update()
+        g.draw()
+    else:
         g.game_over()
-        if g.playing:
-            g.main()
 
 pygame.quit()
 sys.exit()

@@ -108,7 +108,7 @@ class Player(pygame.sprite.Sprite):
             dx = abs(self.rect.centerx - enemy.rect.centerx) // TILESIZE
             dy = abs(self.rect.centery - enemy.rect.centery) // TILESIZE
             if dx <= 1 and dy <= 1:
-                print("⚔️ Iniciando batalha por proximidade!")
+                print("Iniciando batalha por proximidade!")
                 self.game.in_battle = True
                 self.game.battle_enemy = enemy
                 self.game.handle_battle()

@@ -349,7 +349,7 @@ def battle_screen(game, player_hp, player_max_hp, enemy, enemy_img, player_img, 
             if resultado_ataque == "desviou":
                 message = f"E {enemy.nome}...\nDesviou do ataque!"
             else:
-                if dano >= enemy.hp + dano:
+                if dano >= enemy.hp:
                     eficiencia_msg = "Dano crítico! Muito bem!"
                 elif dano >= 0.6 * enemy.max_hp:
                     eficiencia_msg = "O ataque foi MUITO EFICIENTE!"

@@ -81,36 +81,36 @@ def create_tiled_map(game, mapa_atual_index, mapas_visitados, fases, enemies, it
             if column == "H":
                 House(game, j, i)
             if column == "C":
-                CercaTop1(game, j, i)
+                Cerca(game, j, i, 1066, 1126)
             if column == "h":
-                CercaTop2(game, j, i)
+                Cerca(game, j, i, 1098, 1126)
             if column == "9":
-                CercaTop2(game, j, i)
+                Cerca(game, j, i, 1098, 1126)
                 Ground2(game, j, i)
             if column == "F":
-                CercaTop3(game, j, i)
+                Cerca(game, j, i, 1130, 1126)
             if column == "c":
-                CercaTopMid1(game, j, i)
+                Cerca(game, j, i, 1066, 1158)
             if column == "Y":
-                CercaTopMid2(game, j, i)
+                Cerca(game, j, i, 1098, 1158)
             if column == "f":
-                CercaTopMid3(game, j, i)
+                Cerca(game, j, i, 1130, 1158)
             if column == "j":
-                CercaMid1(game, j, i)
+                Cerca(game, j, i, 1066, 1190)
             if column == "i":
-                CercaMid2(game, j, i)
+                Cerca(game, j, i, 1130, 1190)
             if column == "J":
-                CercaBotMid1(game, j, i)
+                Cerca(game, j, i, 1066, 1222)
             if column == "D":
-                CercaBotMid2(game, j, i)
+                Cerca(game, j, i, 1098, 1222)
             if column == "I":
-                CercaBotMid3(game, j, i)
+                Cerca(game, j, i, 1130, 1222)
             if column == "L":
-                CercaBot1(game, j, i)
+                Cerca(game, j, i, 1066, 1254)
             if column == "l":
-                CercaBot2(game, j, i)
+                Cerca(game, j, i, 1098, 1254)
             if column == "K":
-                CercaBot3(game, j, i)
+                Cerca(game, j, i, 1130, 1254)
             if column == "o":
                 BigTree(game, j, i)
             if column == "a":
@@ -180,233 +180,252 @@ class House(pygame.sprite.Sprite):
         self.rect.x = self.x
         self.rect.y = self.y
 
-# classes para criar as cercas superiores do mapa
-class CercaTop1(pygame.sprite.Sprite):
-    def __init__(self, game, x, y):
+class Cerca(pygame.sprite.Sprite):
+    def __init__(self, game, x, y, sprite_sheet_x, sprite_sheet_y):
         self.game = game
         self._layer = BLOCK_LAYER
         self.groups = self.game.all_sprites, self.game.blocks
         pygame.sprite.Sprite.__init__(self, self.groups)
+
         self.x = x * TILESIZE
         self.y = y * TILESIZE
         self.width = TILESIZE
         self.height = TILESIZE
+        
         bg_colors = [CHARACTER_BG, ENEYMY_BG, TERRAIN_BG]
-        self.image = self.game.terrain_spritesheet.get_sprite(1066, 1126, self.width, self.height, bg_colors)
+        # Usa os argumentos para pegar o sprite correto
+        self.image = self.game.terrain_spritesheet.get_sprite(sprite_sheet_x, sprite_sheet_y, self.width, self.height, bg_colors)
+        
         self.rect = self.image.get_rect()
         self.rect.x = self.x
         self.rect.y = self.y
 
-class CercaTop2(pygame.sprite.Sprite):
-    def __init__(self, game, x, y):
-        self.game = game
-        self._layer = BLOCK_LAYER
-        self.groups = self.game.all_sprites, self.game.blocks
-        pygame.sprite.Sprite.__init__(self, self.groups)
-        self.x = x * TILESIZE
-        self.y = y * TILESIZE
-        self.width = TILESIZE
-        self.height = TILESIZE
-        bg_colors = [CHARACTER_BG, ENEYMY_BG, TERRAIN_BG]
-        self.image = self.game.terrain_spritesheet.get_sprite(1066+(TILESIZE*1), 1126, self.width, self.height, bg_colors)
-        self.rect = self.image.get_rect()
-        self.rect.x = self.x
-        self.rect.y = self.y
+# class CercaTop1(pygame.sprite.Sprite):
+#     def __init__(self, game, x, y):
+#         self.game = game
+#         self._layer = BLOCK_LAYER
+#         self.groups = self.game.all_sprites, self.game.blocks
+#         pygame.sprite.Sprite.__init__(self, self.groups)
+#         self.x = x * TILESIZE
+#         self.y = y * TILESIZE
+#         self.width = TILESIZE
+#         self.height = TILESIZE
+#         bg_colors = [CHARACTER_BG, ENEYMY_BG, TERRAIN_BG]
+#         self.image = self.game.terrain_spritesheet.get_sprite(1066, 1126, self.width, self.height, bg_colors)
+#         self.rect = self.image.get_rect()
+#         self.rect.x = self.x
+#         self.rect.y = self.y
 
-class CercaTop3(pygame.sprite.Sprite):
-    def __init__(self, game, x, y):
-        self.game = game
-        self._layer = BLOCK_LAYER
-        self.groups = self.game.all_sprites, self.game.blocks
-        pygame.sprite.Sprite.__init__(self, self.groups)
-        self.x = x * TILESIZE
-        self.y = y * TILESIZE
-        self.width = TILESIZE
-        self.height = TILESIZE
-        bg_colors = [CHARACTER_BG, ENEYMY_BG, TERRAIN_BG]
-        self.image = self.game.terrain_spritesheet.get_sprite(1066+(TILESIZE*2), 1126, self.width, self.height, bg_colors)
-        self.rect = self.image.get_rect()
-        self.rect.x = self.x
-        self.rect.y = self.y
+# class CercaTop2(pygame.sprite.Sprite):
+#     def __init__(self, game, x, y):
+#         self.game = game
+#         self._layer = BLOCK_LAYER
+#         self.groups = self.game.all_sprites, self.game.blocks
+#         pygame.sprite.Sprite.__init__(self, self.groups)
+#         self.x = x * TILESIZE
+#         self.y = y * TILESIZE
+#         self.width = TILESIZE
+#         self.height = TILESIZE
+#         bg_colors = [CHARACTER_BG, ENEYMY_BG, TERRAIN_BG]
+#         self.image = self.game.terrain_spritesheet.get_sprite(1066+(TILESIZE*1), 1126, self.width, self.height, bg_colors)
+#         self.rect = self.image.get_rect()
+#         self.rect.x = self.x
+#         self.rect.y = self.y
 
-# classes para criar as cercas do meio do mapa
-class CercaTopMid1(pygame.sprite.Sprite):
-    def __init__(self, game, x, y):
-        self.game = game
-        self._layer = BLOCK_LAYER
-        self.groups = self.game.all_sprites, self.game.blocks
-        pygame.sprite.Sprite.__init__(self, self.groups)
-        self.x = x * TILESIZE
-        self.y = y * TILESIZE
-        self.width = TILESIZE
-        self.height = TILESIZE
-        bg_colors = [CHARACTER_BG, ENEYMY_BG, TERRAIN_BG]
-        self.image = self.game.terrain_spritesheet.get_sprite(1066, 1126+(TILESIZE*1), self.width, self.height, bg_colors)
-        self.rect = self.image.get_rect()
-        self.rect.x = self.x
-        self.rect.y = self.y
+# class CercaTop3(pygame.sprite.Sprite):
+#     def __init__(self, game, x, y):
+#         self.game = game
+#         self._layer = BLOCK_LAYER
+#         self.groups = self.game.all_sprites, self.game.blocks
+#         pygame.sprite.Sprite.__init__(self, self.groups)
+#         self.x = x * TILESIZE
+#         self.y = y * TILESIZE
+#         self.width = TILESIZE
+#         self.height = TILESIZE
+#         bg_colors = [CHARACTER_BG, ENEYMY_BG, TERRAIN_BG]
+#         self.image = self.game.terrain_spritesheet.get_sprite(1066+(TILESIZE*2), 1126, self.width, self.height, bg_colors)
+#         self.rect = self.image.get_rect()
+#         self.rect.x = self.x
+#         self.rect.y = self.y
 
-class CercaTopMid2(pygame.sprite.Sprite):
-    def __init__(self, game, x, y):
-        self.game = game
-        self._layer = BLOCK_LAYER
-        self.groups = self.game.all_sprites, self.game.blocks
-        pygame.sprite.Sprite.__init__(self, self.groups)
-        self.x = x * TILESIZE
-        self.y = y * TILESIZE
-        self.width = TILESIZE
-        self.height = TILESIZE
-        bg_colors = [CHARACTER_BG, ENEYMY_BG, TERRAIN_BG]
-        self.image = self.game.terrain_spritesheet.get_sprite(1066+(TILESIZE*1), 1126+(TILESIZE*1), self.width, self.height, bg_colors)
-        self.rect = self.image.get_rect()
-        self.rect.x = self.x
-        self.rect.y = self.y
+# # classes para criar as cercas do meio do mapa
+# class CercaTopMid1(pygame.sprite.Sprite):
+#     def __init__(self, game, x, y):
+#         self.game = game
+#         self._layer = BLOCK_LAYER
+#         self.groups = self.game.all_sprites, self.game.blocks
+#         pygame.sprite.Sprite.__init__(self, self.groups)
+#         self.x = x * TILESIZE
+#         self.y = y * TILESIZE
+#         self.width = TILESIZE
+#         self.height = TILESIZE
+#         bg_colors = [CHARACTER_BG, ENEYMY_BG, TERRAIN_BG]
+#         self.image = self.game.terrain_spritesheet.get_sprite(1066, 1126+(TILESIZE*1), self.width, self.height, bg_colors)
+#         self.rect = self.image.get_rect()
+#         self.rect.x = self.x
+#         self.rect.y = self.y
 
-class CercaTopMid3(pygame.sprite.Sprite):
-    def __init__(self, game, x, y):
-        self.game = game
-        self._layer = BLOCK_LAYER
-        self.groups = self.game.all_sprites, self.game.blocks
-        pygame.sprite.Sprite.__init__(self, self.groups)
-        self.x = x * TILESIZE
-        self.y = y * TILESIZE
-        self.width = TILESIZE
-        self.height = TILESIZE
-        bg_colors = [CHARACTER_BG, ENEYMY_BG, TERRAIN_BG]
-        self.image = self.game.terrain_spritesheet.get_sprite(1066+(TILESIZE*2), 1126+(TILESIZE*1), self.width, self.height, bg_colors)
-        self.rect = self.image.get_rect()
-        self.rect.x = self.x
-        self.rect.y = self.y
+# class CercaTopMid2(pygame.sprite.Sprite):
+#     def __init__(self, game, x, y):
+#         self.game = game
+#         self._layer = BLOCK_LAYER
+#         self.groups = self.game.all_sprites, self.game.blocks
+#         pygame.sprite.Sprite.__init__(self, self.groups)
+#         self.x = x * TILESIZE
+#         self.y = y * TILESIZE
+#         self.width = TILESIZE
+#         self.height = TILESIZE
+#         bg_colors = [CHARACTER_BG, ENEYMY_BG, TERRAIN_BG]
+#         self.image = self.game.terrain_spritesheet.get_sprite(1066+(TILESIZE*1), 1126+(TILESIZE*1), self.width, self.height, bg_colors)
+#         self.rect = self.image.get_rect()
+#         self.rect.x = self.x
+#         self.rect.y = self.y
 
-# classes para criar as cercas inferiores do mapa
-class CercaMid1(pygame.sprite.Sprite):
-    def __init__(self, game, x, y):
-        self.game = game
-        self._layer = BLOCK_LAYER
-        self.groups = self.game.all_sprites, self.game.blocks
-        pygame.sprite.Sprite.__init__(self, self.groups)
-        self.x = x * TILESIZE
-        self.y = y * TILESIZE
-        self.width = TILESIZE
-        self.height = TILESIZE
-        bg_colors = [CHARACTER_BG, ENEYMY_BG, TERRAIN_BG]
-        self.image = self.game.terrain_spritesheet.get_sprite(1066, 1126+(TILESIZE*2), self.width, self.height, bg_colors)
-        self.rect = self.image.get_rect()
-        self.rect.x = self.x
-        self.rect.y = self.y
+# class CercaTopMid3(pygame.sprite.Sprite):
+#     def __init__(self, game, x, y):
+#         self.game = game
+#         self._layer = BLOCK_LAYER
+#         self.groups = self.game.all_sprites, self.game.blocks
+#         pygame.sprite.Sprite.__init__(self, self.groups)
+#         self.x = x * TILESIZE
+#         self.y = y * TILESIZE
+#         self.width = TILESIZE
+#         self.height = TILESIZE
+#         bg_colors = [CHARACTER_BG, ENEYMY_BG, TERRAIN_BG]
+#         self.image = self.game.terrain_spritesheet.get_sprite(1066+(TILESIZE*2), 1126+(TILESIZE*1), self.width, self.height, bg_colors)
+#         self.rect = self.image.get_rect()
+#         self.rect.x = self.x
+#         self.rect.y = self.y
 
-class CercaMid2(pygame.sprite.Sprite):
-    def __init__(self, game, x, y):
-        self.game = game
-        self._layer = BLOCK_LAYER
-        self.groups = self.game.all_sprites, self.game.blocks
-        pygame.sprite.Sprite.__init__(self, self.groups)
-        self.x = x * TILESIZE
-        self.y = y * TILESIZE
-        self.width = TILESIZE
-        self.height = TILESIZE
-        bg_colors = [CHARACTER_BG, ENEYMY_BG, TERRAIN_BG]
-        self.image = self.game.terrain_spritesheet.get_sprite(1066+(TILESIZE*2), 1126+(TILESIZE*2), self.width, self.height, bg_colors)
-        self.rect = self.image.get_rect()
-        self.rect.x = self.x
-        self.rect.y = self.y
+# # classes para criar as cercas inferiores do mapa
+# class CercaMid1(pygame.sprite.Sprite):
+#     def __init__(self, game, x, y):
+#         self.game = game
+#         self._layer = BLOCK_LAYER
+#         self.groups = self.game.all_sprites, self.game.blocks
+#         pygame.sprite.Sprite.__init__(self, self.groups)
+#         self.x = x * TILESIZE
+#         self.y = y * TILESIZE
+#         self.width = TILESIZE
+#         self.height = TILESIZE
+#         bg_colors = [CHARACTER_BG, ENEYMY_BG, TERRAIN_BG]
+#         self.image = self.game.terrain_spritesheet.get_sprite(1066, 1126+(TILESIZE*2), self.width, self.height, bg_colors)
+#         self.rect = self.image.get_rect()
+#         self.rect.x = self.x
+#         self.rect.y = self.y
 
-# classes para criar as cercas na parte inferior do mapa
-class CercaBotMid1(pygame.sprite.Sprite):
-    def __init__(self, game, x, y):
-        self.game = game
-        self._layer = BLOCK_LAYER
-        self.groups = self.game.all_sprites, self.game.blocks
-        pygame.sprite.Sprite.__init__(self, self.groups)
-        self.x = x * TILESIZE
-        self.y = y * TILESIZE
-        self.width = TILESIZE
-        self.height = TILESIZE
-        bg_colors = [CHARACTER_BG, ENEYMY_BG, TERRAIN_BG]
-        self.image = self.game.terrain_spritesheet.get_sprite(1066, 1126+(TILESIZE*3), self.width, self.height, bg_colors)
-        self.rect = self.image.get_rect()
-        self.rect.x = self.x
-        self.rect.y = self.y
+# class CercaMid2(pygame.sprite.Sprite):
+#     def __init__(self, game, x, y):
+#         self.game = game
+#         self._layer = BLOCK_LAYER
+#         self.groups = self.game.all_sprites, self.game.blocks
+#         pygame.sprite.Sprite.__init__(self, self.groups)
+#         self.x = x * TILESIZE
+#         self.y = y * TILESIZE
+#         self.width = TILESIZE
+#         self.height = TILESIZE
+#         bg_colors = [CHARACTER_BG, ENEYMY_BG, TERRAIN_BG]
+#         self.image = self.game.terrain_spritesheet.get_sprite(1066+(TILESIZE*2), 1126+(TILESIZE*2), self.width, self.height, bg_colors)
+#         self.rect = self.image.get_rect()
+#         self.rect.x = self.x
+#         self.rect.y = self.y
 
-class CercaBotMid2(pygame.sprite.Sprite):
-    def __init__(self, game, x, y):
-        self.game = game
-        self._layer = BLOCK_LAYER
-        self.groups = self.game.all_sprites, self.game.blocks
-        pygame.sprite.Sprite.__init__(self, self.groups)
-        self.x = x * TILESIZE
-        self.y = y * TILESIZE
-        self.width = TILESIZE
-        self.height = TILESIZE
-        bg_colors = [CHARACTER_BG, ENEYMY_BG, TERRAIN_BG]
-        self.image = self.game.terrain_spritesheet.get_sprite(1066+(TILESIZE*1), 1126+(TILESIZE*3), self.width, self.height, bg_colors)
-        self.rect = self.image.get_rect()
-        self.rect.x = self.x
-        self.rect.y = self.y
+# # classes para criar as cercas na parte inferior do mapa
+# class CercaBotMid1(pygame.sprite.Sprite):
+#     def __init__(self, game, x, y):
+#         self.game = game
+#         self._layer = BLOCK_LAYER
+#         self.groups = self.game.all_sprites, self.game.blocks
+#         pygame.sprite.Sprite.__init__(self, self.groups)
+#         self.x = x * TILESIZE
+#         self.y = y * TILESIZE
+#         self.width = TILESIZE
+#         self.height = TILESIZE
+#         bg_colors = [CHARACTER_BG, ENEYMY_BG, TERRAIN_BG]
+#         self.image = self.game.terrain_spritesheet.get_sprite(1066, 1126+(TILESIZE*3), self.width, self.height, bg_colors)
+#         self.rect = self.image.get_rect()
+#         self.rect.x = self.x
+#         self.rect.y = self.y
 
-class CercaBotMid3(pygame.sprite.Sprite):
-    def __init__(self, game, x, y):
-        self.game = game
-        self._layer = BLOCK_LAYER
-        self.groups = self.game.all_sprites, self.game.blocks
-        pygame.sprite.Sprite.__init__(self, self.groups)
-        self.x = x * TILESIZE
-        self.y = y * TILESIZE
-        self.width = TILESIZE
-        self.height = TILESIZE
-        bg_colors = [CHARACTER_BG, ENEYMY_BG, TERRAIN_BG]
-        self.image = self.game.terrain_spritesheet.get_sprite(1066+(TILESIZE*2), 1126+(TILESIZE*3), self.width, self.height, bg_colors)
-        self.rect = self.image.get_rect()
-        self.rect.x = self.x
-        self.rect.y = self.y
+# class CercaBotMid2(pygame.sprite.Sprite):
+#     def __init__(self, game, x, y):
+#         self.game = game
+#         self._layer = BLOCK_LAYER
+#         self.groups = self.game.all_sprites, self.game.blocks
+#         pygame.sprite.Sprite.__init__(self, self.groups)
+#         self.x = x * TILESIZE
+#         self.y = y * TILESIZE
+#         self.width = TILESIZE
+#         self.height = TILESIZE
+#         bg_colors = [CHARACTER_BG, ENEYMY_BG, TERRAIN_BG]
+#         self.image = self.game.terrain_spritesheet.get_sprite(1066+(TILESIZE*1), 1126+(TILESIZE*3), self.width, self.height, bg_colors)
+#         self.rect = self.image.get_rect()
+#         self.rect.x = self.x
+#         self.rect.y = self.y
 
-class CercaBot1(pygame.sprite.Sprite):
-    def __init__(self, game, x, y):
-        self.game = game
-        self._layer = BLOCK_LAYER
-        self.groups = self.game.all_sprites, self.game.blocks
-        pygame.sprite.Sprite.__init__(self, self.groups)
-        self.x = x * TILESIZE
-        self.y = y * TILESIZE
-        self.width = TILESIZE
-        self.height = TILESIZE
-        bg_colors = [CHARACTER_BG, ENEYMY_BG, TERRAIN_BG]
-        self.image = self.game.terrain_spritesheet.get_sprite(1066, 1126+(TILESIZE*4), self.width, self.height, bg_colors)
-        self.rect = self.image.get_rect()
-        self.rect.x = self.x
-        self.rect.y = self.y
+# class CercaBotMid3(pygame.sprite.Sprite):
+#     def __init__(self, game, x, y):
+#         self.game = game
+#         self._layer = BLOCK_LAYER
+#         self.groups = self.game.all_sprites, self.game.blocks
+#         pygame.sprite.Sprite.__init__(self, self.groups)
+#         self.x = x * TILESIZE
+#         self.y = y * TILESIZE
+#         self.width = TILESIZE
+#         self.height = TILESIZE
+#         bg_colors = [CHARACTER_BG, ENEYMY_BG, TERRAIN_BG]
+#         self.image = self.game.terrain_spritesheet.get_sprite(1066+(TILESIZE*2), 1126+(TILESIZE*3), self.width, self.height, bg_colors)
+#         self.rect = self.image.get_rect()
+#         self.rect.x = self.x
+#         self.rect.y = self.y
 
-class CercaBot2(pygame.sprite.Sprite):
-    def __init__(self, game, x, y):
-        self.game = game
-        self._layer = BLOCK_LAYER
-        self.groups = self.game.all_sprites, self.game.blocks
-        pygame.sprite.Sprite.__init__(self, self.groups)
-        self.x = x * TILESIZE
-        self.y = y * TILESIZE
-        self.width = TILESIZE
-        self.height = TILESIZE
-        bg_colors = [CHARACTER_BG, ENEYMY_BG, TERRAIN_BG]
-        self.image = self.game.terrain_spritesheet.get_sprite(1066+(TILESIZE*1), 1126+(TILESIZE*4), self.width, self.height, bg_colors)
-        self.rect = self.image.get_rect()
-        self.rect.x = self.x
-        self.rect.y = self.y
+# class CercaBot1(pygame.sprite.Sprite):
+#     def __init__(self, game, x, y):
+#         self.game = game
+#         self._layer = BLOCK_LAYER
+#         self.groups = self.game.all_sprites, self.game.blocks
+#         pygame.sprite.Sprite.__init__(self, self.groups)
+#         self.x = x * TILESIZE
+#         self.y = y * TILESIZE
+#         self.width = TILESIZE
+#         self.height = TILESIZE
+#         bg_colors = [CHARACTER_BG, ENEYMY_BG, TERRAIN_BG]
+#         self.image = self.game.terrain_spritesheet.get_sprite(1066, 1126+(TILESIZE*4), self.width, self.height, bg_colors)
+#         self.rect = self.image.get_rect()
+#         self.rect.x = self.x
+#         self.rect.y = self.y
 
-class CercaBot3(pygame.sprite.Sprite):
-    def __init__(self, game, x, y):
-        self.game = game
-        self._layer = BLOCK_LAYER
-        self.groups = self.game.all_sprites, self.game.blocks
-        pygame.sprite.Sprite.__init__(self, self.groups)
-        self.x = x * TILESIZE
-        self.y = y * TILESIZE
-        self.width = TILESIZE
-        self.height = TILESIZE
-        bg_colors = [CHARACTER_BG, ENEYMY_BG, TERRAIN_BG]
-        self.image = self.game.terrain_spritesheet.get_sprite(1066+(TILESIZE*2), 1126+(TILESIZE*4), self.width, self.height, bg_colors)
-        self.rect = self.image.get_rect()
-        self.rect.x = self.x
-        self.rect.y = self.y
+# class CercaBot2(pygame.sprite.Sprite):
+#     def __init__(self, game, x, y):
+#         self.game = game
+#         self._layer = BLOCK_LAYER
+#         self.groups = self.game.all_sprites, self.game.blocks
+#         pygame.sprite.Sprite.__init__(self, self.groups)
+#         self.x = x * TILESIZE
+#         self.y = y * TILESIZE
+#         self.width = TILESIZE
+#         self.height = TILESIZE
+#         bg_colors = [CHARACTER_BG, ENEYMY_BG, TERRAIN_BG]
+#         self.image = self.game.terrain_spritesheet.get_sprite(1066+(TILESIZE*1), 1126+(TILESIZE*4), self.width, self.height, bg_colors)
+#         self.rect = self.image.get_rect()
+#         self.rect.x = self.x
+#         self.rect.y = self.y
+
+# class CercaBot3(pygame.sprite.Sprite):
+#     def __init__(self, game, x, y):
+#         self.game = game
+#         self._layer = BLOCK_LAYER
+#         self.groups = self.game.all_sprites, self.game.blocks
+#         pygame.sprite.Sprite.__init__(self, self.groups)
+#         self.x = x * TILESIZE
+#         self.y = y * TILESIZE
+#         self.width = TILESIZE
+#         self.height = TILESIZE
+#         bg_colors = [CHARACTER_BG, ENEYMY_BG, TERRAIN_BG]
+#         self.image = self.game.terrain_spritesheet.get_sprite(1066+(TILESIZE*2), 1126+(TILESIZE*4), self.width, self.height, bg_colors)
+#         self.rect = self.image.get_rect()
+#         self.rect.x = self.x
+#         self.rect.y = self.y
 
 # classe para criar arvores grandes no mapa
 class BigTree(pygame.sprite.Sprite):
