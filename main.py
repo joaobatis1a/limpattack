@@ -239,7 +239,6 @@ class Game:
     def verificar_portal(self):
         if len(self.enemy) > 0:
             if not self.inimigos_aviso_exibido:
-                self.draw_temporary_message("Derrote os inimigos para avançar!")
                 self.inimigos_aviso_exibido = True
             return False
         self.inimigos_aviso_exibido = False
