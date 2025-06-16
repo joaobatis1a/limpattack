@@ -32,7 +32,7 @@ python main.py
 ---
 
 ## 🎮 sobre o jogo
-limpattack é um protótipo de jogo estilo rpg onde o jogador enfrenta inimigos em batalhas por turnos numa história linear.
+LimpAttack é um protótipo de jogo estilo rpg onde o jogador enfrenta inimigos em batalhas por turnos numa história linear.
 os monstros representam diferentes tipos de descuidados com a higiene, e o herói precisa usar ataques de limpeza para restaurar sua cidade da falta de higiene.
 
 ---
