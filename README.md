@@ -1,6 +1,9 @@
-# 🧼 limpattack
+# 🧼 LimpAttack
 um jogo 2d feito com python e pygame onde a missão é conscientizar crianças sobre hábitos de higiene! 🌍🦠
 projeto criado como parte dos estudos de programação e desenvolvimento de jogos com foco em educação e diversão.
+
+## 📁 instale aqui o executável do LimpAttack
+<a href="https://drive.google.com/drive/folders/1VIwRGwlTwBumcD4k3HdGsDBEggdAV0yF?usp=sharing" target="_blank"><p>clique aqui e acesse a pasta do drive com todas as instruções</p></a>
 
 ---
 
