@@ -124,20 +124,39 @@ def create_tiled_map(game, mapa_atual_index, mapas_visitados, fases, enemies, it
 # classe que representa a tenda no mapa
 class Tenda(pygame.sprite.Sprite):
     def __init__(self, game, x, y):
+        # Cria o tronco (colide)
         self.game = game
         self._layer = BLOCK_LAYER
         self.groups = self.game.all_sprites, self.game.blocks
         pygame.sprite.Sprite.__init__(self, self.groups)
         self.x = x * TILESIZE
         self.y = y * TILESIZE
-        self.width = TILESIZE
-        self.height = TILESIZE
+        # Dimensões reais do tronco
+        casad_w, casad_h = 141, 98
         bg_colors = [CHARACTER_BG, ENEYMY_BG, TERRAIN_BG]
-        # pega o sprite da tenda na spritesheet
-        self.image = self.game.terrain_spritesheet.get_sprite(2, 802, 160, 160, bg_colors)
+        self.image = self.game.terrain_spritesheet.get_sprite(11, 863, casad_w, casad_h, bg_colors)
         self.rect = self.image.get_rect()
-        self.rect.x = self.x
-        self.rect.y = self.y
+        # Centraliza o tronco no tile e alinha a base
+        self.rect.x = self.x + (TILESIZE // 2) - (casad_w // 2)
+        self.rect.y = self.y + TILESIZE - casad_h  # base do tronco alinhada ao chão do tile
+
+        self.copa = TendaCopa(game, x, y, self.rect)
+
+class TendaCopa(pygame.sprite.Sprite):
+    def __init__(self, game, x, y, casad_rect):
+        self.game = game
+        self._layer = UP_LAYER  # Fica acima do player
+        self.groups = self.game.all_sprites
+        pygame.sprite.Sprite.__init__(self, self.groups)
+        # Dimensões reais da copa
+        Tendacopa_w, Tendacopa_h = 141, 60
+        bg_colors = [CHARACTER_BG, ENEYMY_BG, TERRAIN_BG]
+        self.image = self.game.terrain_spritesheet.get_sprite(11, 802, Tendacopa_w, Tendacopa_h, bg_colors)
+        self.rect = self.image.get_rect()
+        # Centraliza a copa em relação ao tronco (ajuste fino se necessário)
+        self.rect.centerx = casad_rect.centerx  # ajuste para -4, 0, +4 conforme visualização
+        self.rect.bottom = casad_rect.top
+
 
 # classe que representa o toco no mapa
 class Toco(pygame.sprite.Sprite):

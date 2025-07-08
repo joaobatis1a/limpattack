@@ -166,19 +166,38 @@ def create_tiled_map(game, mapa_atual_index, mapas_visitados, fases, enemies, it
 # classe para criar as casas no mapa
 class House(pygame.sprite.Sprite):
     def __init__(self, game, x, y):
+        # Cria o tronco (colide)
         self.game = game
         self._layer = BLOCK_LAYER
         self.groups = self.game.all_sprites, self.game.blocks
         pygame.sprite.Sprite.__init__(self, self.groups)
         self.x = x * TILESIZE
         self.y = y * TILESIZE
-        self.width = TILESIZE
-        self.height = TILESIZE
+        # Dimensões reais do tronco
+        casab_w, casab_h = 159, 188
         bg_colors = [CHARACTER_BG, ENEYMY_BG, TERRAIN_BG]
-        self.image = self.game.terrain_spritesheet.get_sprite(518, 3178, 160, 256, bg_colors)
+        self.image = self.game.terrain_spritesheet.get_sprite(518, 3242, casab_w, casab_h, bg_colors)
         self.rect = self.image.get_rect()
-        self.rect.x = self.x
-        self.rect.y = self.y
+        # Centraliza o tronco no tile e alinha a base
+        self.rect.x = self.x + (TILESIZE // 2) - (casab_w // 2)
+        self.rect.y = self.y + TILESIZE - casab_h  # base do tronco alinhada ao chão do tile
+
+        self.copa = HouseCopa(game, x, y, self.rect)
+
+class HouseCopa(pygame.sprite.Sprite):
+    def __init__(self, game, x, y, casab_rect):
+        self.game = game
+        self._layer = UP_LAYER  # Fica acima do player
+        self.groups = self.game.all_sprites
+        pygame.sprite.Sprite.__init__(self, self.groups)
+        # Dimensões reais da copa
+        casacopa_w, casacopa_h = 159, 52
+        bg_colors = [CHARACTER_BG, ENEYMY_BG, TERRAIN_BG]
+        self.image = self.game.terrain_spritesheet.get_sprite(518, 3189, casacopa_w, casacopa_h, bg_colors)
+        self.rect = self.image.get_rect()
+        # Centraliza a copa em relação ao tronco (ajuste fino se necessário)
+        self.rect.centerx = casab_rect.centerx   # ajuste para -4, 0, +4 conforme visualização
+        self.rect.bottom = casab_rect.top
 
 class Cerca(pygame.sprite.Sprite):
     def __init__(self, game, x, y, sprite_sheet_x, sprite_sheet_y):
@@ -430,19 +449,39 @@ class Cerca(pygame.sprite.Sprite):
 # classe para criar arvores grandes no mapa
 class BigTree(pygame.sprite.Sprite):
     def __init__(self, game, x, y):
+        # Cria o tronco (colide)
         self.game = game
         self._layer = BLOCK_LAYER
         self.groups = self.game.all_sprites, self.game.blocks
         pygame.sprite.Sprite.__init__(self, self.groups)
         self.x = x * TILESIZE
         self.y = y * TILESIZE
-        self.width = TILESIZE
-        self.height = TILESIZE
+        # Dimensões reais do tronco
+        tronco_w, tronco_h = 80, 39
         bg_colors = [CHARACTER_BG, ENEYMY_BG, TERRAIN_BG]
-        self.image = self.game.terrain_spritesheet.get_sprite(1678, 1414, 1796-1678, 1574-1414, bg_colors)
+        self.image = self.game.terrain_spritesheet.get_sprite(1712, 1534, tronco_w, tronco_h, bg_colors)
         self.rect = self.image.get_rect()
-        self.rect.x = self.x
-        self.rect.y = self.y
+        # Centraliza o tronco no tile e alinha a base
+        self.rect.x = self.x + (TILESIZE // 2) - (tronco_w // 2)
+        self.rect.y = self.y + TILESIZE - tronco_h  # base do tronco alinhada ao chão do tile
+
+        # Cria a copa (não colide, camada acima do player)
+        self.copa = BigTreeCopa(game, x, y, self.rect)
+
+class BigTreeCopa(pygame.sprite.Sprite):
+    def __init__(self, game, x, y, tronco_rect):
+        self.game = game
+        self._layer = UP_LAYER  # Fica acima do player
+        self.groups = self.game.all_sprites
+        pygame.sprite.Sprite.__init__(self, self.groups)
+        # Dimensões reais da copa
+        copa_w, copa_h = 111, 119
+        bg_colors = [CHARACTER_BG, ENEYMY_BG, TERRAIN_BG]
+        self.image = self.game.terrain_spritesheet.get_sprite(1685, 1414, copa_w, copa_h, bg_colors)
+        self.rect = self.image.get_rect()
+        # Centraliza a copa em relação ao tronco (ajuste fino se necessário)
+        self.rect.centerx = tronco_rect.centerx + -12  # ajuste para -4, 0, +4 conforme visualização
+        self.rect.bottom = tronco_rect.top
 
 # classe para criar arbustos no mapa
 class Arbs(pygame.sprite.Sprite):
@@ -590,17 +629,16 @@ class NPC10(pygame.sprite.Sprite):
         self.game = game
         self.symbol = symbol
         self._layer = BLOCK_LAYER
-        self.groups = self.game.all_sprites
+        self.groups = self.game.all_sprites, self.game.blocks
         pygame.sprite.Sprite.__init__(self, self.groups)
         self.x = x * TILESIZE
         self.y = y * TILESIZE
         self.width = TILESIZE
         self.height = TILESIZE
-        # self.spritesheet = Spritesheet(resource_path("img/rosa.png"))
-        # self.image = self.spritesheet.get_sprite(1, 1, self.width, self.height, [])
-        # self.image.set_colorkey((0, 176, 120))
-        self.image = pygame.Surface((TILESIZE, TILESIZE), pygame.SRCALPHA)
-        self.image.fill((205, 55, 150))
+        # carrega a spritesheet do npc
+        self.spritesheet = Spritesheet(resource_path("img/nhoca.png"))
+        self.image = self.spritesheet.get_sprite(1, 1, 24, 24, [])
+        self.image.set_colorkey((0, 176, 0))
         self.rect = self.image.get_rect()
         self.rect.x = self.x
         self.rect.y = self.y
