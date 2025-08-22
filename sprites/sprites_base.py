@@ -205,7 +205,7 @@ class Player(pygame.sprite.Sprite):
                             # gera um sabonete no mapa
                             if not self.game.sabonete_spawned:
                                 print("DEBUG: Tentando criar sabonete...")
-                                Sabonete(self.game, 19, 2)
+                                Sabonete(self.game, 17, 2)
                                 self.game.sabonete_spawned = True
                                 print("DEBUG: Sabonete spawnado!")
                             return
