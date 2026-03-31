@@ -13,10 +13,10 @@ import random
 
 tilemap = [
     'TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTM',
-    'pN.Z......u...............E............M',
+    'pN........u...............E............M',
     't.........u.uuuuuu.uuu.uuuuuuuu.uuuuuu.M',
     'M.........u.uuuuUu.uuu.uuuuuuuu.uuuuuu.M',
-    'M.........u......u.uuu.u........uuuuuu.M',
+    'M....Z....u......u.uuu.u........uuuuuu.M',
     'M.......k.uuuuuuuu.uuu.uuuuuuuuuu......M',
     'M............E.....uuu.uuuuuuuuuu.uuuuuM',
     'Muuuuuuuuuuuuuuuuuuu...u...............M',
