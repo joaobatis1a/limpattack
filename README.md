@@ -9,7 +9,6 @@ clique [aqui](https://drive.google.com/drive/folders/1VIwRGwlTwBumcD4k3HdGsDBEgg
 
 ## 🚀 como rodar o projeto
 0. instale git e o python 3.1 ou superior
-
 1. instale o pygame com o comando:
 ```bash
 pip install pygame
@@ -18,12 +17,10 @@ pip install pygame
 ```bash
 python -m pip install pygame
 ```
-
 2. clone o repositório ou baixe os arquivos
 ```bash
 git clone https://github.com/guifigueireedo/limpattack.git
 ```
-
 3. execute o jogo com:
 ```bash
 python main.py
@@ -38,7 +35,6 @@ os monstros representam diferentes tipos de descuidados com a higiene, e o heró
 ---
 
 ## 🛠️ tecnologias usadas
-
 - 🐍 python 3
 - 🕹️ pygame
 - 🗂️ sistema de módulos (arquivos organizados por função)
@@ -61,8 +57,10 @@ os monstros representam diferentes tipos de descuidados com a higiene, e o heró
 ideias, melhorias e feedbacks são muito bem-vindos!
 sinta-se livre para abrir uma issue ou mandar um pull request. 🚀
 
+## 📧 contato
+para mais informações, entre em contato por e-mail: **profissionalba1is1a@gmail.com**
+
 ## 📜 licença
 este projeto é livre para uso acadêmico e educativo.
 cite a fonte se for reaproveitar o código.
-
-por: @guifigueireedo em todas as redes sociais
+por: @joaobatis1a em todas as redes sociais
