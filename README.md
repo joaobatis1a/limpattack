@@ -14,6 +14,8 @@ Jogo 2D inspirado em Pokémon, feito pra ensinar crianças de 6 a 10 anos sobre 
 🔗 **Landing page e trailer:** [limpattack.vercel.app](https://limpattack.vercel.app)
 📦 **Executável:** [baixar pelo Google Drive](https://drive.google.com/drive/folders/1VIwRGwlTwBumcD4k3HdGsDBEggdAV0yF?usp=sharing)
 
+![Captura de tela do LimpAttack](docs/img/preview.png)
+
 ## Sobre o jogo
 
 Protótipo estilo RPG onde o jogador enfrenta inimigos em batalhas por turnos numa história linear. Os monstros representam diferentes descuidos com a higiene, e o herói precisa usar ataques de limpeza para restaurar a cidade.
