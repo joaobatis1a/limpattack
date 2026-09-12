@@ -1,66 +1,59 @@
-# 🧼 LimpAttack
-um jogo 2d feito com python e pygame onde a missão é conscientizar crianças sobre hábitos de higiene! 🌍🦠
-projeto criado como parte dos estudos de programação e desenvolvimento de jogos com foco em educação e diversão.
+# LimpAttack
 
-## 📁 instale aqui o executável do LimpAttack
-clique [aqui](https://drive.google.com/drive/folders/1VIwRGwlTwBumcD4k3HdGsDBEggdAV0yF?usp=sharing) e acesse a pasta do drive com todas as instruções
+**Jogo educativo sobre higiene** · Python · Pygame
 
----
+[![Demo](https://img.shields.io/badge/demo-online-FBBF24?style=flat-square)](https://limpattack.vercel.app)
+[![Python](https://img.shields.io/badge/Python-3776AB?style=flat-square&logo=python&logoColor=white)](https://www.python.org)
 
-## 🚀 como rodar o projeto
-0. instale git e o python 3.1 ou superior
-1. instale o pygame com o comando:
+> **Projeto acadêmico desenvolvido em equipe (4 pessoas), 1º lugar entre 8 equipes.**
+> Minha atuação: mecânicas de jogo e produção do trailer oficial.
+> Repositório original da equipe: [guifigueireedo/limpattack](https://github.com/guifigueireedo/limpattack)
+
+Jogo 2D inspirado em Pokémon, feito pra ensinar crianças de 6 a 10 anos sobre hábitos de higiene e combate a bactérias, com sprites, mapas interativos e mecânicas de RPG.
+
+🔗 **Landing page e trailer:** [limpattack.vercel.app](https://limpattack.vercel.app)
+📦 **Executável:** [baixar pelo Google Drive](https://drive.google.com/drive/folders/1VIwRGwlTwBumcD4k3HdGsDBEggdAV0yF?usp=sharing)
+
+## Sobre o jogo
+
+Protótipo estilo RPG onde o jogador enfrenta inimigos em batalhas por turnos numa história linear. Os monstros representam diferentes descuidos com a higiene, e o herói precisa usar ataques de limpeza para restaurar a cidade.
+
+## Como rodar
+
+Pré-requisitos: Python 3.10 ou superior.
+
 ```bash
+git clone https://github.com/joaobatis1a/limpattack.git
+cd limpattack
 pip install pygame
-```
-- no terminal powershell vs code:
-```bash
-python -m pip install pygame
-```
-2. clone o repositório ou baixe os arquivos
-```bash
-git clone https://github.com/guifigueireedo/limpattack.git
-```
-3. execute o jogo com:
-```bash
 python main.py
 ```
 
----
+## Stack
 
-## 🎮 sobre o jogo
-LimpAttack é um protótipo de jogo estilo rpg onde o jogador enfrenta inimigos em batalhas por turnos numa história linear.
-os monstros representam diferentes tipos de descuidados com a higiene, e o herói precisa usar ataques de limpeza para restaurar sua cidade da falta de higiene.
+- **[Python 3](https://www.python.org/)**
+- **[Pygame](https://www.pygame.org/)**
+- Código organizado em módulos por função
 
----
+## Status do desenvolvimento
 
-## 🛠️ tecnologias usadas
-- 🐍 python 3
-- 🕹️ pygame
-- 🗂️ sistema de módulos (arquivos organizados por função)
+- ✅ Sistema de movimentação e animação
+- ✅ Mapas e estrutura das fases
+- ✅ Inimigos, HUD e batalhas
+- ✅ Efeitos visuais, sons e músicas
+- ✅ História, NPCs e diálogos
+- ✅ Menu inicial e batalha final do boss
+- 🚧 Implementação online, ainda em construção
 
----
+## Autor
 
-## 🧪 status do desenvolvimento
-- ✅ sistema básico de movimentação e animação
-- ✅ detalhes dos mapas
-- ✅ estruturas das fases
-- ✅ visual dos inimigos, HUD e batalhas
-- ✅ efeitos visuais, sons e músicas
-- ✅ desenvolvimento da história
-- ✅ npcs e diálogos
-- ✅ menu inicial funcional
-- ✅ batalha final do boss
-- ⚠️ em construção: implementação online
+**João Batista da Silva Neto**
+Desenvolvedor de Gameplay & Integração Visual
 
-## 🤝 contribuições
-ideias, melhorias e feedbacks são muito bem-vindos!
-sinta-se livre para abrir uma issue ou mandar um pull request. 🚀
+- GitHub: [@joaobatis1a](https://github.com/joaobatis1a)
+- LinkedIn: [joao-batista-silva-neto](https://linkedin.com/in/joao-batista-silva-neto)
+- E-mail: [profissionalba1is1a@gmail.com](mailto:profissionalba1is1a@gmail.com)
 
-## 📧 contato
-para mais informações, entre em contato por e-mail: **profissionalba1is1a@gmail.com**
+## Licença
 
-## 📜 licença
-este projeto é livre para uso acadêmico e educativo.
-cite a fonte se for reaproveitar o código.
-por: @joaobatis1a em todas as redes sociais
+Projeto acadêmico, livre para uso educativo. Cite a equipe original se for reaproveitar o código.
