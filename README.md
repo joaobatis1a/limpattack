@@ -49,7 +49,7 @@ python main.py
 
 ## Autor
 
-**João Batista da Silva Neto**
+**João Batista Neto**
 Desenvolvedor de Gameplay & Integração Visual
 
 - GitHub: [@joaobatis1a](https://github.com/joaobatis1a)
